@@ -13,6 +13,7 @@ import {
   ArrowLeft,
   Calendar,
   DollarSign,
+  Fuel,
   Gauge,
   MapPin,
   Plus,
@@ -46,6 +47,17 @@ interface Job {
   totalPartsCost: string;
 }
 
+interface FuelEntry {
+  id: string;
+  date: string;
+  odometer: number;
+  gallons: string;
+  totalCost?: string;
+  gasStation?: string;
+  mpg?: number;
+  costPerGallon?: number;
+}
+
 interface VehicleDetailPageProps {
   params: {
     vehicleId: string;
@@ -55,7 +67,9 @@ interface VehicleDetailPageProps {
 export default function VehicleDetailPage({ params }: VehicleDetailPageProps) {
   const [vehicle, setVehicle] = useState<Vehicle | null>(null);
   const [jobs, setJobs] = useState<Job[]>([]);
+  const [fuelEntries, setFuelEntries] = useState<FuelEntry[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isPaid, setIsPaid] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -69,13 +83,26 @@ export default function VehicleDetailPage({ params }: VehicleDetailPageProps) {
           setVehicle(vehicleData);
         }
 
-        // Fetch jobs (we'll implement this API later)
+        // Fetch jobs
         const jobsResponse = await fetch(
           `/api/vehicles/${params.vehicleId}/jobs`
         );
         if (jobsResponse.ok) {
           const jobsData = await jobsResponse.json();
           setJobs(jobsData);
+        }
+
+        // Fetch fuel entries (only for paid users)
+        const fuelResponse = await fetch(
+          `/api/vehicles/${params.vehicleId}/fuel`
+        );
+        if (fuelResponse.ok) {
+          const fuelData = await fuelResponse.json();
+          setFuelEntries(fuelData);
+          setIsPaid(true);
+        } else if (fuelResponse.status === 403) {
+          // User doesn't have paid access
+          setIsPaid(false);
         }
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -120,6 +147,16 @@ export default function VehicleDetailPage({ params }: VehicleDetailPageProps) {
     return sum + parseFloat(job.laborCost) + parseFloat(job.totalPartsCost);
   }, 0);
 
+  // Calculate average MPG from fuel entries
+  const validMpgEntries = fuelEntries.filter(
+    (entry) => entry.mpg && entry.mpg > 0
+  );
+  const averageMpg =
+    validMpgEntries.length > 0
+      ? validMpgEntries.reduce((sum, entry) => sum + (entry.mpg || 0), 0) /
+        validMpgEntries.length
+      : 0;
+
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
       {/* Header */}
@@ -138,17 +175,27 @@ export default function VehicleDetailPage({ params }: VehicleDetailPageProps) {
               {vehicle.year} {vehicle.make} {vehicle.model}
             </p>
           </div>
-          <Button asChild>
-            <Link href={`/dashboard/vehicles/${vehicle.id}/jobs/new`}>
-              <Plus className="h-4 w-4 mr-2" />
-              Add Job
-            </Link>
-          </Button>
+          <div className="flex space-x-2">
+            <Button asChild>
+              <Link href={`/dashboard/vehicles/${vehicle.id}/jobs/new`}>
+                <Plus className="h-4 w-4 mr-2" />
+                Add Job
+              </Link>
+            </Button>
+            {isPaid && (
+              <Button asChild variant="outline">
+                <Link href={`/dashboard/vehicles/${vehicle.id}/fuel/new`}>
+                  <Fuel className="h-4 w-4 mr-2" />
+                  Add Fuel
+                </Link>
+              </Button>
+            )}
+          </div>
         </div>
       </div>
 
       {/* Vehicle Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8">
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center space-x-2">
@@ -208,6 +255,46 @@ export default function VehicleDetailPage({ params }: VehicleDetailPageProps) {
             </div>
           </CardContent>
         </Card>
+
+        {isPaid ? (
+          <Card>
+            <CardContent className="pt-6">
+              <div className="flex items-center space-x-2">
+                <Fuel className="h-5 w-5 text-cyan-600" />
+                <div>
+                  <p className="text-sm font-medium text-gray-600">
+                    Average MPG
+                  </p>
+                  <p className="text-2xl font-bold">
+                    {averageMpg > 0 ? averageMpg.toFixed(1) : "--"}
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    {fuelEntries.length} fuel stops
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        ) : (
+          <Card className="border-orange-200 bg-orange-50">
+            <CardContent className="pt-6">
+              <div className="flex items-center space-x-2">
+                <Fuel className="h-5 w-5 text-orange-600" />
+                <div>
+                  <p className="text-sm font-medium text-orange-900">
+                    Fuel Tracking
+                  </p>
+                  <p className="text-sm font-bold text-orange-800">
+                    Pro Feature
+                  </p>
+                  <Button variant="outline" size="sm" className="mt-1">
+                    Upgrade
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
       </div>
 
       {/* Recent Jobs */}
@@ -238,49 +325,58 @@ export default function VehicleDetailPage({ params }: VehicleDetailPageProps) {
           ) : (
             <div className="space-y-4">
               {jobs.map((job) => (
-                <Card key={job.id} className="border-gray-200">
-                  <CardContent className="pt-4">
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <h4 className="font-medium text-lg">{job.title}</h4>
-                        <div className="flex items-center space-x-4 mt-2 text-sm text-gray-600">
-                          <span className="flex items-center space-x-1">
-                            <Calendar className="h-4 w-4" />
-                            <span>
-                              {new Date(job.date).toLocaleDateString()}
-                            </span>
-                          </span>
-                          <span className="flex items-center space-x-1">
-                            <Gauge className="h-4 w-4" />
-                            <span>{job.odometer.toLocaleString()} miles</span>
-                          </span>
-                          {job.shopName && (
+                <Card
+                  key={job.id}
+                  className="border-gray-200 hover:shadow-md transition-shadow cursor-pointer"
+                >
+                  <Link
+                    href={`/dashboard/vehicles/${vehicle.id}/jobs/${job.id}`}
+                  >
+                    <CardContent className="pt-4">
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <h4 className="font-medium text-lg hover:text-blue-600 transition-colors">
+                            {job.title}
+                          </h4>
+                          <div className="flex items-center space-x-4 mt-2 text-sm text-gray-600">
                             <span className="flex items-center space-x-1">
-                              <MapPin className="h-4 w-4" />
-                              <span>{job.shopName}</span>
+                              <Calendar className="h-4 w-4" />
+                              <span>
+                                {new Date(job.date).toLocaleDateString()}
+                              </span>
                             </span>
+                            <span className="flex items-center space-x-1">
+                              <Gauge className="h-4 w-4" />
+                              <span>{job.odometer.toLocaleString()} miles</span>
+                            </span>
+                            {job.shopName && (
+                              <span className="flex items-center space-x-1">
+                                <MapPin className="h-4 w-4" />
+                                <span>{job.shopName}</span>
+                              </span>
+                            )}
+                          </div>
+                          {job.notes && (
+                            <p className="text-sm text-gray-600 mt-2 line-clamp-2">
+                              {job.notes}
+                            </p>
                           )}
                         </div>
-                        {job.notes && (
-                          <p className="text-sm text-gray-600 mt-2">
-                            {job.notes}
-                          </p>
-                        )}
-                      </div>
-                      <div className="text-right">
-                        <div className="text-lg font-bold">
-                          $
-                          {(
-                            parseFloat(job.laborCost) +
-                            parseFloat(job.totalPartsCost)
-                          ).toFixed(2)}
-                        </div>
-                        <div className="text-sm text-gray-600">
-                          {job.totalPartsCount} parts
+                        <div className="text-right">
+                          <div className="text-lg font-bold">
+                            $
+                            {(
+                              parseFloat(job.laborCost) +
+                              parseFloat(job.totalPartsCost)
+                            ).toFixed(2)}
+                          </div>
+                          <div className="text-sm text-gray-600">
+                            {job.totalPartsCount} parts
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </CardContent>
+                    </CardContent>
+                  </Link>
                 </Card>
               ))}
             </div>
