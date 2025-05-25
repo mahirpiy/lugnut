@@ -1,36 +1,29 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+## Lugnut
 
-## Getting Started
+Lugnut is a tool for managing your vehicle maintenance records. I built it because I was tired of using Excel to manage my vehicle maintenance records and needed a new side project to play with. Money would be cool so I might monetize this in some way. If you're actually reading this on GitHub, I'll give you all the paid features for free.
 
-First, run the development server:
+### Features
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+1. Manage the maintenance records for your vehicle(s)
+2. Analyze cost and time of DIY vs shop maintenance
+3. Track fuel consumption and cost
+4. Granular tracking for jobs, allowing deeper trends around vehicle health
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Tech Stack
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- Next.js with Tailwind CSS
+- Neon (postgres) with Drizzle
+- NextAuth
+- Vercel
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Future Plans
 
-## Learn More
+1. I wanna make money so I'll probs set up a subscription model
+2. In the name of making money, might as well add some ads for Rock Auto or local shops
+3. Image and video support for records
+4. Maintenance scheduling or planning
 
-To learn more about Next.js, take a look at the following resources:
+### Long Shot Features
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. Integration with OBD2 scanners
+2. Something AI because its the future
