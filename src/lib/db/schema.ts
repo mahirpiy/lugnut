@@ -173,6 +173,26 @@ export const fuelEntries = pgTable("fuel_entries", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+export const jobPhotos = pgTable("job_photos", {
+  id: serial("id").primaryKey(),
+  uuid: uuid("uuid").defaultRandom().unique().notNull(),
+  jobId: serial("job_id")
+    .notNull()
+    .references(() => jobs.id, { onDelete: "cascade" }),
+  url: text("url").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const partPhotos = pgTable("part_photos", {
+  id: serial("id").primaryKey(),
+  uuid: uuid("uuid").defaultRandom().unique().notNull(),
+  partId: serial("part_id")
+    .notNull()
+    .references(() => parts.id, { onDelete: "cascade" }),
+  url: text("url").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 // Relations
 export const usersRelations = relations(users, ({ many }) => ({
   vehicles: many(vehicles),

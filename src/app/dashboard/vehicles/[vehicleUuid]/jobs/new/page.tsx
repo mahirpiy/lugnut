@@ -9,6 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { FileUpload } from "@/components/ui/file-upload";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
@@ -18,8 +19,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { jobSchema, type JobInput } from "@/lib/validations/job";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowLeft, Wrench } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 
@@ -40,16 +42,13 @@ interface Vehicle {
   initialOdometer: number;
 }
 
-interface NewJobPageProps {
-  params: {
-    vehicleUuid: string;
-  };
-}
+export default function NewJobPage() {
+  const { vehicleUuid } = useParams();
 
-export default function NewJobPage({ params }: NewJobPageProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [tags, setTags] = useState<Tag[]>([]);
+  const [jobPhotos, setJobPhotos] = useState<string[]>([]);
   const [vehicle, setVehicle] = useState<Vehicle | null>(null);
   const router = useRouter();
 
@@ -85,6 +84,7 @@ export default function NewJobPage({ params }: NewJobPageProps) {
           notes: "",
         },
       ],
+      jobPhotos: [],
     },
   });
 
@@ -95,9 +95,7 @@ export default function NewJobPage({ params }: NewJobPageProps) {
     const fetchData = async () => {
       try {
         // Fetch vehicle data
-        const vehicleResponse = await fetch(
-          `/api/vehicles/${params.vehicleUuid}`
-        );
+        const vehicleResponse = await fetch(`/api/vehicles/${vehicleUuid}`);
         if (vehicleResponse.ok) {
           const vehicleData = await vehicleResponse.json();
           setVehicle(vehicleData);
@@ -117,7 +115,7 @@ export default function NewJobPage({ params }: NewJobPageProps) {
     };
 
     fetchData();
-  }, [params.vehicleUuid, setValue]);
+  }, [vehicleUuid, setValue]);
 
   const onSubmit = async (data: JobInput) => {
     setIsLoading(true);
@@ -129,7 +127,7 @@ export default function NewJobPage({ params }: NewJobPageProps) {
         delete data.url;
       }
 
-      const response = await fetch(`/api/vehicles/${params.vehicleUuid}/jobs`, {
+      const response = await fetch(`/api/vehicles/${vehicleUuid}/jobs`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -144,7 +142,7 @@ export default function NewJobPage({ params }: NewJobPageProps) {
         return;
       }
 
-      router.push(`/dashboard/vehicles/${params.vehicleUuid}`);
+      router.push(`/dashboard/vehicles/${vehicleUuid}`);
     } catch (err) {
       console.error("Error creating job:", err);
       setError("Something went wrong. Please try again.");
@@ -171,7 +169,7 @@ export default function NewJobPage({ params }: NewJobPageProps) {
     <div className="max-w-4xl mx-auto px-4 py-8">
       <div className="mb-6">
         <Link
-          href={`/dashboard/vehicles/${params.vehicleUuid}`}
+          href={`/dashboard/vehicles/${vehicleUuid}`}
           className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground mb-4"
         >
           <ArrowLeft className="h-4 w-4 mr-1" />
@@ -380,6 +378,55 @@ export default function NewJobPage({ params }: NewJobPageProps) {
                 rows={3}
               />
             </div>
+            <div className="space-y-2">
+              <Label>Job Photos (Optional)</Label>
+
+              <FileUpload
+                endpoint="jobImage"
+                onUploadComplete={(files) => {
+                  const urls = files.map((f) => f.url);
+                  setJobPhotos((prev) => [...prev, ...urls]);
+                  setValue("jobPhotos", [...jobPhotos, ...urls]); // Update form data
+                }}
+                onUploadError={(error) => setError(error.message)}
+              />
+
+              {/* Show uploaded photos immediately */}
+              {jobPhotos.length > 0 && (
+                <div className="mt-4">
+                  <p className="text-sm text-muted-foreground mb-2">
+                    Uploaded Photos ({jobPhotos.length}/5)
+                  </p>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                    {jobPhotos.map((url, index) => (
+                      <div key={index} className="relative group">
+                        <Image
+                          src={url}
+                          alt={`Photo ${index + 1}`}
+                          width={200}
+                          height={96}
+                          className="w-full h-24 object-cover rounded border"
+                        />
+                        {/* Optional: Remove button */}
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const newPhotos = jobPhotos.filter(
+                              (_, i) => i !== index
+                            );
+                            setJobPhotos(newPhotos);
+                            setValue("jobPhotos", newPhotos);
+                          }}
+                          className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-5 h-5 text-xs opacity-0 group-hover:opacity-100 transition-opacity"
+                        >
+                          ×
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
           </CardContent>
         </Card>
 
@@ -405,9 +452,7 @@ export default function NewJobPage({ params }: NewJobPageProps) {
                 className="flex-1"
                 asChild
               >
-                <Link href={`/dashboard/vehicles/${params.vehicleUuid}`}>
-                  Cancel
-                </Link>
+                <Link href={`/dashboard/vehicles/${vehicleUuid}`}>Cancel</Link>
               </Button>
               <Button type="submit" className="flex-1" disabled={isLoading}>
                 {isLoading ? "Creating Job..." : "Create Job"}

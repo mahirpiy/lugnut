@@ -65,6 +65,7 @@ export const jobSchema = z
       .url("Please enter a valid URL")
       .optional()
       .or(z.literal("")),
+    jobPhotos: z.array(z.string()).optional(),
   })
   .refine(
     (data) => {
