@@ -20,7 +20,6 @@ import { jobSchema, type JobInput } from "@/lib/validations/job";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowLeft, Wrench } from "lucide-react";
 import Image from "next/image";
-import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -151,6 +150,37 @@ export default function NewJobPage() {
     }
   };
 
+  const handleFormExit = async () => {
+    if (jobPhotos.length > 0) {
+      const fileKeys = jobPhotos.map((photo) => photo);
+
+      // Delete orphaned files
+      await fetch("/api/uploadthing/delete", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ fileKeys }),
+      });
+    }
+
+    // Navigate away
+    router.push(`/dashboard/vehicles/${vehicleUuid}`);
+  };
+
+  const handleRemovePhoto = async (photo: string) => {
+    setJobPhotos(jobPhotos.filter((p) => p !== photo));
+    setValue(
+      "jobPhotos",
+      jobPhotos.filter((p) => p !== photo)
+    );
+
+    // Delete orphaned files
+    await fetch("/api/uploadthing/delete", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ fileKeys: [photo] }),
+    });
+  };
+
   if (!vehicle) {
     return (
       <div className="max-w-4xl mx-auto px-4 py-8">
@@ -168,13 +198,14 @@ export default function NewJobPage() {
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
       <div className="mb-6">
-        <Link
-          href={`/dashboard/vehicles/${vehicleUuid}`}
-          className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground mb-4"
+        <button
+          type="button"
+          onClick={handleFormExit}
+          className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground mb-4 bg-transparent border-none cursor-pointer"
         >
           <ArrowLeft className="h-4 w-4 mr-1" />
           Back to {displayName}
-        </Link>
+        </button>
         <div className="flex items-center space-x-3">
           <Wrench className="h-8 w-8 text-stone-600" />
           <div>
@@ -387,6 +418,7 @@ export default function NewJobPage() {
                   const urls = files.map((f) => f.url);
                   setJobPhotos((prev) => [...prev, ...urls]);
                   setValue("jobPhotos", [...jobPhotos, ...urls]); // Update form data
+                  console.log(urls);
                 }}
                 onUploadError={(error) => setError(error.message)}
               />
@@ -410,13 +442,7 @@ export default function NewJobPage() {
                         {/* Optional: Remove button */}
                         <button
                           type="button"
-                          onClick={() => {
-                            const newPhotos = jobPhotos.filter(
-                              (_, i) => i !== index
-                            );
-                            setJobPhotos(newPhotos);
-                            setValue("jobPhotos", newPhotos);
-                          }}
+                          onClick={() => handleRemovePhoto(url)}
                           className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-5 h-5 text-xs opacity-0 group-hover:opacity-100 transition-opacity"
                         >
                           ×
@@ -450,9 +476,9 @@ export default function NewJobPage() {
                 type="button"
                 variant="outline"
                 className="flex-1"
-                asChild
+                onClick={handleFormExit}
               >
-                <Link href={`/dashboard/vehicles/${vehicleUuid}`}>Cancel</Link>
+                Cancel
               </Button>
               <Button type="submit" className="flex-1" disabled={isLoading}>
                 {isLoading ? "Creating Job..." : "Create Job"}
