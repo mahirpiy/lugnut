@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { calculateDiyLaborSaved } from "@/utils/cost";
 import {
   ArrowLeft,
   DollarSign,
@@ -254,7 +255,7 @@ export default function JobDetailPage() {
                   {job.hours} Labor Hours Saved by DIYing
                 </span>
                 <span className="font-semibold">
-                  ${((job.hours / 2) * 140).toFixed(2)}
+                  ${calculateDiyLaborSaved(job.hours).toFixed(2)}
                 </span>
               </div>
             )}
@@ -306,13 +307,15 @@ export default function JobDetailPage() {
                 {record.parts.map((part) => (
                   <div
                     key={part.uuid}
-                    className="flex items-center justify-between p-4 bg-muted rounded-lg"
+                    className="flex items-center justify-between p-4 bg-muted-foreground rounded-lg"
                   >
                     <div className="flex items-center space-x-3">
-                      <Package className="h-5 w-5 text-muted-foreground" />
+                      <Package className="h-5 w-5 text-background" />
                       <div>
-                        <p className="font-medium">{part.name}</p>
-                        <div className="flex items-center space-x-4 text-sm text-muted-foreground">
+                        <p className="font-medium text-background">
+                          {part.name}
+                        </p>
+                        <div className="flex items-center space-x-4 text-sm text-background">
                           {part.partNumber && (
                             <span>PN: {part.partNumber}</span>
                           )}
@@ -324,11 +327,11 @@ export default function JobDetailPage() {
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="font-semibold">
+                      <p className="font-semibold text-background">
                         ${parseFloat(part.cost).toFixed(2)}
                       </p>
                       {part.quantity > 1 && (
-                        <p className="text-sm text-muted-foreground">
+                        <p className="text-sm text-background">
                           ${(parseFloat(part.cost) / part.quantity).toFixed(2)}{" "}
                           each
                         </p>

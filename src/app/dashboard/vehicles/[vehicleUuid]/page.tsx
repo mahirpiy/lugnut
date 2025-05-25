@@ -8,6 +8,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { calculateDiyLaborSaved } from "@/utils/cost";
 import {
   ArrowLeft,
   Calendar,
@@ -46,6 +47,7 @@ interface Job {
   notes?: string;
   totalPartsCount: number;
   totalPartsCost: string;
+  hours: number;
 }
 
 interface FuelEntry {
@@ -222,14 +224,14 @@ export default function VehicleDetailPage() {
                 <p className="text-2xl font-bold">{jobs.length}</p>
                 {jobs.length > 0 && (
                   <p className="text-xs text-muted-foreground">
-                    {`${Math.round(
-                      (jobs.reduce(
-                        (sum, job) => (job.isDiy ? sum + 1 : sum),
-                        0
-                      ) /
-                        jobs.length) *
-                        100
-                    )}% DIY`}
+                    {`$${calculateDiyLaborSaved(
+                      jobs.reduce((sum, job) => {
+                        if (job.isDiy && job.hours && job.hours > 0) {
+                          return sum + job.hours;
+                        }
+                        return sum;
+                      }, 0)
+                    )} saved by DIYing`}
                   </p>
                 )}
               </div>
