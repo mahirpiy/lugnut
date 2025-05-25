@@ -218,7 +218,7 @@ export default function JobDetailPage({ params }: JobDetailPageProps) {
                   <p className="text-sm font-medium text-muted-foreground">
                     DIY Difficulty
                   </p>
-                  <p className="font-semibold">{job.difficulty}/5</p>
+                  <p className="font-semibold">{job.difficulty}/10</p>
                 </div>
               </div>
             )}

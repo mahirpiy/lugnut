@@ -84,9 +84,9 @@ export default function HomePage() {
                 </CardHeader>
                 <CardContent>
                   <CardDescription>
-                    Organize maintenance by jobs (like &quot;tune-up&quot; or
-                    &quot;brake service&quot;) with multiple component records
-                    per job.
+                    Group related work into jobs and then break down every
+                    detail - from oil changes to spark plugs - within each
+                    service record.
                   </CardDescription>
                 </CardContent>
               </Card>
@@ -111,8 +111,8 @@ export default function HomePage() {
                 </CardHeader>
                 <CardContent>
                   <CardDescription>
-                    Your maintenance records belong to you. Simple, secure, and
-                    always accessible when you need them.
+                    Your maintenance records belong to you. Simple, secure,
+                    always exportable.
                   </CardDescription>
                 </CardContent>
               </Card>

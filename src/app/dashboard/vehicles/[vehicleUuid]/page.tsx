@@ -173,9 +173,14 @@ export default function VehicleDetailPage({ params }: VehicleDetailPageProps) {
             <h1 className="text-3xl font-bold text-foreground">
               {displayName}
             </h1>
-            <p className="text-muted-foreground mt-1">
-              {vehicle.year} {vehicle.make} {vehicle.model}
-            </p>
+            {vehicle.nickname && (
+              <p className="text-muted-foreground mt-1">
+                {vehicle.year} {vehicle.make} {vehicle.model}
+              </p>
+            )}
+            {vehicle.vin && (
+              <p className="text-muted-foreground mt-1">{vehicle.vin}</p>
+            )}
           </div>
           <div className="flex space-x-2">
             <Button asChild>

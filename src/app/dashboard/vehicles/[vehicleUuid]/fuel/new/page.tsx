@@ -44,7 +44,7 @@ const fuelEntrySchema = z.object({
 type FuelEntryInput = z.infer<typeof fuelEntrySchema>;
 
 interface Vehicle {
-  id: string;
+  uuid: string;
   make: string;
   model: string;
   year: number;
@@ -55,7 +55,7 @@ interface Vehicle {
 
 interface NewFuelEntryPageProps {
   params: {
-    vehicleId: string;
+    vehicleUuid: string;
   };
 }
 
@@ -89,7 +89,7 @@ export default function NewFuelEntryPage({ params }: NewFuelEntryPageProps) {
   useEffect(() => {
     const fetchVehicle = async () => {
       try {
-        const response = await fetch(`/api/vehicles/${params.vehicleId}`);
+        const response = await fetch(`/api/vehicles/${params.vehicleUuid}`);
         if (response.ok) {
           const vehicleData = await response.json();
           setVehicle(vehicleData);
@@ -102,14 +102,14 @@ export default function NewFuelEntryPage({ params }: NewFuelEntryPageProps) {
     };
 
     fetchVehicle();
-  }, [params.vehicleId, setValue]);
+  }, [params.vehicleUuid, setValue]);
 
   const onSubmit = async (data: FuelEntryInput) => {
     setIsLoading(true);
     setError("");
 
     try {
-      const response = await fetch(`/api/vehicles/${params.vehicleId}/fuel`, {
+      const response = await fetch(`/api/vehicles/${params.vehicleUuid}/fuel`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -124,7 +124,7 @@ export default function NewFuelEntryPage({ params }: NewFuelEntryPageProps) {
         return;
       }
 
-      router.push(`/dashboard/vehicles/${params.vehicleId}`);
+      router.push(`/dashboard/vehicles/${params.vehicleUuid}`);
     } catch (err) {
       console.error(err);
       setError("Something went wrong. Please try again.");
@@ -137,8 +137,8 @@ export default function NewFuelEntryPage({ params }: NewFuelEntryPageProps) {
     return (
       <div className="max-w-2xl mx-auto px-4 py-8">
         <div className="animate-pulse space-y-4">
-          <div className="h-8 bg-gray-200 rounded w-1/4"></div>
-          <div className="h-64 bg-gray-200 rounded"></div>
+          <div className="h-8 bg-muted rounded w-1/4"></div>
+          <div className="h-64 bg-muted rounded"></div>
         </div>
       </div>
     );
@@ -151,8 +151,8 @@ export default function NewFuelEntryPage({ params }: NewFuelEntryPageProps) {
     <div className="max-w-2xl mx-auto px-4 py-8">
       <div className="mb-6">
         <Link
-          href={`/dashboard/vehicles/${params.vehicleId}`}
-          className="inline-flex items-center text-sm text-gray-600 hover:text-gray-900 mb-4"
+          href={`/dashboard/vehicles/${params.vehicleUuid}`}
+          className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground mb-4"
         >
           <ArrowLeft className="h-4 w-4 mr-1" />
           Back to {displayName}
@@ -160,8 +160,10 @@ export default function NewFuelEntryPage({ params }: NewFuelEntryPageProps) {
         <div className="flex items-center space-x-3">
           <Fuel className="h-8 w-8 text-stone-600" />
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Add Fuel Entry</h1>
-            <p className="text-gray-600">
+            <h1 className="text-2xl font-bold text-foreground">
+              Add Fuel Entry
+            </h1>
+            <p className="text-muted-foreground">
               Record a fuel stop for {displayName}
             </p>
           </div>
@@ -205,7 +207,7 @@ export default function NewFuelEntryPage({ params }: NewFuelEntryPageProps) {
                   {...register("odometer", { valueAsNumber: true })}
                   min={vehicle.initialOdometer}
                 />
-                <p className="text-xs text-gray-500">
+                <p className="text-xs text-muted-foreground">
                   Current: {vehicle.currentOdometer.toLocaleString()} miles
                 </p>
                 {errors.odometer && (
@@ -242,7 +244,7 @@ export default function NewFuelEntryPage({ params }: NewFuelEntryPageProps) {
                   placeholder="45.67"
                 />
                 {costPerGallon > 0 && (
-                  <p className="text-xs text-gray-500">
+                  <p className="text-xs text-muted-foreground">
                     ${costPerGallon.toFixed(3)} per gallon
                   </p>
                 )}
@@ -285,7 +287,9 @@ export default function NewFuelEntryPage({ params }: NewFuelEntryPageProps) {
 
         <div className="mt-6 flex space-x-4">
           <Button type="button" variant="outline" className="flex-1" asChild>
-            <Link href={`/dashboard/vehicles/${params.vehicleId}`}>Cancel</Link>
+            <Link href={`/dashboard/vehicles/${params.vehicleUuid}`}>
+              Cancel
+            </Link>
           </Button>
           <Button type="submit" className="flex-1" disabled={isLoading}>
             {isLoading ? "Adding Entry..." : "Add Fuel Entry"}
