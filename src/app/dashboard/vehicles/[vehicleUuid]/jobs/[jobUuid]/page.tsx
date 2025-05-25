@@ -6,10 +6,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import {
   ArrowLeft,
-  Calendar,
   DollarSign,
   Gauge,
   Package,
+  ScrollText,
   Wrench,
 } from "lucide-react";
 import Link from "next/link";
@@ -22,6 +22,7 @@ interface Part {
   manufacturer?: string;
   cost: string;
   quantity: number;
+  url?: string;
 }
 
 interface Tag {
@@ -53,6 +54,7 @@ interface Job {
   totalCost: number;
   url?: string;
   difficulty: number;
+  hours?: number;
 }
 
 interface Vehicle {
@@ -142,17 +144,17 @@ export default function JobDetailPage({ params }: JobDetailPageProps) {
       <div className="mb-6">
         <Link
           href={`/dashboard/vehicles/${params.vehicleUuid}`}
-          className="inline-flex items-center text-sm text-gray-600 hover:text-gray-900 mb-4"
+          className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground mb-4"
         >
           <ArrowLeft className="h-4 w-4 mr-1" />
           Back to {displayName}
         </Link>
         <div className="flex items-center space-x-3">
-          <Wrench className="h-8 w-8 text-stone-600" />
+          <Wrench className="h-8 w-8 text-muted-foreground" />
           <div>
             <h1 className="text-2xl font-bold text-foreground">{job.title}</h1>
             <p className="text-muted-foreground">
-              Maintenance job for {displayName}
+              {new Date(job.date).toLocaleDateString()}
             </p>
           </div>
         </div>
@@ -162,26 +164,18 @@ export default function JobDetailPage({ params }: JobDetailPageProps) {
       <Card className="mb-8">
         <CardHeader>
           <CardTitle className="flex items-center space-x-2">
-            <Calendar className="h-5 w-5" />
+            <ScrollText className="h-5 w-5" />
             <span>Job Summary</span>
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <div className="flex items-center space-x-3">
-              <Calendar className="h-8 w-8 text-stone-500 bg-stone-100 rounded-lg p-2" />
-              <div>
-                <p className="text-sm font-medium text-gray-600">Date</p>
-                <p className="font-semibold">
-                  {new Date(job.date).toLocaleDateString()}
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-center space-x-3">
               <Gauge className="h-8 w-8 text-green-500 bg-green-100 rounded-lg p-2" />
               <div>
-                <p className="text-sm font-medium text-gray-600">Odometer</p>
+                <p className="text-sm font-medium text-muted-foreground">
+                  Odometer
+                </p>
                 <p className="font-semibold">
                   {job.odometer.toLocaleString()} miles
                 </p>
@@ -191,12 +185,16 @@ export default function JobDetailPage({ params }: JobDetailPageProps) {
             <div className="flex items-center space-x-3">
               <Wrench className="h-8 w-8 text-purple-500 bg-purple-100 rounded-lg p-2" />
               <div>
-                <p className="text-sm font-medium text-gray-600">Work Type</p>
+                <p className="text-sm font-medium text-muted-foreground">
+                  Work Type
+                </p>
                 <p className="font-semibold">
                   {job.isDiy ? "DIY" : job.shopName || "Shop Work"}
                 </p>
                 {!job.isDiy && job.shopName && (
-                  <p className="text-xs text-gray-500">{job.shopName}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {job.shopName}
+                  </p>
                 )}
               </div>
             </div>
@@ -204,18 +202,32 @@ export default function JobDetailPage({ params }: JobDetailPageProps) {
             <div className="flex items-center space-x-3">
               <DollarSign className="h-8 w-8 text-orange-500 bg-orange-100 rounded-lg p-2" />
               <div>
-                <p className="text-sm font-medium text-gray-600">Total Cost</p>
+                <p className="text-sm font-medium text-muted-foreground">
+                  Total Cost
+                </p>
                 <p className="font-semibold text-lg">
                   ${job.totalCost.toFixed(2)}
                 </p>
               </div>
             </div>
+
+            {job.isDiy && (
+              <div className="flex items-center space-x-3">
+                <Wrench className="h-8 w-8 text-blue-500 bg-blue-100 rounded-lg p-2" />
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">
+                    DIY Difficulty
+                  </p>
+                  <p className="font-semibold">{job.difficulty}/5</p>
+                </div>
+              </div>
+            )}
           </div>
 
           {job.notes && (
             <div className="mt-6 pt-6 border-t">
               <h4 className="font-medium mb-2">Job Notes</h4>
-              <p className="text-gray-700">{job.notes}</p>
+              <p className="text-muted-foreground">{job.notes}</p>
             </div>
           )}
         </CardContent>
@@ -232,21 +244,31 @@ export default function JobDetailPage({ params }: JobDetailPageProps) {
         <CardContent>
           <div className="space-y-3">
             <div className="flex justify-between items-center">
-              <span className="text-gray-600">Parts Total</span>
+              <span className="text-muted-foreground">Parts Total</span>
               <span className="font-semibold">
                 ${job.totalPartsCost.toFixed(2)}
               </span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-gray-600">Labor Cost</span>
+              <span className="text-muted-foreground">Labor Cost</span>
               <span className="font-semibold">
                 ${parseFloat(job.laborCost).toFixed(2)}
               </span>
             </div>
+            {job.isDiy && job.hours && job.hours > 0 && (
+              <div className="flex justify-between items-center text-green-600">
+                <span className="text-muted-foreground">
+                  {job.hours} Labor Hours Saved by DIYing
+                </span>
+                <span className="font-semibold">
+                  ${((job.hours / 2) * 140).toFixed(2)}
+                </span>
+              </div>
+            )}
             <Separator />
             <div className="flex justify-between items-center text-lg">
               <span className="font-semibold">Total</span>
-              <span className="font-bold text-green-600">
+              <span className="font-bold text-red-600">
                 ${job.totalCost.toFixed(2)}
               </span>
             </div>
@@ -257,18 +279,18 @@ export default function JobDetailPage({ params }: JobDetailPageProps) {
       {/* Records */}
       <div className="space-y-6">
         <h2 className="text-xl font-bold">Maintenance Records</h2>
-
         {job.records.map((record) => (
-          <Card key={record.uuid} className="border-stone-200">
-            <CardHeader className="bg-stone-50">
+          <Card key={record.uuid} className="mb-8">
+            <CardHeader className="bg-muted">
               <div className="flex items-start justify-between">
                 <div>
                   <CardTitle className="text-lg">{record.title}</CardTitle>
-                  <div className="flex flex-wrap gap-2 mt-2">
+                  <div className="flex flex-wrap gap-2 mt-3">
                     {record.tags.map((tag) => (
                       <Badge
                         key={tag.uuid}
                         variant={tag.isPreset ? "default" : "secondary"}
+                        className="bg-muted border-muted-foreground"
                       >
                         {tag.name}
                       </Badge>
@@ -279,7 +301,7 @@ export default function JobDetailPage({ params }: JobDetailPageProps) {
                   <p className="font-semibold text-lg">
                     ${record.totalCost.toFixed(2)}
                   </p>
-                  <p className="text-sm text-gray-600">
+                  <p className="text-sm text-muted-foreground">
                     {record.parts.length} parts
                   </p>
                 </div>
@@ -291,13 +313,13 @@ export default function JobDetailPage({ params }: JobDetailPageProps) {
                 {record.parts.map((part) => (
                   <div
                     key={part.uuid}
-                    className="flex items-center justify-between p-4 bg-gray-50 rounded-lg"
+                    className="flex items-center justify-between p-4 bg-muted rounded-lg"
                   >
                     <div className="flex items-center space-x-3">
-                      <Package className="h-5 w-5 text-gray-400" />
+                      <Package className="h-5 w-5 text-muted-foreground" />
                       <div>
                         <p className="font-medium">{part.name}</p>
-                        <div className="flex items-center space-x-4 text-sm text-gray-600">
+                        <div className="flex items-center space-x-4 text-sm text-muted-foreground">
                           {part.partNumber && (
                             <span>PN: {part.partNumber}</span>
                           )}
@@ -313,7 +335,7 @@ export default function JobDetailPage({ params }: JobDetailPageProps) {
                         ${parseFloat(part.cost).toFixed(2)}
                       </p>
                       {part.quantity > 1 && (
-                        <p className="text-sm text-gray-600">
+                        <p className="text-sm text-muted-foreground">
                           ${(parseFloat(part.cost) / part.quantity).toFixed(2)}{" "}
                           each
                         </p>
@@ -326,7 +348,7 @@ export default function JobDetailPage({ params }: JobDetailPageProps) {
               {record.notes && (
                 <div className="mt-6 pt-4 border-t">
                   <h5 className="font-medium mb-2">Record Notes</h5>
-                  <p className="text-gray-700">{record.notes}</p>
+                  <p className="text-muted-foreground">{record.notes}</p>
                 </div>
               )}
             </CardContent>

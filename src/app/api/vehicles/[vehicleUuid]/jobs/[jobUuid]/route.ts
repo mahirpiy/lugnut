@@ -119,6 +119,8 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       records: enrichedRecords,
       totalPartsCost,
       totalCost,
+      hours: job.hours,
+      difficulty: job.difficulty,
     };
 
     return NextResponse.json(response);
