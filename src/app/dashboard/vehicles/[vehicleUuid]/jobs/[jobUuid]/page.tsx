@@ -13,6 +13,7 @@ import {
   Wrench,
 } from "lucide-react";
 import Link from "next/link";
+import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 interface Part {
@@ -65,14 +66,8 @@ interface Vehicle {
   nickname?: string;
 }
 
-interface JobDetailPageProps {
-  params: {
-    vehicleUuid: string;
-    jobUuid: string;
-  };
-}
-
-export default function JobDetailPage({ params }: JobDetailPageProps) {
+export default function JobDetailPage() {
+  const { vehicleUuid, jobUuid } = useParams();
   const [job, setJob] = useState<Job | null>(null);
   const [vehicle, setVehicle] = useState<Vehicle | null>(null);
   const [loading, setLoading] = useState(true);
@@ -81,9 +76,7 @@ export default function JobDetailPage({ params }: JobDetailPageProps) {
     const fetchData = async () => {
       try {
         // Fetch vehicle
-        const vehicleResponse = await fetch(
-          `/api/vehicles/${params.vehicleUuid}`
-        );
+        const vehicleResponse = await fetch(`/api/vehicles/${vehicleUuid}`);
         if (vehicleResponse.ok) {
           const vehicleData = await vehicleResponse.json();
           setVehicle(vehicleData);
@@ -91,7 +84,7 @@ export default function JobDetailPage({ params }: JobDetailPageProps) {
 
         // Fetch job details
         const jobResponse = await fetch(
-          `/api/vehicles/${params.vehicleUuid}/jobs/${params.jobUuid}`
+          `/api/vehicles/${vehicleUuid}/jobs/${jobUuid}`
         );
         if (jobResponse.ok) {
           const jobData = await jobResponse.json();
@@ -105,7 +98,7 @@ export default function JobDetailPage({ params }: JobDetailPageProps) {
     };
 
     fetchData();
-  }, [params.vehicleUuid, params.jobUuid]);
+  }, [vehicleUuid, jobUuid]);
 
   if (loading) {
     return (
@@ -125,7 +118,7 @@ export default function JobDetailPage({ params }: JobDetailPageProps) {
           <CardContent className="pt-6 text-center">
             <p>Job not found</p>
             <Button asChild className="mt-4">
-              <Link href={`/dashboard/vehicles/${params.vehicleUuid}`}>
+              <Link href={`/dashboard/vehicles/${vehicleUuid}`}>
                 Back to Vehicle
               </Link>
             </Button>
@@ -143,7 +136,7 @@ export default function JobDetailPage({ params }: JobDetailPageProps) {
       {/* Header */}
       <div className="mb-6">
         <Link
-          href={`/dashboard/vehicles/${params.vehicleUuid}`}
+          href={`/dashboard/vehicles/${vehicleUuid}`}
           className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground mb-4"
         >
           <ArrowLeft className="h-4 w-4 mr-1" />

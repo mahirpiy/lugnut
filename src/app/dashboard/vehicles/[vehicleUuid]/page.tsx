@@ -19,6 +19,7 @@ import {
   Wrench,
 } from "lucide-react";
 import Link from "next/link";
+import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 interface Vehicle {
@@ -58,13 +59,9 @@ interface FuelEntry {
   costPerGallon?: number;
 }
 
-interface VehicleDetailPageProps {
-  params: {
-    vehicleUuid: string;
-  };
-}
+export default function VehicleDetailPage() {
+  const { vehicleUuid } = useParams();
 
-export default function VehicleDetailPage({ params }: VehicleDetailPageProps) {
   const [vehicle, setVehicle] = useState<Vehicle | null>(null);
   const [jobs, setJobs] = useState<Job[]>([]);
   const [fuelEntries, setFuelEntries] = useState<FuelEntry[]>([]);
@@ -75,27 +72,21 @@ export default function VehicleDetailPage({ params }: VehicleDetailPageProps) {
     const fetchData = async () => {
       try {
         // Fetch vehicle
-        const vehicleResponse = await fetch(
-          `/api/vehicles/${params.vehicleUuid}`
-        );
+        const vehicleResponse = await fetch(`/api/vehicles/${vehicleUuid}`);
         if (vehicleResponse.ok) {
           const vehicleData = await vehicleResponse.json();
           setVehicle(vehicleData);
         }
 
         // Fetch jobs
-        const jobsResponse = await fetch(
-          `/api/vehicles/${params.vehicleUuid}/jobs`
-        );
+        const jobsResponse = await fetch(`/api/vehicles/${vehicleUuid}/jobs`);
         if (jobsResponse.ok) {
           const jobsData = await jobsResponse.json();
           setJobs(jobsData);
         }
 
         // Fetch fuel entries (only for paid users)
-        const fuelResponse = await fetch(
-          `/api/vehicles/${params.vehicleUuid}/fuel`
-        );
+        const fuelResponse = await fetch(`/api/vehicles/${vehicleUuid}/fuel`);
         if (fuelResponse.ok) {
           const fuelData = await fuelResponse.json();
           setFuelEntries(fuelData);
@@ -112,7 +103,7 @@ export default function VehicleDetailPage({ params }: VehicleDetailPageProps) {
     };
 
     fetchData();
-  }, [params.vehicleUuid]);
+  }, [vehicleUuid]);
 
   if (loading) {
     return (

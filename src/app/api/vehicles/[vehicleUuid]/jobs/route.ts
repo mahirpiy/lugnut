@@ -15,6 +15,8 @@ interface RouteParams {
 // GET all jobs for a vehicle
 export async function GET(request: NextRequest, { params }: RouteParams) {
   try {
+    const { vehicleUuid } = await params;
+
     const session = await getServerSession(authOptions);
 
     if (!session?.user?.id) {
@@ -27,7 +29,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       .from(vehicles)
       .where(
         and(
-          eq(vehicles.uuid, params.vehicleUuid),
+          eq(vehicles.uuid, vehicleUuid),
           eq(vehicles.userId, session.user.id)
         )
       )
@@ -98,6 +100,8 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 // POST create new job
 export async function POST(request: NextRequest, { params }: RouteParams) {
   try {
+    const { vehicleUuid } = await params;
+
     const session = await getServerSession(authOptions);
 
     if (!session?.user?.id) {
@@ -110,7 +114,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       .from(vehicles)
       .where(
         and(
-          eq(vehicles.uuid, params.vehicleUuid),
+          eq(vehicles.uuid, vehicleUuid),
           eq(vehicles.userId, session.user.id)
         )
       )

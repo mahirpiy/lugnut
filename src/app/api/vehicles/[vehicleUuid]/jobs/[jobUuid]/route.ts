@@ -21,6 +21,7 @@ interface RouteParams {
 
 export async function GET(request: NextRequest, { params }: RouteParams) {
   try {
+    const { vehicleUuid, jobUuid } = await params;
     const session = await getServerSession(authOptions);
 
     if (!session?.user?.id) {
@@ -34,8 +35,9 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       .innerJoin(vehicles, eq(jobs.vehicleId, vehicles.id))
       .where(
         and(
-          eq(jobs.uuid, params.jobUuid),
+          eq(jobs.uuid, jobUuid),
           eq(jobs.vehicleId, vehicles.id),
+          eq(vehicles.uuid, vehicleUuid),
           eq(vehicles.userId, session.user.id)
         )
       )
@@ -52,7 +54,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       .select()
       .from(records)
       .innerJoin(jobs, eq(records.jobId, jobs.id))
-      .where(eq(jobs.uuid, params.jobUuid));
+      .where(eq(jobs.uuid, jobUuid));
 
     // Get parts and tags for each record
     const enrichedRecords = await Promise.all(

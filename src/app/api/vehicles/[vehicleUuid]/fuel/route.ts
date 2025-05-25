@@ -3,7 +3,7 @@ import { db } from "@/lib/db";
 import { fuelEntries, vehicles } from "@/lib/db/schema";
 import { and, desc, eq } from "drizzle-orm";
 import { getServerSession } from "next-auth";
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { z } from "zod";
 
 const fuelEntrySchema = z.object({
@@ -35,7 +35,9 @@ interface RouteParams {
 }
 
 // GET all fuel entries for a vehicle
-export async function GET(request: NextRequest, { params }: RouteParams) {
+export async function GET(request: Request, { params }: RouteParams) {
+  const { vehicleUuid } = await params;
+
   try {
     const session = await getServerSession(authOptions);
 
@@ -57,7 +59,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       .from(vehicles)
       .where(
         and(
-          eq(vehicles.uuid, params.vehicleUuid),
+          eq(vehicles.uuid, vehicleUuid),
           eq(vehicles.userId, session.user.id)
         )
       )
@@ -113,7 +115,9 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 }
 
 // POST create new fuel entry
-export async function POST(request: NextRequest, { params }: RouteParams) {
+export async function POST(request: Request, { params }: RouteParams) {
+  const { vehicleUuid } = await params;
+
   try {
     const session = await getServerSession(authOptions);
 
@@ -135,7 +139,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       .from(vehicles)
       .where(
         and(
-          eq(vehicles.uuid, params.vehicleUuid),
+          eq(vehicles.uuid, vehicleUuid),
           eq(vehicles.userId, session.user.id)
         )
       )
