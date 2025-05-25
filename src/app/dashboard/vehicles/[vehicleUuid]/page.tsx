@@ -201,7 +201,7 @@ export default function VehicleDetailPage({ params }: VehicleDetailPageProps) {
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center space-x-2">
-              <Gauge className="h-5 w-5 text-stone-600" />
+              <Gauge className="h-5 w-5 text-blue-600" />
               <div>
                 <p className="text-sm font-medium text-muted-foreground">
                   Current Odometer

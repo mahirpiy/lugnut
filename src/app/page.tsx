@@ -37,14 +37,14 @@ export default function HomePage() {
         {/* Hero Section */}
         <section className="py-20 px-4">
           <div className="max-w-4xl mx-auto text-center">
-            <h1 className="text-5xl font-bold text-gray-900 mb-6">
-              Track Every Detail of Your
-              <span className="text-stone-600"> Vehicle Maintenance</span>
+            <h1 className="text-5xl font-bold text-foreground mb-6">
+              Track Every Detail of Your Vehicle Maintenance
             </h1>
-            <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-              Lugnut helps DIY mechanics track granular maintenance records at
-              the component level. Know exactly what you&apos;ve done, when, and
-              what&apos;s next.
+            <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
+              Whether you wrench on weekends or just want to treat your car
+              right, Lugnut helps you track every service, part, and upgrade —
+              down to the bolt. Know exactly what you&apos;ve done, when you did
+              it, and what&apos;s due next.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button size="lg" asChild>
@@ -130,7 +130,7 @@ export default function HomePage() {
               <CardHeader>
                 <CardTitle>Job: Spark Plugs & Wires</CardTitle>
                 <CardDescription>
-                  2024-03-15 • 45,230 miles • Joe&apos;s Garage
+                  2024-09-13 • 45,230 miles • Joe&apos;s Garage
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -183,7 +183,8 @@ export default function HomePage() {
             <span className="font-bold">Lugnut</span>
           </div>
           <p className="text-muted-foreground">
-            © 2025 Lugnut. Built for DIY mechanics who care about the details.
+            © 2025 Overbrook Holdings LLC. Built for DIY mechanics who care
+            about the details.
           </p>
         </div>
       </footer>

@@ -18,10 +18,11 @@ Lugnut is a tool for managing your vehicle maintenance records. I built it becau
 
 ### Future Plans
 
+1. Data export -- I hate apps that don't let me export my data
 1. I wanna make money so I'll probs set up a subscription model
-2. In the name of making money, might as well add some ads for Rock Auto or local shops
-3. Image and video support for records
-4. Maintenance scheduling or planning
+1. In the name of making money, might as well add some ads for Rock Auto or local shops
+1. Image and video support for records
+1. Maintenance scheduling or planning
 
 ### Long Shot Features
 
