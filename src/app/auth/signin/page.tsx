@@ -57,7 +57,7 @@ export default function SignInPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen flex items-center justify-center bg-background py-12 px-4 sm:px-6 lg:px-8">
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl font-bold text-center">
@@ -70,7 +70,7 @@ export default function SignInPage() {
         <form onSubmit={handleSubmit(onSubmit)}>
           <CardContent className="space-y-4">
             {error && (
-              <div className="p-3 text-sm text-red-600 bg-red-50 border border-red-200 rounded">
+              <div className="p-3 text-sm text-destructive bg-destructive/10 border border-destructive/20 rounded">
                 {error}
               </div>
             )}
@@ -83,7 +83,9 @@ export default function SignInPage() {
                 {...register("email")}
               />
               {errors.email && (
-                <p className="text-sm text-red-600">{errors.email.message}</p>
+                <p className="text-sm text-destructive">
+                  {errors.email.message}
+                </p>
               )}
             </div>
             <div className="space-y-2">
@@ -95,7 +97,7 @@ export default function SignInPage() {
                 {...register("password")}
               />
               {errors.password && (
-                <p className="text-sm text-red-600">
+                <p className="text-sm text-destructive">
                   {errors.password.message}
                 </p>
               )}
@@ -105,11 +107,11 @@ export default function SignInPage() {
             <Button type="submit" className="w-full" disabled={isLoading}>
               {isLoading ? "Signing in..." : "Sign In"}
             </Button>
-            <p className="text-sm text-center text-gray-600">
+            <p className="text-sm text-center text-muted-foreground">
               Don&apos;t have an account?{" "}
               <Link
                 href="/auth/signup"
-                className="text-blue-600 hover:underline"
+                className="text-muted-foreground hover:underline"
               >
                 Sign up
               </Link>

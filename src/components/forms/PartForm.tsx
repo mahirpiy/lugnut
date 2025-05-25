@@ -45,14 +45,20 @@ export function PartForm({
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h4 className="font-medium">Parts</h4>
-        <Button type="button" variant="outline" size="sm" onClick={addPart}>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={addPart}
+          className="bg-muted hover:bg-muted-foreground hover:text-background"
+        >
           <Plus className="h-4 w-4 mr-1" />
           Add Part
         </Button>
       </div>
 
       {fields.map((field, partIndex) => (
-        <Card key={field.id} className="border-gray-200">
+        <Card key={field.id} className="border-muted">
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <CardTitle className="text-sm">Part {partIndex + 1}</CardTitle>
@@ -73,6 +79,7 @@ export function PartForm({
               <div className="space-y-2">
                 <Label
                   htmlFor={`records.${recordIndex}.parts.${partIndex}.name`}
+                  className="text-foreground"
                 >
                   Part Name *
                 </Label>
@@ -83,7 +90,7 @@ export function PartForm({
                   placeholder="Brake pads, oil filter..."
                 />
                 {errors?.records?.[recordIndex]?.parts?.[partIndex]?.name && (
-                  <p className="text-sm text-red-600">
+                  <p className="text-sm text-destructive">
                     {errors.records[recordIndex].parts[partIndex].name.message}
                   </p>
                 )}
@@ -91,6 +98,7 @@ export function PartForm({
               <div className="space-y-2">
                 <Label
                   htmlFor={`records.${recordIndex}.parts.${partIndex}.partNumber`}
+                  className="text-foreground"
                 >
                   Part Number
                 </Label>
@@ -107,6 +115,7 @@ export function PartForm({
               <div className="space-y-2">
                 <Label
                   htmlFor={`records.${recordIndex}.parts.${partIndex}.manufacturer`}
+                  className="text-foreground"
                 >
                   Manufacturer
                 </Label>
@@ -120,6 +129,7 @@ export function PartForm({
               <div className="space-y-2">
                 <Label
                   htmlFor={`records.${recordIndex}.parts.${partIndex}.cost`}
+                  className="text-foreground"
                 >
                   Cost ($)
                 </Label>
@@ -138,6 +148,7 @@ export function PartForm({
               <div className="space-y-2">
                 <Label
                   htmlFor={`records.${recordIndex}.parts.${partIndex}.quantity`}
+                  className="text-foreground"
                 >
                   Quantity
                 </Label>

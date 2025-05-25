@@ -146,7 +146,7 @@ export default function JobDetailPage({ params }: JobDetailPageProps) {
           Back to {displayName}
         </Link>
         <div className="flex items-center space-x-3">
-          <Wrench className="h-8 w-8 text-blue-600" />
+          <Wrench className="h-8 w-8 text-stone-600" />
           <div>
             <h1 className="text-2xl font-bold text-gray-900">{job.title}</h1>
             <p className="text-gray-600">Maintenance job for {displayName}</p>
@@ -165,7 +165,7 @@ export default function JobDetailPage({ params }: JobDetailPageProps) {
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <div className="flex items-center space-x-3">
-              <Calendar className="h-8 w-8 text-blue-500 bg-blue-100 rounded-lg p-2" />
+              <Calendar className="h-8 w-8 text-stone-500 bg-stone-100 rounded-lg p-2" />
               <div>
                 <p className="text-sm font-medium text-gray-600">Date</p>
                 <p className="font-semibold">
@@ -255,8 +255,8 @@ export default function JobDetailPage({ params }: JobDetailPageProps) {
         <h2 className="text-xl font-bold">Maintenance Records</h2>
 
         {job.records.map((record) => (
-          <Card key={record.uuid} className="border-blue-200">
-            <CardHeader className="bg-blue-50">
+          <Card key={record.uuid} className="border-stone-200">
+            <CardHeader className="bg-stone-50">
               <div className="flex items-start justify-between">
                 <div>
                   <CardTitle className="text-lg">{record.title}</CardTitle>

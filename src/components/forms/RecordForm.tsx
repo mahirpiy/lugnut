@@ -81,10 +81,10 @@ export function RecordForm({
         const selectedTags = watch(`records.${recordIndex}.tagIds`) || [];
 
         return (
-          <Card key={field.id} className="border-blue-200">
-            <CardHeader className="bg-blue-50">
+          <Card key={field.id} className="border-muted">
+            <CardHeader className="bg-muted p-4">
               <div className="flex items-center justify-between">
-                <CardTitle className="text-lg">
+                <CardTitle className="text-lg font-bold">
                   Record {recordIndex + 1}
                 </CardTitle>
                 {fields.length > 1 && (
@@ -110,7 +110,7 @@ export function RecordForm({
                   placeholder="Front brake pads, oil change..."
                 />
                 {errors?.records?.[recordIndex]?.title && (
-                  <p className="text-sm text-red-600">
+                  <p className="text-sm text-destructive">
                     {errors.records[recordIndex].title.message}
                   </p>
                 )}
@@ -134,7 +134,7 @@ export function RecordForm({
                   ))}
                 </div>
                 {errors?.records?.[recordIndex]?.tagIds && (
-                  <p className="text-sm text-red-600">
+                  <p className="text-sm text-destructive">
                     {errors.records[recordIndex].tagIds.message}
                   </p>
                 )}

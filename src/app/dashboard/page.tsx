@@ -58,10 +58,10 @@ export default function DashboardPage() {
     return (
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="animate-pulse space-y-4">
-          <div className="h-8 bg-gray-200 rounded w-1/4"></div>
+          <div className="h-8 bg-muted rounded w-1/4"></div>
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="h-48 bg-gray-200 rounded"></div>
+              <div key={i} className="h-48 bg-muted rounded"></div>
             ))}
           </div>
         </div>
@@ -75,8 +75,8 @@ export default function DashboardPage() {
     <div className="max-w-7xl mx-auto px-4 py-8">
       <div className="flex justify-between items-center mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Your Vehicles</h1>
-          <p className="text-gray-600 mt-1">
+          <h1 className="text-3xl font-bold text-foreground">Your Vehicles</h1>
+          <p className="text-muted-foreground mt-1">
             Manage your vehicle maintenance records
           </p>
         </div>
@@ -93,7 +93,7 @@ export default function DashboardPage() {
       {vehicles.length === 0 ? (
         <Card className="text-center py-12">
           <CardContent>
-            <Car className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+            <Car className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
             <CardTitle className="text-xl mb-2">No vehicles yet</CardTitle>
             <CardDescription className="mb-4">
               Add your first vehicle to start tracking maintenance records

@@ -93,7 +93,7 @@ export default function NewVehiclePage() {
           Back to Dashboard
         </Link>
         <div className="flex items-center space-x-3">
-          <Car className="h-8 w-8 text-blue-600" />
+          <Car className="h-8 w-8 text-stone-600" />
           <div>
             <h1 className="text-2xl font-bold text-gray-900">
               Add New Vehicle

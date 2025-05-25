@@ -12,13 +12,13 @@ import Link from "next/link";
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+    <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="border-b bg-white/80 backdrop-blur-sm">
+      <header className="border-b backdrop-blur-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-2">
-              <Car className="h-8 w-8 text-blue-600" />
+              <Car className="h-8 w-8 text-stone-600" />
               <span className="font-bold text-xl">Lugnut</span>
             </div>
             <div className="flex space-x-2">
@@ -39,7 +39,7 @@ export default function HomePage() {
           <div className="max-w-4xl mx-auto text-center">
             <h1 className="text-5xl font-bold text-gray-900 mb-6">
               Track Every Detail of Your
-              <span className="text-blue-600"> Vehicle Maintenance</span>
+              <span className="text-stone-600"> Vehicle Maintenance</span>
             </h1>
             <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
               Lugnut helps DIY mechanics track granular maintenance records at
@@ -58,15 +58,15 @@ export default function HomePage() {
         </section>
 
         {/* Features Section */}
-        <section className="py-16 px-4 bg-white">
+        <section className="py-16 px-4 bg-background">
           <div className="max-w-6xl mx-auto">
-            <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">
+            <h2 className="text-3xl font-bold text-center text-foreground mb-12">
               Why Choose Lugnut?
             </h2>
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
               <Card>
                 <CardHeader className="text-center">
-                  <Wrench className="h-12 w-12 text-blue-600 mx-auto mb-4" />
+                  <Wrench className="h-12 w-12 mx-auto mb-4" />
                   <CardTitle>Granular Tracking</CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -79,7 +79,7 @@ export default function HomePage() {
 
               <Card>
                 <CardHeader className="text-center">
-                  <Car className="h-12 w-12 text-blue-600 mx-auto mb-4" />
+                  <Car className="h-12 w-12 mx-auto mb-4" />
                   <CardTitle>Job-Based Organization</CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -93,7 +93,7 @@ export default function HomePage() {
 
               <Card>
                 <CardHeader className="text-center">
-                  <BarChart3 className="h-12 w-12 text-blue-600 mx-auto mb-4" />
+                  <BarChart3 className="h-12 w-12 mx-auto mb-4" />
                   <CardTitle>Cost Tracking</CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -106,7 +106,7 @@ export default function HomePage() {
 
               <Card>
                 <CardHeader className="text-center">
-                  <Shield className="h-12 w-12 text-blue-600 mx-auto mb-4" />
+                  <Shield className="h-12 w-12 mx-auto mb-4" />
                   <CardTitle>Your Data</CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -121,31 +121,29 @@ export default function HomePage() {
         </section>
 
         {/* Example Section */}
-        <section className="py-16 px-4 bg-gray-50">
+        <section className="py-16 px-4 bg-background">
           <div className="max-w-4xl mx-auto">
-            <h2 className="text-3xl font-bold text-center text-gray-900 mb-8">
+            <h2 className="text-3xl font-bold text-center text-foreground mb-8">
               See How It Works
             </h2>
             <Card className="max-w-2xl mx-auto">
               <CardHeader>
-                <CardTitle className="text-blue-600">
-                  Job: Spark Plugs & Wires
-                </CardTitle>
+                <CardTitle>Job: Spark Plugs & Wires</CardTitle>
                 <CardDescription>
                   2024-03-15 • 45,230 miles • Joe&apos;s Garage
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="border-l-2 border-blue-200 pl-4">
+                <div className="border-l-2 pl-4">
                   <h4 className="font-medium">Record: Spark Plugs</h4>
-                  <ul className="text-sm text-gray-600 mt-1 space-y-1">
+                  <ul className="text-sm text-muted-foreground mt-1 space-y-1">
                     <li>• 6x NGK Iridium IX Plugs - $48.99</li>
                     <li>• Anti-seize compound - $8.99</li>
                   </ul>
                 </div>
-                <div className="border-l-2 border-blue-200 pl-4">
+                <div className="border-l-2 pl-4">
                   <h4 className="font-medium">Record: Spark Plug Wires</h4>
-                  <ul className="text-sm text-gray-600 mt-1 space-y-1">
+                  <ul className="text-sm text-muted-foreground mt-1 space-y-1">
                     <li>• NGK Wire Set - $89.99</li>
                     <li>• Dielectric grease - $6.99</li>
                   </ul>
@@ -161,12 +159,12 @@ export default function HomePage() {
         </section>
 
         {/* CTA Section */}
-        <section className="py-16 px-4 bg-blue-600 text-white">
+        <section className="py-16 px-4 bg-background text-foreground">
           <div className="max-w-4xl mx-auto text-center">
             <h2 className="text-3xl font-bold mb-4">
               Ready to Start Tracking?
             </h2>
-            <p className="text-xl mb-8 text-blue-100">
+            <p className="text-xl mb-8 text-foreground">
               Join DIY mechanics who trust Lugnut to keep detailed maintenance
               records.
             </p>
@@ -178,13 +176,13 @@ export default function HomePage() {
       </main>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-white py-8 px-4">
+      <footer className="bg-background text-foreground py-8 px-4">
         <div className="max-w-4xl mx-auto text-center">
           <div className="flex items-center justify-center space-x-2 mb-4">
             <Car className="h-6 w-6" />
             <span className="font-bold">Lugnut</span>
           </div>
-          <p className="text-gray-400">
+          <p className="text-muted-foreground">
             © 2025 Lugnut. Built for DIY mechanics who care about the details.
           </p>
         </div>

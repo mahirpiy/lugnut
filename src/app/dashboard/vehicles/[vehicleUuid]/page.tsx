@@ -118,8 +118,8 @@ export default function VehicleDetailPage({ params }: VehicleDetailPageProps) {
     return (
       <div className="max-w-6xl mx-auto px-4 py-8">
         <div className="animate-pulse space-y-4">
-          <div className="h-8 bg-gray-200 rounded w-1/4"></div>
-          <div className="h-48 bg-gray-200 rounded"></div>
+          <div className="h-8 bg-muted rounded w-1/4"></div>
+          <div className="h-48 bg-muted rounded"></div>
         </div>
       </div>
     );
@@ -163,15 +163,17 @@ export default function VehicleDetailPage({ params }: VehicleDetailPageProps) {
       <div className="mb-6">
         <Link
           href="/dashboard"
-          className="inline-flex items-center text-sm text-gray-600 hover:text-gray-900 mb-4"
+          className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground mb-4"
         >
           <ArrowLeft className="h-4 w-4 mr-1" />
           Back to Dashboard
         </Link>
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">{displayName}</h1>
-            <p className="text-gray-600 mt-1">
+            <h1 className="text-3xl font-bold text-foreground">
+              {displayName}
+            </h1>
+            <p className="text-muted-foreground mt-1">
               {vehicle.year} {vehicle.make} {vehicle.model}
             </p>
           </div>
@@ -199,15 +201,15 @@ export default function VehicleDetailPage({ params }: VehicleDetailPageProps) {
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center space-x-2">
-              <Gauge className="h-5 w-5 text-blue-600" />
+              <Gauge className="h-5 w-5 text-stone-600" />
               <div>
-                <p className="text-sm font-medium text-gray-600">
+                <p className="text-sm font-medium text-muted-foreground">
                   Current Odometer
                 </p>
                 <p className="text-2xl font-bold">
                   {vehicle.currentOdometer.toLocaleString()}
                 </p>
-                <p className="text-xs text-gray-500">miles</p>
+                <p className="text-xs text-muted-foreground">miles</p>
               </div>
             </div>
           </CardContent>
@@ -218,10 +220,12 @@ export default function VehicleDetailPage({ params }: VehicleDetailPageProps) {
             <div className="flex items-center space-x-2">
               <Wrench className="h-5 w-5 text-green-600" />
               <div>
-                <p className="text-sm font-medium text-gray-600">Total Jobs</p>
+                <p className="text-sm font-medium text-muted-foreground">
+                  Total Jobs
+                </p>
                 <p className="text-2xl font-bold">{jobs.length}</p>
                 {jobs.length > 0 && (
-                  <p className="text-xs text-gray-500">
+                  <p className="text-xs text-muted-foreground">
                     {`${Math.round(
                       (jobs.reduce(
                         (sum, job) => (job.isDiy ? sum + 1 : sum),
@@ -242,9 +246,11 @@ export default function VehicleDetailPage({ params }: VehicleDetailPageProps) {
             <div className="flex items-center space-x-2">
               <DollarSign className="h-5 w-5 text-orange-600" />
               <div>
-                <p className="text-sm font-medium text-gray-600">Total Spent</p>
+                <p className="text-sm font-medium text-muted-foreground">
+                  Total Spent
+                </p>
                 <p className="text-2xl font-bold">${totalSpent.toFixed(2)}</p>
-                <p className="text-xs text-gray-500">all maintenance</p>
+                <p className="text-xs text-muted-foreground">all maintenance</p>
               </div>
             </div>
           </CardContent>
@@ -255,13 +261,13 @@ export default function VehicleDetailPage({ params }: VehicleDetailPageProps) {
             <div className="flex items-center space-x-2">
               <Map className="h-5 w-5 text-purple-600" />
               <div>
-                <p className="text-sm font-medium text-gray-600">
+                <p className="text-sm font-medium text-muted-foreground">
                   Miles Driven
                 </p>
                 <p className="text-2xl font-bold">
                   {totalMilesDriven.toLocaleString()}
                 </p>
-                <p className="text-xs text-gray-500">since purchase</p>
+                <p className="text-xs text-muted-foreground">since purchase</p>
               </div>
             </div>
           </CardContent>
@@ -273,13 +279,13 @@ export default function VehicleDetailPage({ params }: VehicleDetailPageProps) {
               <div className="flex items-center space-x-2">
                 <Fuel className="h-5 w-5 text-cyan-600" />
                 <div>
-                  <p className="text-sm font-medium text-gray-600">
+                  <p className="text-sm font-medium text-muted-foreground">
                     Average MPG
                   </p>
                   <p className="text-2xl font-bold">
                     {averageMpg > 0 ? averageMpg.toFixed(1) : "--"}
                   </p>
-                  <p className="text-xs text-gray-500">
+                  <p className="text-xs text-muted-foreground">
                     {fuelEntries.length} fuel stops
                   </p>
                 </div>
@@ -319,11 +325,11 @@ export default function VehicleDetailPage({ params }: VehicleDetailPageProps) {
         <CardContent>
           {jobs.length === 0 ? (
             <div className="text-center py-12">
-              <Wrench className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-gray-900">
+              <Wrench className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+              <h3 className="text-lg font-medium text-foreground">
                 No maintenance jobs yet
               </h3>
-              <p className="text-gray-500 mb-4">
+              <p className="text-muted-foreground mb-4">
                 Start tracking your vehicle maintenance by adding your first job
               </p>
               <Button asChild>
@@ -338,7 +344,7 @@ export default function VehicleDetailPage({ params }: VehicleDetailPageProps) {
               {jobs.map((job) => (
                 <Card
                   key={job.uuid}
-                  className="border-gray-200 hover:shadow-md transition-shadow cursor-pointer"
+                  className="border-muted hover:shadow-md transition-shadow cursor-pointer"
                 >
                   <Link
                     href={`/dashboard/vehicles/${vehicle.uuid}/jobs/${job.uuid}`}
@@ -346,10 +352,10 @@ export default function VehicleDetailPage({ params }: VehicleDetailPageProps) {
                     <CardContent className="pt-4">
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
-                          <h4 className="font-medium text-lg hover:text-blue-600 transition-colors">
+                          <h4 className="font-medium text-lg hover:text-stone-600 transition-colors">
                             {job.title}
                           </h4>
-                          <div className="flex items-center space-x-4 mt-2 text-sm text-gray-600">
+                          <div className="flex items-center space-x-4 mt-2 text-sm text-muted-foreground">
                             <span className="flex items-center space-x-1">
                               <Calendar className="h-4 w-4" />
                               <span>
@@ -368,7 +374,7 @@ export default function VehicleDetailPage({ params }: VehicleDetailPageProps) {
                             </span>
                           </div>
                           {job.notes && (
-                            <p className="text-sm text-gray-600 mt-2 line-clamp-2">
+                            <p className="text-sm text-muted-foreground mt-2 line-clamp-2">
                               {job.notes}
                             </p>
                           )}
@@ -381,7 +387,7 @@ export default function VehicleDetailPage({ params }: VehicleDetailPageProps) {
                               parseFloat(job.totalPartsCost)
                             ).toFixed(2)}
                           </div>
-                          <div className="text-sm text-gray-600">
+                          <div className="text-sm text-muted-foreground">
                             {job.totalPartsCount} parts
                           </div>
                         </div>

@@ -158,7 +158,7 @@ export default function NewFuelEntryPage({ params }: NewFuelEntryPageProps) {
           Back to {displayName}
         </Link>
         <div className="flex items-center space-x-3">
-          <Fuel className="h-8 w-8 text-blue-600" />
+          <Fuel className="h-8 w-8 text-stone-600" />
           <div>
             <h1 className="text-2xl font-bold text-gray-900">Add Fuel Entry</h1>
             <p className="text-gray-600">

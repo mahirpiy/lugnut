@@ -150,8 +150,8 @@ export default function NewJobPage({ params }: NewJobPageProps) {
     return (
       <div className="max-w-4xl mx-auto px-4 py-8">
         <div className="animate-pulse space-y-4">
-          <div className="h-8 bg-gray-200 rounded w-1/4"></div>
-          <div className="h-64 bg-gray-200 rounded"></div>
+          <div className="h-8 bg-muted rounded w-1/4"></div>
+          <div className="h-64 bg-muted rounded"></div>
         </div>
       </div>
     );
@@ -165,16 +165,16 @@ export default function NewJobPage({ params }: NewJobPageProps) {
       <div className="mb-6">
         <Link
           href={`/dashboard/vehicles/${params.vehicleUuid}`}
-          className="inline-flex items-center text-sm text-gray-600 hover:text-gray-900 mb-4"
+          className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground mb-4"
         >
           <ArrowLeft className="h-4 w-4 mr-1" />
           Back to {displayName}
         </Link>
         <div className="flex items-center space-x-3">
-          <Wrench className="h-8 w-8 text-blue-600" />
+          <Wrench className="h-8 w-8 text-stone-600" />
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Add New Job</h1>
-            <p className="text-gray-600">
+            <h1 className="text-2xl font-bold text-foreground">Add New Job</h1>
+            <p className="text-muted-foreground">
               Record maintenance work for {displayName}
             </p>
           </div>
@@ -183,7 +183,7 @@ export default function NewJobPage({ params }: NewJobPageProps) {
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
         {error && (
-          <div className="p-3 text-sm text-red-600 bg-red-50 border border-red-200 rounded">
+          <div className="p-3 text-sm text-destructive bg-destructive/10 border border-destructive/20 rounded">
             {error}
           </div>
         )}
@@ -206,7 +206,9 @@ export default function NewJobPage({ params }: NewJobPageProps) {
                   placeholder="Brake service, oil change, tune-up..."
                 />
                 {errors.title && (
-                  <p className="text-sm text-red-600">{errors.title.message}</p>
+                  <p className="text-sm text-destructive">
+                    {errors.title.message}
+                  </p>
                 )}
               </div>
               <div className="space-y-2">
@@ -219,7 +221,9 @@ export default function NewJobPage({ params }: NewJobPageProps) {
                   })}
                 />
                 {errors.date && (
-                  <p className="text-sm text-red-600">{errors.date.message}</p>
+                  <p className="text-sm text-destructive">
+                    {errors.date.message}
+                  </p>
                 )}
               </div>
             </div>
@@ -233,12 +237,12 @@ export default function NewJobPage({ params }: NewJobPageProps) {
                   {...register("odometer", { valueAsNumber: true })}
                   min={vehicle.initialOdometer}
                 />
-                <p className="text-xs text-gray-500">
+                <p className="text-xs text-muted-foreground">
                   Current: {vehicle.currentOdometer.toLocaleString()} miles •
                   Minimum: {vehicle.initialOdometer.toLocaleString()} miles
                 </p>
                 {errors.odometer && (
-                  <p className="text-sm text-red-600">
+                  <p className="text-sm text-destructive">
                     {errors.odometer.message}
                   </p>
                 )}
@@ -260,7 +264,7 @@ export default function NewJobPage({ params }: NewJobPageProps) {
               <div className="flex items-center space-x-3">
                 <span
                   className={`text-sm ${
-                    !isDiy ? "font-semibold text-blue-600" : "text-gray-500"
+                    !isDiy ? "font-semibold text-stone-600" : "text-gray-500"
                   }`}
                 >
                   Shop
@@ -272,7 +276,7 @@ export default function NewJobPage({ params }: NewJobPageProps) {
                 />
                 <span
                   className={`text-sm ${
-                    isDiy ? "font-semibold text-blue-600" : "text-gray-500"
+                    isDiy ? "font-semibold text-stone-600" : "text-gray-500"
                   }`}
                 >
                   DIY
@@ -289,7 +293,7 @@ export default function NewJobPage({ params }: NewJobPageProps) {
                   placeholder="Enter shop or business name"
                 />
                 {errors.shopName && (
-                  <p className="text-sm text-red-600">
+                  <p className="text-sm text-destructive">
                     {errors.shopName.message}
                   </p>
                 )}
@@ -314,7 +318,7 @@ export default function NewJobPage({ params }: NewJobPageProps) {
                   </span>
                 </div>
                 {errors.difficulty && (
-                  <p className="text-sm text-red-600">
+                  <p className="text-sm text-destructive">
                     {errors.difficulty.message}
                   </p>
                 )}
