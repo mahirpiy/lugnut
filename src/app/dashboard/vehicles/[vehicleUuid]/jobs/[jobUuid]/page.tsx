@@ -51,6 +51,8 @@ interface Job {
   records: Record[];
   totalPartsCost: number;
   totalCost: number;
+  url?: string;
+  difficulty: number;
 }
 
 interface Vehicle {
@@ -107,8 +109,8 @@ export default function JobDetailPage({ params }: JobDetailPageProps) {
     return (
       <div className="max-w-4xl mx-auto px-4 py-8">
         <div className="animate-pulse space-y-4">
-          <div className="h-8 bg-gray-200 rounded w-1/4"></div>
-          <div className="h-64 bg-gray-200 rounded"></div>
+          <div className="h-8 bg-muted rounded w-1/4"></div>
+          <div className="h-64 bg-muted rounded"></div>
         </div>
       </div>
     );
@@ -148,8 +150,10 @@ export default function JobDetailPage({ params }: JobDetailPageProps) {
         <div className="flex items-center space-x-3">
           <Wrench className="h-8 w-8 text-stone-600" />
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">{job.title}</h1>
-            <p className="text-gray-600">Maintenance job for {displayName}</p>
+            <h1 className="text-2xl font-bold text-foreground">{job.title}</h1>
+            <p className="text-muted-foreground">
+              Maintenance job for {displayName}
+            </p>
           </div>
         </div>
       </div>

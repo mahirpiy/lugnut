@@ -68,7 +68,6 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
           .select({
             tagId: tags.id,
             tagName: tags.name,
-            tagIsPreset: tags.isPreset,
           })
           .from(recordTags)
           .innerJoin(tags, eq(recordTags.tagId, tags.id))
@@ -76,7 +75,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 
         // Calculate total cost for this record
         const totalCost = recordParts.reduce((sum, part) => {
-          return sum + parseFloat(part.cost || "0.00") * part.quantity;
+          return sum + parseFloat(part.cost || "0.00");
         }, 0);
 
         return {
@@ -94,7 +93,6 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
           tags: recordTagsData.map((tag) => ({
             id: tag.tagId,
             name: tag.tagName,
-            isPreset: tag.tagIsPreset,
           })),
           totalCost,
         };

@@ -2,7 +2,6 @@
 import { authOptions } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { tags } from "@/lib/db/schema";
-import { and, eq, or } from "drizzle-orm";
 import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 
@@ -15,16 +14,7 @@ export async function GET() {
     }
 
     // Get preset tags and user's custom tags
-    const userTags = await db
-      .select()
-      .from(tags)
-      .where(
-        or(
-          eq(tags.isPreset, true),
-          and(eq(tags.userId, session.user.id), eq(tags.isPreset, false))
-        )
-      )
-      .orderBy(tags.isPreset, tags.name);
+    const userTags = await db.select().from(tags).orderBy(tags.name);
 
     return NextResponse.json(userTags);
   } catch (error) {

@@ -35,22 +35,22 @@ export function VehicleCard({ vehicle }: VehicleCardProps) {
       <CardHeader className="pb-3">
         <CardTitle className="text-lg">{displayName}</CardTitle>
         {vehicle.nickname && (
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-muted-foreground">
             {vehicle.year} {vehicle.make} {vehicle.model}
           </p>
         )}
       </CardHeader>
-      <CardContent className="space-y-2">
-        <div className="flex items-center space-x-2 text-sm text-gray-600">
+      <CardContent className="space-y-2 mb-4">
+        <div className="flex items-center space-x-2 text-sm text-muted-foreground">
           <Gauge className="h-4 w-4" />
           <span>{vehicle.currentOdometer.toLocaleString()} miles</span>
         </div>
-        <div className="flex items-center space-x-2 text-sm text-gray-600">
+        <div className="flex items-center space-x-2 text-sm text-muted-foreground">
           <IdCard className="h-4 w-4" />
           <span>{vehicle.licensePlate}</span>
         </div>
         {daysOwned && (
-          <div className="flex items-center space-x-2 text-sm text-gray-600">
+          <div className="flex items-center space-x-2 text-sm text-muted-foreground">
             <Gift className="h-4 w-4" />
             <span>{`Bought ${daysOwned} days ago`}</span>
           </div>

@@ -81,7 +81,7 @@ CREATE TABLE "tags" (
 	"uuid" uuid DEFAULT gen_random_uuid() NOT NULL,
 	"name" text NOT NULL,
 	"is_preset" boolean DEFAULT false,
-	"user_id" serial NOT NULL,
+	"user_id" serial,
 	"created_at" timestamp DEFAULT now(),
 	CONSTRAINT "tags_uuid_unique" UNIQUE("uuid")
 );

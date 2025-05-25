@@ -64,7 +64,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 
           totalPartsCount += recordParts.length;
           totalPartsCost += recordParts.reduce((sum, part) => {
-            return sum + parseFloat(part.cost || "0.00") * part.quantity;
+            return sum + parseFloat(part.cost || "0.00");
           }, 0);
         }
 
@@ -79,6 +79,8 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
           notes: job.notes,
           totalPartsCount,
           totalPartsCost: totalPartsCost.toFixed(2),
+          uuid: job.uuid,
+          hours: job.hours,
         };
       })
     );
@@ -167,6 +169,9 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
           isDiy: validatedData.isDiy, // New field
           shopName: validatedData.shopName,
           notes: validatedData.notes,
+          url: validatedData.url,
+          difficulty: validatedData.difficulty,
+          hours: validatedData.hours?.toString() || "0.00",
         })
         .returning();
 
@@ -190,6 +195,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
             manufacturer: partData.manufacturer,
             cost: partData.cost?.toString() || "0.00",
             quantity: partData.quantity,
+            url: partData.url,
           });
         }
 

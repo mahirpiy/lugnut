@@ -38,6 +38,7 @@ export function PartForm({
       manufacturer: "",
       cost: 0,
       quantity: 1,
+      url: undefined,
     });
   };
 
@@ -164,6 +165,20 @@ export function PartForm({
                   min="1"
                 />
               </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label
+                htmlFor={`records.${recordIndex}.parts.${partIndex}.url`}
+                className="text-foreground"
+              >
+                Part URL
+              </Label>
+              <Input
+                type="url"
+                {...register(`records.${recordIndex}.parts.${partIndex}.url`)}
+                placeholder="https://example.com/part"
+              />
             </div>
           </CardContent>
         </Card>

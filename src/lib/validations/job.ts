@@ -16,6 +16,7 @@ export const partSchema = z.object({
     .optional(),
   cost: z.number().min(0, "Cost cannot be negative").optional(),
   quantity: z.number().int().min(1, "Quantity must be at least 1"),
+  url: z.string().url("Please enter a valid URL").optional().or(z.literal("")),
 });
 
 export const recordSchema = z.object({
@@ -47,6 +48,7 @@ export const jobSchema = z
       .min(0, "Odometer must be positive")
       .max(10000000, "Odometer seems too high"),
     laborCost: z.number().min(0, "Labor cost cannot be negative").optional(),
+    hours: z.number().min(0, "Hours cannot be negative").optional(),
     isDiy: z.boolean(),
     shopName: z
       .string()
@@ -57,7 +59,12 @@ export const jobSchema = z
       .string()
       .max(2000, "Notes must be less than 2000 characters")
       .optional(),
-    records: z.array(recordSchema).min(1, "At least one record is required"),
+    records: z.array(recordSchema).min(0),
+    url: z
+      .string()
+      .url("Please enter a valid URL")
+      .optional()
+      .or(z.literal("")),
   })
   .refine(
     (data) => {

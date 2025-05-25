@@ -67,6 +67,8 @@ export default function NewJobPage({ params }: NewJobPageProps) {
       odometer: 0,
       laborCost: 0,
       isDiy: true,
+      url: "",
+      hours: 0,
       records: [
         {
           title: "",
@@ -122,6 +124,11 @@ export default function NewJobPage({ params }: NewJobPageProps) {
     setError("");
 
     try {
+      // Remove empty URL before submission
+      if (!data.url || data.url === "") {
+        delete data.url;
+      }
+
       const response = await fetch(`/api/vehicles/${params.vehicleUuid}/jobs`, {
         method: "POST",
         headers: {
@@ -264,7 +271,9 @@ export default function NewJobPage({ params }: NewJobPageProps) {
               <div className="flex items-center space-x-3">
                 <span
                   className={`text-sm ${
-                    !isDiy ? "font-semibold text-stone-600" : "text-gray-500"
+                    !isDiy
+                      ? "font-semibold text-foreground"
+                      : "text-muted-foreground"
                   }`}
                 >
                   Shop
@@ -276,7 +285,9 @@ export default function NewJobPage({ params }: NewJobPageProps) {
                 />
                 <span
                   className={`text-sm ${
-                    isDiy ? "font-semibold text-stone-600" : "text-gray-500"
+                    isDiy
+                      ? "font-semibold text-foreground"
+                      : "text-muted-foreground"
                   }`}
                 >
                   DIY
@@ -303,11 +314,18 @@ export default function NewJobPage({ params }: NewJobPageProps) {
             {isDiy && (
               <div className="space-y-2">
                 <Label htmlFor="difficulty">Difficulty *</Label>
+                <p className="text-xs text-muted-foreground">
+                  How difficult was this job?
+                </p>
                 <div className="flex items-center gap-4">
                   <div className="w-1/2">
                     <Slider
                       id="difficulty"
-                      {...register("difficulty")}
+                      className="text-muted-foreground"
+                      value={[watch("difficulty") || 0]}
+                      onValueChange={(value) =>
+                        setValue("difficulty", value[0])
+                      }
                       min={0}
                       max={10}
                       step={1}
@@ -322,6 +340,34 @@ export default function NewJobPage({ params }: NewJobPageProps) {
                     {errors.difficulty.message}
                   </p>
                 )}
+
+                <Label htmlFor="hours">Time Spent</Label>
+                <p className="text-xs text-muted-foreground">
+                  How long did it take you to do this job?
+                </p>
+                <Input
+                  id="hours"
+                  {...register("hours", {
+                    valueAsNumber: true,
+                    setValueAs: (value) =>
+                      value === "" ? undefined : parseFloat(value),
+                  })}
+                  type="number"
+                  min={0}
+                  step={0.5}
+                  placeholder="Enter hours"
+                />
+
+                <Label htmlFor="url">Tutorial URL</Label>
+                <p className="text-xs text-muted-foreground">
+                  Optional: Did you follow a tutorial for this job?
+                </p>
+                <Input
+                  id="url"
+                  {...register("url")}
+                  type="text"
+                  placeholder="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+                />
               </div>
             )}
 

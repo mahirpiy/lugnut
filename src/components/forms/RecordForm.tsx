@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { cn } from "@/lib/utils";
 import { JobInput } from "@/lib/validations/job";
 import { Plus, Trash2 } from "lucide-react";
 import {
@@ -126,7 +127,12 @@ export function RecordForm({
                       variant={
                         selectedTags.includes(tag.id) ? "default" : "outline"
                       }
-                      className="cursor-pointer"
+                      className={cn(
+                        "cursor-pointer text-sm px-3 py-1.5",
+                        selectedTags.includes(tag.id)
+                          ? "hover:bg-primary/80"
+                          : "hover:bg-accent hover:text-accent-foreground"
+                      )}
                       onClick={() => toggleTag(recordIndex, tag.id)}
                     >
                       {tag.name}

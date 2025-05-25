@@ -106,6 +106,8 @@ export const jobs = pgTable("jobs", {
   difficulty: integer("difficulty").default(0),
   shopName: text("shop_name"),
   notes: text("notes"),
+  url: text("url"),
+  hours: decimal("hours", { precision: 10, scale: 2 }),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
@@ -131,14 +133,13 @@ export const parts = pgTable("parts", {
   manufacturer: text("manufacturer"),
   cost: decimal("cost", { precision: 10, scale: 2 }).default("0.00"),
   quantity: integer("quantity").notNull().default(1),
+  url: text("url"),
 });
 
 export const tags = pgTable("tags", {
   id: serial("id").primaryKey(),
   uuid: uuid("uuid").defaultRandom().unique().notNull(),
   name: text("name").notNull(),
-  isPreset: boolean("is_preset").default(false),
-  userId: serial("user_id").references(() => users.id, { onDelete: "cascade" }),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
@@ -209,14 +210,6 @@ export const partsRelations = relations(parts, ({ one }) => ({
     fields: [parts.recordId],
     references: [records.id],
   }),
-}));
-
-export const tagsRelations = relations(tags, ({ one, many }) => ({
-  user: one(users, {
-    fields: [tags.userId],
-    references: [users.id],
-  }),
-  recordTags: many(recordTags),
 }));
 
 export const recordTagsRelations = relations(recordTags, ({ one }) => ({
