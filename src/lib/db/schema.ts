@@ -94,6 +94,7 @@ export const jobs = pgTable("jobs", {
   date: timestamp("date", { mode: "date" }).notNull(),
   odometer: integer("odometer").notNull(),
   laborCost: decimal("labor_cost", { precision: 10, scale: 2 }).default("0.00"),
+  isDiy: boolean("is_diy").default(true),
   shopName: text("shop_name"),
   notes: text("notes"),
   createdAt: timestamp("created_at").defaultNow(),

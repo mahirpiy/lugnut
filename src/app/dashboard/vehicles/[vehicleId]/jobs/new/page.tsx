@@ -1,3 +1,4 @@
+// src/app/dashboard/vehicles/[vehicleId]/jobs/new/page.tsx
 "use client";
 
 import { RecordForm } from "@/components/forms/RecordForm";
@@ -13,6 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
+import { Toggle } from "@/components/ui/toggle";
 import { jobSchema, type JobInput } from "@/lib/validations/job";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowLeft, Wrench } from "lucide-react";
@@ -63,6 +65,7 @@ export default function NewJobPage({ params }: NewJobPageProps) {
       date: new Date(),
       odometer: 0,
       laborCost: 0,
+      isDiy: true,
       records: [
         {
           title: "",
@@ -81,6 +84,8 @@ export default function NewJobPage({ params }: NewJobPageProps) {
       ],
     },
   });
+
+  const isDiy = watch("isDiy");
 
   // Fetch vehicle and tags data
   useEffect(() => {
@@ -250,13 +255,46 @@ export default function NewJobPage({ params }: NewJobPageProps) {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="shopName">Shop Name (if applicable)</Label>
-              <Input
-                id="shopName"
-                {...register("shopName")}
-                placeholder="Joe's Auto Shop, DIY..."
-              />
+              <Label>Work Type *</Label>
+              <div className="flex items-center space-x-3">
+                <span
+                  className={`text-sm ${
+                    isDiy ? "font-semibold text-blue-600" : "text-gray-500"
+                  }`}
+                >
+                  DIY
+                </span>
+                <Toggle
+                  pressed={!isDiy}
+                  onPressedChange={(pressed) => setValue("isDiy", !pressed)}
+                  aria-label="Toggle between DIY and Shop work"
+                  size="sm"
+                />
+                <span
+                  className={`text-sm ${
+                    !isDiy ? "font-semibold text-blue-600" : "text-gray-500"
+                  }`}
+                >
+                  Shop
+                </span>
+              </div>
             </div>
+
+            {!isDiy && (
+              <div className="space-y-2">
+                <Label htmlFor="shopName">Shop Name *</Label>
+                <Input
+                  id="shopName"
+                  {...register("shopName")}
+                  placeholder="Enter shop or business name"
+                />
+                {errors.shopName && (
+                  <p className="text-sm text-red-600">
+                    {errors.shopName.message}
+                  </p>
+                )}
+              </div>
+            )}
 
             <div className="space-y-2">
               <Label htmlFor="notes">Job Notes</Label>

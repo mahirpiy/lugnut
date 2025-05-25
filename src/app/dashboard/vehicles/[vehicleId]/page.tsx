@@ -15,7 +15,6 @@ import {
   DollarSign,
   Fuel,
   Gauge,
-  MapPin,
   Plus,
   Wrench,
 } from "lucide-react";
@@ -41,6 +40,7 @@ interface Job {
   date: string;
   odometer: number;
   laborCost: string;
+  isDiy: boolean; // Add isDiy field
   shopName?: string;
   notes?: string;
   totalPartsCount: number;
@@ -220,7 +220,13 @@ export default function VehicleDetailPage({ params }: VehicleDetailPageProps) {
               <div>
                 <p className="text-sm font-medium text-gray-600">Total Jobs</p>
                 <p className="text-2xl font-bold">{jobs.length}</p>
-                <p className="text-xs text-gray-500">maintenance records</p>
+                <p className="text-xs text-gray-500">
+                  {`${Math.round(
+                    (jobs.reduce((sum, job) => (job.isDiy ? sum + 1 : sum), 0) /
+                      jobs.length) *
+                      100
+                  )}% DIY`}
+                </p>
               </div>
             </div>
           </CardContent>
@@ -349,12 +355,12 @@ export default function VehicleDetailPage({ params }: VehicleDetailPageProps) {
                               <Gauge className="h-4 w-4" />
                               <span>{job.odometer.toLocaleString()} miles</span>
                             </span>
-                            {job.shopName && (
-                              <span className="flex items-center space-x-1">
-                                <MapPin className="h-4 w-4" />
-                                <span>{job.shopName}</span>
+                            <span className="flex items-center space-x-1">
+                              <Wrench className="h-4 w-4" />
+                              <span>
+                                {job.isDiy ? "DIY" : job.shopName || "Shop"}
                               </span>
-                            )}
+                            </span>
                           </div>
                           {job.notes && (
                             <p className="text-sm text-gray-600 mt-2 line-clamp-2">

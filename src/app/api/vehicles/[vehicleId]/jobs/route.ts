@@ -1,4 +1,3 @@
-// src/app/api/vehicles/[vehicleId]/jobs/route.ts
 import { authOptions } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { jobs, parts, records, recordTags, vehicles } from "@/lib/db/schema";
@@ -65,7 +64,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 
           totalPartsCount += recordParts.length;
           totalPartsCost += recordParts.reduce((sum, part) => {
-            return sum + parseFloat(part.cost || "0") * part.quantity;
+            return sum + parseFloat(part.cost || "0.00") * part.quantity;
           }, 0);
         }
 
@@ -75,6 +74,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
           date: job.date,
           odometer: job.odometer,
           laborCost: job.laborCost,
+          isDiy: job.isDiy,
           shopName: job.shopName,
           notes: job.notes,
           totalPartsCount,
@@ -139,7 +139,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     const body = await request.json();
     const validatedData = jobSchema.parse({
       ...body,
-      date: body.date ? new Date(body.date) : undefined,
+      date: body.date ? new Date(body.date) : new Date(),
     });
 
     // Validate odometer is greater than vehicle's initial odometer (allow backdating)
@@ -164,6 +164,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
           date: validatedData.date,
           odometer: validatedData.odometer,
           laborCost: validatedData.laborCost?.toString() || "0.00",
+          isDiy: validatedData.isDiy, // New field
           shopName: validatedData.shopName,
           notes: validatedData.notes,
         })

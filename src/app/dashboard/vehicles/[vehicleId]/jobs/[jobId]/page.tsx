@@ -10,7 +10,6 @@ import {
   Calendar,
   DollarSign,
   Gauge,
-  MapPin,
   Package,
   Wrench,
 } from "lucide-react";
@@ -47,6 +46,7 @@ interface Job {
   date: string;
   odometer: number;
   laborCost: string;
+  isDiy: boolean; // Add isDiy field
   shopName?: string;
   notes?: string;
   records: Record[];
@@ -185,15 +185,18 @@ export default function JobDetailPage({ params }: JobDetailPageProps) {
               </div>
             </div>
 
-            {job.shopName && (
-              <div className="flex items-center space-x-3">
-                <MapPin className="h-8 w-8 text-purple-500 bg-purple-100 rounded-lg p-2" />
-                <div>
-                  <p className="text-sm font-medium text-gray-600">Shop</p>
-                  <p className="font-semibold">{job.shopName}</p>
-                </div>
+            <div className="flex items-center space-x-3">
+              <Wrench className="h-8 w-8 text-purple-500 bg-purple-100 rounded-lg p-2" />
+              <div>
+                <p className="text-sm font-medium text-gray-600">Work Type</p>
+                <p className="font-semibold">
+                  {job.isDiy ? "DIY" : job.shopName || "Shop Work"}
+                </p>
+                {!job.isDiy && job.shopName && (
+                  <p className="text-xs text-gray-500">{job.shopName}</p>
+                )}
               </div>
-            )}
+            </div>
 
             <div className="flex items-center space-x-3">
               <DollarSign className="h-8 w-8 text-orange-500 bg-orange-100 rounded-lg p-2" />

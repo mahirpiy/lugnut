@@ -76,7 +76,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 
         // Calculate total cost for this record
         const totalCost = recordParts.reduce((sum, part) => {
-          return sum + parseFloat(part.cost || "0") * part.quantity;
+          return sum + parseFloat(part.cost || "0.00") * part.quantity;
         }, 0);
 
         return {
@@ -106,7 +106,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       (sum, record) => sum + record.totalCost,
       0
     );
-    const laborCost = parseFloat(job.laborCost || "0");
+    const laborCost = parseFloat(job.laborCost || "0.00");
     const totalCost = totalPartsCost + laborCost;
 
     const response = {
@@ -115,6 +115,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       date: job.date,
       odometer: job.odometer,
       laborCost: job.laborCost,
+      isDiy: job.isDiy, // Include isDiy field
       shopName: job.shopName,
       notes: job.notes,
       records: enrichedRecords,

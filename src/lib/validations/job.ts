@@ -1,3 +1,4 @@
+// src/lib/validations/job.ts
 import { z } from "zod";
 
 export const partSchema = z.object({
@@ -33,28 +34,46 @@ export const recordSchema = z.object({
     .optional(),
 });
 
-export const jobSchema = z.object({
-  title: z
-    .string()
-    .min(5, "Job title must be at least 5 characters")
-    .max(100, "Job title must be less than 100 characters"),
-  date: z.date(),
-  odometer: z
-    .number()
-    .int()
-    .min(0, "Odometer must be positive")
-    .max(10000000, "Odometer seems too high"),
-  laborCost: z.number().min(0, "Labor cost cannot be negative").optional(),
-  shopName: z
-    .string()
-    .max(100, "Shop name must be less than 100 characters")
-    .optional(),
-  notes: z
-    .string()
-    .max(2000, "Notes must be less than 2000 characters")
-    .optional(),
-  records: z.array(recordSchema).min(1, "At least one record is required"),
-});
+export const jobSchema = z
+  .object({
+    title: z
+      .string()
+      .min(5, "Job title must be at least 5 characters")
+      .max(100, "Job title must be less than 100 characters"),
+    date: z.date(),
+    odometer: z
+      .number()
+      .int()
+      .min(0, "Odometer must be positive")
+      .max(10000000, "Odometer seems too high"),
+    laborCost: z.number().min(0, "Labor cost cannot be negative").optional(),
+    isDiy: z.boolean(),
+    shopName: z
+      .string()
+      .max(100, "Shop name must be less than 100 characters")
+      .optional(),
+    notes: z
+      .string()
+      .max(2000, "Notes must be less than 2000 characters")
+      .optional(),
+    records: z.array(recordSchema).min(1, "At least one record is required"),
+  })
+  .refine(
+    (data) => {
+      // If not DIY, shop name is required
+      if (
+        !data.isDiy &&
+        (!data.shopName || data.shopName.trim().length === 0)
+      ) {
+        return false;
+      }
+      return true;
+    },
+    {
+      message: "Shop name is required when work is not DIY",
+      path: ["shopName"],
+    }
+  );
 
 export type PartInput = z.infer<typeof partSchema>;
 export type RecordInput = z.infer<typeof recordSchema>;
