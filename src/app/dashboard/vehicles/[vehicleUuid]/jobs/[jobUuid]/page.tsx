@@ -255,7 +255,7 @@ export default function JobDetailPage() {
                   {job.hours} Labor Hours Saved by DIYing
                 </span>
                 <span className="font-semibold">
-                  {calculateDiyLaborSavedString(job.hours)}
+                  {calculateDiyLaborSavedString(job.hours, false)}
                 </span>
               </div>
             )}
@@ -316,11 +316,11 @@ export default function JobDetailPage() {
                           {part.name}
                         </p>
                         <div className="flex items-center space-x-4 text-sm text-background">
-                          {part.partNumber && (
-                            <span>PN: {part.partNumber}</span>
-                          )}
                           {part.manufacturer && (
                             <span>Brand: {part.manufacturer}</span>
+                          )}
+                          {part.partNumber && (
+                            <span>PN: {part.partNumber}</span>
                           )}
                           <span>Qty: {part.quantity}</span>
                         </div>

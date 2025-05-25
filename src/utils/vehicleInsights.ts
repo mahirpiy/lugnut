@@ -1,6 +1,10 @@
-export function calculateDiyLaborSavedString(diyHours: number): string {
+export function calculateDiyLaborSavedString(
+  diyHours: number,
+  includeSuffix: boolean = true
+): string {
   if (diyHours === 0) return "No DIY work yet";
-  return `$${(diyHours * 0.4 * 140).toFixed(2)} saved in labor`;
+  const saved = diyHours * 0.4 * 140;
+  return `$${saved.toFixed(2)}${includeSuffix ? " saved in labor" : ""}`;
 }
 
 export function formatDiyHours(diyHours: number): string {
