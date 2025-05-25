@@ -186,6 +186,20 @@ export default function NewVehiclePage() {
                 <p className="text-sm text-red-600">{errors.vin.message}</p>
               )}
             </div>
+            <div className="space-y-2">
+              <Label htmlFor="licensePlate">License Plate (Optional)</Label>
+              <Input
+                id="licensePlate"
+                placeholder="ABC123"
+                maxLength={17}
+                {...register("licensePlate")}
+              />
+              {errors.licensePlate && (
+                <p className="text-sm text-red-600">
+                  {errors.licensePlate.message}
+                </p>
+              )}
+            </div>
 
             {/* Odometer Section */}
             <div className="border-t pt-6">

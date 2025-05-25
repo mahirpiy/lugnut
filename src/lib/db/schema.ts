@@ -6,6 +6,7 @@ import {
   integer,
   pgTable,
   primaryKey,
+  serial,
   text,
   timestamp,
   uuid,
@@ -13,9 +14,10 @@ import {
 
 // NextAuth tables
 export const users = pgTable("user", {
-  id: text("id").notNull().primaryKey(),
+  id: serial("id").notNull().primaryKey(),
+  uuid: uuid("uuid").defaultRandom().unique().notNull(),
   name: text("name"),
-  email: text("email").notNull(),
+  email: text("email").notNull().unique(),
   emailVerified: timestamp("emailVerified", { mode: "date" }),
   image: text("image"),
   password: text("password"), // Added for credentials auth
@@ -26,7 +28,7 @@ export const users = pgTable("user", {
 export const accounts = pgTable(
   "account",
   {
-    userId: text("userId")
+    userId: serial("userId")
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
     type: text("type").notNull(),
@@ -49,7 +51,7 @@ export const accounts = pgTable(
 
 export const sessions = pgTable("session", {
   sessionToken: text("sessionToken").notNull().primaryKey(),
-  userId: text("userId")
+  userId: serial("userId")
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
   expires: timestamp("expires", { mode: "date" }).notNull(),
@@ -69,25 +71,31 @@ export const verificationTokens = pgTable(
 
 // Lugnut tables
 export const vehicles = pgTable("vehicles", {
-  id: uuid("id").defaultRandom().primaryKey(),
-  userId: text("user_id")
+  id: serial("id").primaryKey(),
+  uuid: uuid("uuid").defaultRandom().unique().notNull(),
+  userId: serial("user_id")
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
   make: text("make").notNull(),
   model: text("model").notNull(),
   year: integer("year").notNull(),
+  licensePlate: text("license_plate"),
   vin: text("vin"),
   nickname: text("nickname"),
   initialOdometer: integer("initial_odometer").notNull(),
   currentOdometer: integer("current_odometer").notNull(),
+  registrationExpiration: timestamp("registration_expiration", {
+    mode: "date",
+  }),
   purchaseDate: timestamp("purchase_date", { mode: "date" }),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
 export const jobs = pgTable("jobs", {
-  id: uuid("id").defaultRandom().primaryKey(),
-  vehicleId: uuid("vehicle_id")
+  id: serial("id").primaryKey(),
+  uuid: uuid("uuid").defaultRandom().unique().notNull(),
+  vehicleId: serial("vehicle_id")
     .notNull()
     .references(() => vehicles.id, { onDelete: "cascade" }),
   title: text("title").notNull(),
@@ -95,14 +103,16 @@ export const jobs = pgTable("jobs", {
   odometer: integer("odometer").notNull(),
   laborCost: decimal("labor_cost", { precision: 10, scale: 2 }).default("0.00"),
   isDiy: boolean("is_diy").default(true),
+  difficulty: integer("difficulty").default(0),
   shopName: text("shop_name"),
   notes: text("notes"),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
 export const records = pgTable("records", {
-  id: uuid("id").defaultRandom().primaryKey(),
-  jobId: uuid("job_id")
+  id: serial("id").primaryKey(),
+  uuid: uuid("uuid").defaultRandom().unique().notNull(),
+  jobId: serial("job_id")
     .notNull()
     .references(() => jobs.id, { onDelete: "cascade" }),
   title: text("title").notNull(),
@@ -111,8 +121,9 @@ export const records = pgTable("records", {
 });
 
 export const parts = pgTable("parts", {
-  id: uuid("id").defaultRandom().primaryKey(),
-  recordId: uuid("record_id")
+  id: serial("id").primaryKey(),
+  uuid: uuid("uuid").defaultRandom().unique().notNull(),
+  recordId: serial("record_id")
     .notNull()
     .references(() => records.id, { onDelete: "cascade" }),
   name: text("name").notNull(),
@@ -123,20 +134,21 @@ export const parts = pgTable("parts", {
 });
 
 export const tags = pgTable("tags", {
-  id: uuid("id").defaultRandom().primaryKey(),
+  id: serial("id").primaryKey(),
+  uuid: uuid("uuid").defaultRandom().unique().notNull(),
   name: text("name").notNull(),
   isPreset: boolean("is_preset").default(false),
-  userId: text("user_id").references(() => users.id, { onDelete: "cascade" }),
+  userId: serial("user_id").references(() => users.id, { onDelete: "cascade" }),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
 export const recordTags = pgTable(
   "record_tags",
   {
-    recordId: uuid("record_id")
+    recordId: serial("record_id")
       .notNull()
       .references(() => records.id, { onDelete: "cascade" }),
-    tagId: uuid("tag_id")
+    tagId: serial("tag_id")
       .notNull()
       .references(() => tags.id, { onDelete: "cascade" }),
   },
@@ -146,8 +158,9 @@ export const recordTags = pgTable(
 );
 
 export const fuelEntries = pgTable("fuel_entries", {
-  id: uuid("id").defaultRandom().primaryKey(),
-  vehicleId: uuid("vehicle_id")
+  id: serial("id").primaryKey(),
+  uuid: uuid("uuid").defaultRandom().unique().notNull(),
+  vehicleId: serial("vehicle_id")
     .notNull()
     .references(() => vehicles.id, { onDelete: "cascade" }),
   date: timestamp("date", { mode: "date" }).notNull(),

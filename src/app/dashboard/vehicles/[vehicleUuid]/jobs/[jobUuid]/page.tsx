@@ -1,4 +1,3 @@
-// src/app/dashboard/vehicles/[vehicleId]/jobs/[jobId]/page.tsx
 "use client";
 
 import { Badge } from "@/components/ui/badge";
@@ -17,7 +16,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 
 interface Part {
-  id: string;
+  uuid: string;
   name: string;
   partNumber?: string;
   manufacturer?: string;
@@ -26,13 +25,13 @@ interface Part {
 }
 
 interface Tag {
-  id: string;
+  uuid: string;
   name: string;
   isPreset: boolean;
 }
 
 interface Record {
-  id: string;
+  uuid: string;
   title: string;
   notes?: string;
   parts: Part[];
@@ -41,7 +40,7 @@ interface Record {
 }
 
 interface Job {
-  id: string;
+  uuid: string;
   title: string;
   date: string;
   odometer: number;
@@ -55,7 +54,7 @@ interface Job {
 }
 
 interface Vehicle {
-  id: string;
+  uuid: string;
   make: string;
   model: string;
   year: number;
@@ -64,8 +63,8 @@ interface Vehicle {
 
 interface JobDetailPageProps {
   params: {
-    vehicleId: string;
-    jobId: string;
+    vehicleUuid: string;
+    jobUuid: string;
   };
 }
 
@@ -79,7 +78,7 @@ export default function JobDetailPage({ params }: JobDetailPageProps) {
       try {
         // Fetch vehicle
         const vehicleResponse = await fetch(
-          `/api/vehicles/${params.vehicleId}`
+          `/api/vehicles/${params.vehicleUuid}`
         );
         if (vehicleResponse.ok) {
           const vehicleData = await vehicleResponse.json();
@@ -88,7 +87,7 @@ export default function JobDetailPage({ params }: JobDetailPageProps) {
 
         // Fetch job details
         const jobResponse = await fetch(
-          `/api/vehicles/${params.vehicleId}/jobs/${params.jobId}`
+          `/api/vehicles/${params.vehicleUuid}/jobs/${params.jobUuid}`
         );
         if (jobResponse.ok) {
           const jobData = await jobResponse.json();
@@ -102,7 +101,7 @@ export default function JobDetailPage({ params }: JobDetailPageProps) {
     };
 
     fetchData();
-  }, [params.vehicleId, params.jobId]);
+  }, [params.vehicleUuid, params.jobUuid]);
 
   if (loading) {
     return (
@@ -122,7 +121,7 @@ export default function JobDetailPage({ params }: JobDetailPageProps) {
           <CardContent className="pt-6 text-center">
             <p>Job not found</p>
             <Button asChild className="mt-4">
-              <Link href={`/dashboard/vehicles/${params.vehicleId}`}>
+              <Link href={`/dashboard/vehicles/${params.vehicleUuid}`}>
                 Back to Vehicle
               </Link>
             </Button>
@@ -140,7 +139,7 @@ export default function JobDetailPage({ params }: JobDetailPageProps) {
       {/* Header */}
       <div className="mb-6">
         <Link
-          href={`/dashboard/vehicles/${params.vehicleId}`}
+          href={`/dashboard/vehicles/${params.vehicleUuid}`}
           className="inline-flex items-center text-sm text-gray-600 hover:text-gray-900 mb-4"
         >
           <ArrowLeft className="h-4 w-4 mr-1" />
@@ -256,7 +255,7 @@ export default function JobDetailPage({ params }: JobDetailPageProps) {
         <h2 className="text-xl font-bold">Maintenance Records</h2>
 
         {job.records.map((record) => (
-          <Card key={record.id} className="border-blue-200">
+          <Card key={record.uuid} className="border-blue-200">
             <CardHeader className="bg-blue-50">
               <div className="flex items-start justify-between">
                 <div>
@@ -264,7 +263,7 @@ export default function JobDetailPage({ params }: JobDetailPageProps) {
                   <div className="flex flex-wrap gap-2 mt-2">
                     {record.tags.map((tag) => (
                       <Badge
-                        key={tag.id}
+                        key={tag.uuid}
                         variant={tag.isPreset ? "default" : "secondary"}
                       >
                         {tag.name}
@@ -287,7 +286,7 @@ export default function JobDetailPage({ params }: JobDetailPageProps) {
               <div className="space-y-4">
                 {record.parts.map((part) => (
                   <div
-                    key={part.id}
+                    key={part.uuid}
                     className="flex items-center justify-between p-4 bg-gray-50 rounded-lg"
                   >
                     <div className="flex items-center space-x-3">

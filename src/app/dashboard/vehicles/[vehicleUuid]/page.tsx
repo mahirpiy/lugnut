@@ -1,4 +1,3 @@
-// src/app/dashboard/vehicles/[vehicleId]/page.tsx
 "use client";
 
 import { Button } from "@/components/ui/button";
@@ -15,6 +14,7 @@ import {
   DollarSign,
   Fuel,
   Gauge,
+  Map,
   Plus,
   Wrench,
 } from "lucide-react";
@@ -22,7 +22,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 
 interface Vehicle {
-  id: string;
+  uuid: string;
   make: string;
   model: string;
   year: number;
@@ -35,7 +35,7 @@ interface Vehicle {
 }
 
 interface Job {
-  id: string;
+  uuid: string;
   title: string;
   date: string;
   odometer: number;
@@ -48,7 +48,7 @@ interface Job {
 }
 
 interface FuelEntry {
-  id: string;
+  uuid: string;
   date: string;
   odometer: number;
   gallons: string;
@@ -60,7 +60,7 @@ interface FuelEntry {
 
 interface VehicleDetailPageProps {
   params: {
-    vehicleId: string;
+    vehicleUuid: string;
   };
 }
 
@@ -76,7 +76,7 @@ export default function VehicleDetailPage({ params }: VehicleDetailPageProps) {
       try {
         // Fetch vehicle
         const vehicleResponse = await fetch(
-          `/api/vehicles/${params.vehicleId}`
+          `/api/vehicles/${params.vehicleUuid}`
         );
         if (vehicleResponse.ok) {
           const vehicleData = await vehicleResponse.json();
@@ -85,7 +85,7 @@ export default function VehicleDetailPage({ params }: VehicleDetailPageProps) {
 
         // Fetch jobs
         const jobsResponse = await fetch(
-          `/api/vehicles/${params.vehicleId}/jobs`
+          `/api/vehicles/${params.vehicleUuid}/jobs`
         );
         if (jobsResponse.ok) {
           const jobsData = await jobsResponse.json();
@@ -94,7 +94,7 @@ export default function VehicleDetailPage({ params }: VehicleDetailPageProps) {
 
         // Fetch fuel entries (only for paid users)
         const fuelResponse = await fetch(
-          `/api/vehicles/${params.vehicleId}/fuel`
+          `/api/vehicles/${params.vehicleUuid}/fuel`
         );
         if (fuelResponse.ok) {
           const fuelData = await fuelResponse.json();
@@ -112,7 +112,7 @@ export default function VehicleDetailPage({ params }: VehicleDetailPageProps) {
     };
 
     fetchData();
-  }, [params.vehicleId]);
+  }, [params.vehicleUuid]);
 
   if (loading) {
     return (
@@ -177,14 +177,14 @@ export default function VehicleDetailPage({ params }: VehicleDetailPageProps) {
           </div>
           <div className="flex space-x-2">
             <Button asChild>
-              <Link href={`/dashboard/vehicles/${vehicle.id}/jobs/new`}>
+              <Link href={`/dashboard/vehicles/${vehicle.uuid}/jobs/new`}>
                 <Plus className="h-4 w-4 mr-2" />
                 Add Job
               </Link>
             </Button>
             {isPaid && (
               <Button asChild variant="outline">
-                <Link href={`/dashboard/vehicles/${vehicle.id}/fuel/new`}>
+                <Link href={`/dashboard/vehicles/${vehicle.uuid}/fuel/new`}>
                   <Fuel className="h-4 w-4 mr-2" />
                   Add Fuel
                 </Link>
@@ -220,13 +220,18 @@ export default function VehicleDetailPage({ params }: VehicleDetailPageProps) {
               <div>
                 <p className="text-sm font-medium text-gray-600">Total Jobs</p>
                 <p className="text-2xl font-bold">{jobs.length}</p>
-                <p className="text-xs text-gray-500">
-                  {`${Math.round(
-                    (jobs.reduce((sum, job) => (job.isDiy ? sum + 1 : sum), 0) /
-                      jobs.length) *
-                      100
-                  )}% DIY`}
-                </p>
+                {jobs.length > 0 && (
+                  <p className="text-xs text-gray-500">
+                    {`${Math.round(
+                      (jobs.reduce(
+                        (sum, job) => (job.isDiy ? sum + 1 : sum),
+                        0
+                      ) /
+                        jobs.length) *
+                        100
+                    )}% DIY`}
+                  </p>
+                )}
               </div>
             </div>
           </CardContent>
@@ -248,7 +253,7 @@ export default function VehicleDetailPage({ params }: VehicleDetailPageProps) {
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center space-x-2">
-              <Calendar className="h-5 w-5 text-purple-600" />
+              <Map className="h-5 w-5 text-purple-600" />
               <div>
                 <p className="text-sm font-medium text-gray-600">
                   Miles Driven
@@ -322,7 +327,7 @@ export default function VehicleDetailPage({ params }: VehicleDetailPageProps) {
                 Start tracking your vehicle maintenance by adding your first job
               </p>
               <Button asChild>
-                <Link href={`/dashboard/vehicles/${vehicle.id}/jobs/new`}>
+                <Link href={`/dashboard/vehicles/${vehicle.uuid}/jobs/new`}>
                   <Plus className="h-4 w-4 mr-2" />
                   Add First Job
                 </Link>
@@ -332,11 +337,11 @@ export default function VehicleDetailPage({ params }: VehicleDetailPageProps) {
             <div className="space-y-4">
               {jobs.map((job) => (
                 <Card
-                  key={job.id}
+                  key={job.uuid}
                   className="border-gray-200 hover:shadow-md transition-shadow cursor-pointer"
                 >
                   <Link
-                    href={`/dashboard/vehicles/${vehicle.id}/jobs/${job.id}`}
+                    href={`/dashboard/vehicles/${vehicle.uuid}/jobs/${job.uuid}`}
                   >
                     <CardContent className="pt-4">
                       <div className="flex items-start justify-between">

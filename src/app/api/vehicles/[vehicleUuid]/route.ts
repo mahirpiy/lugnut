@@ -7,7 +7,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 interface RouteParams {
   params: {
-    vehicleId: string;
+    vehicleUuid: string;
   };
 }
 
@@ -26,7 +26,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       .from(vehicles)
       .where(
         and(
-          eq(vehicles.id, params.vehicleId),
+          eq(vehicles.uuid, params.vehicleUuid),
           eq(vehicles.userId, session.user.id)
         )
       )

@@ -19,7 +19,8 @@ import {
 import { PartForm } from "./PartForm";
 
 interface Tag {
-  id: string;
+  id: number;
+  uuid: string;
   name: string;
   isPreset: boolean;
 }
@@ -57,10 +58,10 @@ export function RecordForm({
     });
   };
 
-  const toggleTag = (recordIndex: number, tagId: string) => {
+  const toggleTag = (recordIndex: number, tagId: number) => {
     const currentTags = watch(`records.${recordIndex}.tagIds`) || [];
     const newTags = currentTags.includes(tagId)
-      ? currentTags.filter((id: string) => id !== tagId)
+      ? currentTags.filter((id: number) => id !== tagId)
       : [...currentTags, tagId];
 
     setValue(`records.${recordIndex}.tagIds`, newTags);

@@ -1,4 +1,3 @@
-// src/app/api/vehicles/[vehicleId]/fuel/route.ts
 import { authOptions } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { fuelEntries, vehicles } from "@/lib/db/schema";
@@ -31,7 +30,7 @@ const fuelEntrySchema = z.object({
 
 interface RouteParams {
   params: {
-    vehicleId: string;
+    vehicleUuid: string;
   };
 }
 
@@ -58,7 +57,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       .from(vehicles)
       .where(
         and(
-          eq(vehicles.id, params.vehicleId),
+          eq(vehicles.uuid, params.vehicleUuid),
           eq(vehicles.userId, session.user.id)
         )
       )
@@ -72,7 +71,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     const entries = await db
       .select()
       .from(fuelEntries)
-      .where(eq(fuelEntries.vehicleId, params.vehicleId))
+      .where(eq(fuelEntries.vehicleId, vehicle[0].id))
       .orderBy(desc(fuelEntries.date), desc(fuelEntries.odometer));
 
     // Calculate MPG for each entry (except the first one)
@@ -136,7 +135,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       .from(vehicles)
       .where(
         and(
-          eq(vehicles.id, params.vehicleId),
+          eq(vehicles.uuid, params.vehicleUuid),
           eq(vehicles.userId, session.user.id)
         )
       )
@@ -167,7 +166,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     const [newEntry] = await db
       .insert(fuelEntries)
       .values({
-        vehicleId: params.vehicleId,
+        vehicleId: vehicle[0].id,
         date: validatedData.date,
         odometer: validatedData.odometer,
         gallons: validatedData.gallons.toString(),
@@ -185,7 +184,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
           currentOdometer: validatedData.odometer,
           updatedAt: new Date(),
         })
-        .where(eq(vehicles.id, params.vehicleId));
+        .where(eq(vehicles.id, vehicle[0].id));
     }
 
     return NextResponse.json(newEntry, { status: 201 });

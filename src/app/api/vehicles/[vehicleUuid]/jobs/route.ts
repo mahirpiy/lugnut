@@ -8,7 +8,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 interface RouteParams {
   params: {
-    vehicleId: string;
+    vehicleUuid: string;
   };
 }
 
@@ -27,7 +27,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       .from(vehicles)
       .where(
         and(
-          eq(vehicles.id, params.vehicleId),
+          eq(vehicles.uuid, params.vehicleUuid),
           eq(vehicles.userId, session.user.id)
         )
       )
@@ -41,7 +41,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     const vehicleJobs = await db
       .select()
       .from(jobs)
-      .where(eq(jobs.vehicleId, params.vehicleId))
+      .where(eq(jobs.vehicleId, vehicle[0].id))
       .orderBy(jobs.date);
 
     // Get parts count and cost for each job
@@ -108,7 +108,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       .from(vehicles)
       .where(
         and(
-          eq(vehicles.id, params.vehicleId),
+          eq(vehicles.uuid, params.vehicleUuid),
           eq(vehicles.userId, session.user.id)
         )
       )
@@ -123,7 +123,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       const jobCount = await db
         .select({ count: count() })
         .from(jobs)
-        .where(eq(jobs.vehicleId, params.vehicleId));
+        .where(eq(jobs.vehicleId, vehicle[0].id));
 
       if (jobCount[0].count >= 2) {
         return NextResponse.json(
@@ -159,7 +159,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       const [newJob] = await db
         .insert(jobs)
         .values({
-          vehicleId: params.vehicleId,
+          vehicleId: vehicle[0].id,
           title: validatedData.title,
           date: validatedData.date,
           odometer: validatedData.odometer,
@@ -210,7 +210,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
             currentOdometer: validatedData.odometer,
             updatedAt: new Date(),
           })
-          .where(eq(vehicles.id, params.vehicleId));
+          .where(eq(vehicles.id, vehicle[0].id));
       }
 
       return NextResponse.json(newJob, { status: 201 });

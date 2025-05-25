@@ -23,6 +23,13 @@ export const vehicleSchema = z
         if (!val) return true; // Optional field
         return val.length === 17; // Basic VIN validation
       }, "VIN must be 17 characters"),
+    licensePlate: z
+      .string()
+      .optional()
+      .refine((val) => {
+        if (!val) return true; // Optional field
+        return val.length <= 17 && val.length >= 1; // Basic license plate validation
+      }, "License plate must be less than 17 characters"),
     nickname: z
       .string()
       .max(30, "Nickname must be less than 30 characters")

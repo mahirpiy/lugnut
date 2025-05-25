@@ -1,4 +1,3 @@
-// src/app/dashboard/vehicles/[vehicleId]/jobs/new/page.tsx
 "use client";
 
 import { RecordForm } from "@/components/forms/RecordForm";
@@ -13,8 +12,9 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
+import { Slider } from "@/components/ui/slider";
+import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
-import { Toggle } from "@/components/ui/toggle";
 import { jobSchema, type JobInput } from "@/lib/validations/job";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowLeft, Wrench } from "lucide-react";
@@ -24,13 +24,14 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 
 interface Tag {
-  id: string;
+  id: number;
+  uuid: string;
   name: string;
   isPreset: boolean;
 }
 
 interface Vehicle {
-  id: string;
+  uuid: string;
   make: string;
   model: string;
   year: number;
@@ -41,7 +42,7 @@ interface Vehicle {
 
 interface NewJobPageProps {
   params: {
-    vehicleId: string;
+    vehicleUuid: string;
   };
 }
 
@@ -93,7 +94,7 @@ export default function NewJobPage({ params }: NewJobPageProps) {
       try {
         // Fetch vehicle data
         const vehicleResponse = await fetch(
-          `/api/vehicles/${params.vehicleId}`
+          `/api/vehicles/${params.vehicleUuid}`
         );
         if (vehicleResponse.ok) {
           const vehicleData = await vehicleResponse.json();
@@ -114,14 +115,14 @@ export default function NewJobPage({ params }: NewJobPageProps) {
     };
 
     fetchData();
-  }, [params.vehicleId, setValue]);
+  }, [params.vehicleUuid, setValue]);
 
   const onSubmit = async (data: JobInput) => {
     setIsLoading(true);
     setError("");
 
     try {
-      const response = await fetch(`/api/vehicles/${params.vehicleId}/jobs`, {
+      const response = await fetch(`/api/vehicles/${params.vehicleUuid}/jobs`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -136,7 +137,7 @@ export default function NewJobPage({ params }: NewJobPageProps) {
         return;
       }
 
-      router.push(`/dashboard/vehicles/${params.vehicleId}`);
+      router.push(`/dashboard/vehicles/${params.vehicleUuid}`);
     } catch (err) {
       console.error("Error creating job:", err);
       setError("Something went wrong. Please try again.");
@@ -163,7 +164,7 @@ export default function NewJobPage({ params }: NewJobPageProps) {
     <div className="max-w-4xl mx-auto px-4 py-8">
       <div className="mb-6">
         <Link
-          href={`/dashboard/vehicles/${params.vehicleId}`}
+          href={`/dashboard/vehicles/${params.vehicleUuid}`}
           className="inline-flex items-center text-sm text-gray-600 hover:text-gray-900 mb-4"
         >
           <ArrowLeft className="h-4 w-4 mr-1" />
@@ -259,23 +260,22 @@ export default function NewJobPage({ params }: NewJobPageProps) {
               <div className="flex items-center space-x-3">
                 <span
                   className={`text-sm ${
-                    isDiy ? "font-semibold text-blue-600" : "text-gray-500"
-                  }`}
-                >
-                  DIY
-                </span>
-                <Toggle
-                  pressed={!isDiy}
-                  onPressedChange={(pressed) => setValue("isDiy", !pressed)}
-                  aria-label="Toggle between DIY and Shop work"
-                  size="sm"
-                />
-                <span
-                  className={`text-sm ${
                     !isDiy ? "font-semibold text-blue-600" : "text-gray-500"
                   }`}
                 >
                   Shop
+                </span>
+                <Switch
+                  checked={isDiy}
+                  onCheckedChange={(checked) => setValue("isDiy", checked)}
+                  aria-label="Toggle between DIY and Shop work"
+                />
+                <span
+                  className={`text-sm ${
+                    isDiy ? "font-semibold text-blue-600" : "text-gray-500"
+                  }`}
+                >
+                  DIY
                 </span>
               </div>
             </div>
@@ -291,6 +291,31 @@ export default function NewJobPage({ params }: NewJobPageProps) {
                 {errors.shopName && (
                   <p className="text-sm text-red-600">
                     {errors.shopName.message}
+                  </p>
+                )}
+              </div>
+            )}
+
+            {isDiy && (
+              <div className="space-y-2">
+                <Label htmlFor="difficulty">Difficulty *</Label>
+                <div className="flex items-center gap-4">
+                  <div className="w-1/2">
+                    <Slider
+                      id="difficulty"
+                      {...register("difficulty")}
+                      min={0}
+                      max={10}
+                      step={1}
+                    />
+                  </div>
+                  <span className="min-w-[3ch] text-sm">
+                    {watch("difficulty") || 0}/10
+                  </span>
+                </div>
+                {errors.difficulty && (
+                  <p className="text-sm text-red-600">
+                    {errors.difficulty.message}
                   </p>
                 )}
               </div>
@@ -330,7 +355,7 @@ export default function NewJobPage({ params }: NewJobPageProps) {
                 className="flex-1"
                 asChild
               >
-                <Link href={`/dashboard/vehicles/${params.vehicleId}`}>
+                <Link href={`/dashboard/vehicles/${params.vehicleUuid}`}>
                   Cancel
                 </Link>
               </Button>

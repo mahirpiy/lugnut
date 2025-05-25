@@ -14,11 +14,12 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 
 interface Vehicle {
-  id: string;
+  uuid: string;
   make: string;
   model: string;
   year: number;
   nickname?: string;
+  licensePlate?: string;
   currentOdometer: number;
   createdAt: string;
 }
@@ -112,7 +113,7 @@ export default function DashboardPage() {
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {vehicles.map((vehicle) => (
               <VehicleCard
-                key={vehicle.id}
+                key={vehicle.uuid}
                 vehicle={{
                   ...vehicle,
                   createdAt: new Date(vehicle.createdAt),
@@ -120,7 +121,6 @@ export default function DashboardPage() {
               />
             ))}
           </div>
-
           {!canAddVehicle && (
             <Card className="mt-6 border-orange-200 bg-orange-50">
               <CardContent className="pt-6">

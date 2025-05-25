@@ -1,16 +1,18 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Calendar, Gauge } from "lucide-react";
+import { Gauge, Gift, IdCard } from "lucide-react";
 import Link from "next/link";
 
 interface Vehicle {
-  id: string;
+  uuid: string;
   make: string;
   model: string;
   year: number;
   nickname?: string;
   currentOdometer: number;
   createdAt: Date;
+  licensePlate?: string;
+  purchaseDate?: Date;
 }
 
 interface VehicleCardProps {
@@ -21,29 +23,46 @@ export function VehicleCard({ vehicle }: VehicleCardProps) {
   const displayName =
     vehicle.nickname || `${vehicle.year} ${vehicle.make} ${vehicle.model}`;
 
+  const daysOwned = vehicle.purchaseDate
+    ? Math.floor(
+        (new Date().getTime() - new Date(vehicle.purchaseDate).getTime()) /
+          (1000 * 60 * 60 * 24)
+      )
+    : null;
+
   return (
     <Card className="hover:shadow-md transition-shadow">
       <CardHeader className="pb-3">
         <CardTitle className="text-lg">{displayName}</CardTitle>
-        <p className="text-sm text-gray-600">
-          {vehicle.year} {vehicle.make} {vehicle.model}
-        </p>
+        {vehicle.nickname && (
+          <p className="text-sm text-gray-600">
+            {vehicle.year} {vehicle.make} {vehicle.model}
+          </p>
+        )}
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-2">
         <div className="flex items-center space-x-2 text-sm text-gray-600">
           <Gauge className="h-4 w-4" />
           <span>{vehicle.currentOdometer.toLocaleString()} miles</span>
         </div>
         <div className="flex items-center space-x-2 text-sm text-gray-600">
-          <Calendar className="h-4 w-4" />
-          <span>Added {vehicle.createdAt.toLocaleDateString()}</span>
+          <IdCard className="h-4 w-4" />
+          <span>{vehicle.licensePlate}</span>
         </div>
+        {daysOwned && (
+          <div className="flex items-center space-x-2 text-sm text-gray-600">
+            <Gift className="h-4 w-4" />
+            <span>{`Bought ${daysOwned} days ago`}</span>
+          </div>
+        )}
         <div className="flex space-x-2">
           <Button asChild className="flex-1">
-            <Link href={`/dashboard/vehicles/${vehicle.id}`}>View Details</Link>
+            <Link href={`/dashboard/vehicles/${vehicle.uuid}`}>
+              View Details
+            </Link>
           </Button>
           <Button asChild variant="outline" className="flex-1">
-            <Link href={`/dashboard/vehicles/${vehicle.id}/jobs/new`}>
+            <Link href={`/dashboard/vehicles/${vehicle.uuid}/jobs/new`}>
               Add Job
             </Link>
           </Button>

@@ -1,4 +1,3 @@
-// src/app/api/vehicles/[vehicleId]/jobs/[jobId]/route.ts
 import { authOptions } from "@/lib/auth";
 import { db } from "@/lib/db";
 import {
@@ -15,8 +14,8 @@ import { NextRequest, NextResponse } from "next/server";
 
 interface RouteParams {
   params: {
-    vehicleId: string;
-    jobId: string;
+    vehicleUuid: string;
+    jobUuid: string;
   };
 }
 
@@ -35,8 +34,8 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       .innerJoin(vehicles, eq(jobs.vehicleId, vehicles.id))
       .where(
         and(
-          eq(jobs.id, params.jobId),
-          eq(jobs.vehicleId, params.vehicleId),
+          eq(jobs.uuid, params.jobUuid),
+          eq(jobs.vehicleId, vehicles.id),
           eq(vehicles.userId, session.user.id)
         )
       )
@@ -52,7 +51,8 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     const jobRecords = await db
       .select()
       .from(records)
-      .where(eq(records.jobId, params.jobId));
+      .innerJoin(jobs, eq(records.jobId, jobs.id))
+      .where(eq(jobs.uuid, params.jobUuid));
 
     // Get parts and tags for each record
     const enrichedRecords = await Promise.all(
@@ -61,7 +61,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
         const recordParts = await db
           .select()
           .from(parts)
-          .where(eq(parts.recordId, record.id));
+          .where(eq(parts.recordId, record.records.id));
 
         // Get tags for this record
         const recordTagsData = await db
@@ -72,7 +72,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
           })
           .from(recordTags)
           .innerJoin(tags, eq(recordTags.tagId, tags.id))
-          .where(eq(recordTags.recordId, record.id));
+          .where(eq(recordTags.recordId, record.records.id));
 
         // Calculate total cost for this record
         const totalCost = recordParts.reduce((sum, part) => {
@@ -80,9 +80,9 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
         }, 0);
 
         return {
-          id: record.id,
-          title: record.title,
-          notes: record.notes,
+          id: record.records.id,
+          title: record.records.title,
+          notes: record.records.notes,
           parts: recordParts.map((part) => ({
             id: part.id,
             name: part.name,
