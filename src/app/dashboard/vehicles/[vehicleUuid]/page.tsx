@@ -8,7 +8,12 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { calculateDiyLaborSaved } from "@/utils/cost";
+import {
+  calculateDiyLaborSavedString,
+  calculateMilesPerTank,
+  formatDiyHours,
+  milesDrivenPerDay,
+} from "@/utils/vehicleInsights";
 import {
   ArrowLeft,
   Calendar,
@@ -47,7 +52,7 @@ interface Job {
   notes?: string;
   totalPartsCount: number;
   totalPartsCost: string;
-  hours: number;
+  hours?: number;
 }
 
 interface FuelEntry {
@@ -106,6 +111,13 @@ export default function VehicleDetailPage() {
 
     fetchData();
   }, [vehicleUuid]);
+
+  const totalDiyHours = jobs.reduce((sum, job) => {
+    if (job.isDiy && job.hours && job.hours > 0) {
+      return sum + job.hours;
+    }
+    return sum;
+  }, 0);
 
   if (loading) {
     return (
@@ -207,7 +219,14 @@ export default function VehicleDetailPage() {
                 <p className="text-2xl font-bold">
                   {vehicle.currentOdometer.toLocaleString()}
                 </p>
-                <p className="text-xs text-muted-foreground">miles</p>
+                <p className="text-xs text-muted-foreground">
+                  {milesDrivenPerDay(
+                    vehicle.initialOdometer,
+                    vehicle.currentOdometer,
+                    new Date(vehicle.purchaseDate || ""),
+                    new Date()
+                  )}
+                </p>
               </div>
             </div>
           </CardContent>
@@ -222,18 +241,9 @@ export default function VehicleDetailPage() {
                   Total Jobs
                 </p>
                 <p className="text-2xl font-bold">{jobs.length}</p>
-                {jobs.length > 0 && (
-                  <p className="text-xs text-muted-foreground">
-                    {`$${calculateDiyLaborSaved(
-                      jobs.reduce((sum, job) => {
-                        if (job.isDiy && job.hours && job.hours > 0) {
-                          return sum + job.hours;
-                        }
-                        return sum;
-                      }, 0)
-                    )} saved by DIYing`}
-                  </p>
-                )}
+                <p className="text-xs text-muted-foreground">
+                  {`${formatDiyHours(totalDiyHours)}`}
+                </p>
               </div>
             </div>
           </CardContent>
@@ -248,7 +258,9 @@ export default function VehicleDetailPage() {
                   Total Spent
                 </p>
                 <p className="text-2xl font-bold">${totalSpent.toFixed(2)}</p>
-                <p className="text-xs text-muted-foreground">all maintenance</p>
+                <p className="text-xs text-muted-foreground">
+                  {`${calculateDiyLaborSavedString(totalDiyHours)}`}
+                </p>
               </div>
             </div>
           </CardContent>
@@ -284,7 +296,9 @@ export default function VehicleDetailPage() {
                     {averageMpg > 0 ? averageMpg.toFixed(1) : "--"}
                   </p>
                   <p className="text-xs text-muted-foreground">
-                    {fuelEntries.length} fuel stops
+                    {`${calculateMilesPerTank(
+                      fuelEntries.map((entry) => entry.odometer)
+                    )}`}
                   </p>
                 </div>
               </div>

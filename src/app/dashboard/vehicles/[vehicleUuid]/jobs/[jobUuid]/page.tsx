@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { calculateDiyLaborSaved } from "@/utils/cost";
+import { calculateDiyLaborSavedString } from "@/utils/vehicleInsights";
 import {
   ArrowLeft,
   DollarSign,
@@ -255,7 +255,7 @@ export default function JobDetailPage() {
                   {job.hours} Labor Hours Saved by DIYing
                 </span>
                 <span className="font-semibold">
-                  ${calculateDiyLaborSaved(job.hours).toFixed(2)}
+                  {calculateDiyLaborSavedString(job.hours)}
                 </span>
               </div>
             )}

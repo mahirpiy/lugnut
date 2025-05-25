@@ -82,7 +82,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
           totalPartsCount,
           totalPartsCost: totalPartsCost.toFixed(2),
           uuid: job.uuid,
-          hours: job.hours,
+          hours: job.hours ? parseFloat(job.hours) : 0,
         };
       })
     );
