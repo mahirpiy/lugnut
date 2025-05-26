@@ -18,7 +18,7 @@ CREATE TABLE "fuel_entries" (
 	"uuid" uuid DEFAULT gen_random_uuid() NOT NULL,
 	"vehicle_id" serial NOT NULL,
 	"date" timestamp NOT NULL,
-	"odometer" integer NOT NULL,
+	"odometer_id" serial NOT NULL,
 	"gallons" numeric(8, 3) NOT NULL,
 	"total_cost" numeric(10, 2),
 	"gas_station" text,
@@ -27,19 +27,52 @@ CREATE TABLE "fuel_entries" (
 	CONSTRAINT "fuel_entries_uuid_unique" UNIQUE("uuid")
 );
 --> statement-breakpoint
+CREATE TABLE "job_photos" (
+	"id" serial PRIMARY KEY NOT NULL,
+	"uuid" uuid DEFAULT gen_random_uuid() NOT NULL,
+	"job_id" serial NOT NULL,
+	"url" text NOT NULL,
+	"created_at" timestamp DEFAULT now(),
+	CONSTRAINT "job_photos_uuid_unique" UNIQUE("uuid")
+);
+--> statement-breakpoint
 CREATE TABLE "jobs" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"uuid" uuid DEFAULT gen_random_uuid() NOT NULL,
 	"vehicle_id" serial NOT NULL,
 	"title" text NOT NULL,
 	"date" timestamp NOT NULL,
-	"odometer" integer NOT NULL,
+	"odometer_id" serial NOT NULL,
 	"labor_cost" numeric(10, 2) DEFAULT '0.00',
 	"is_diy" boolean DEFAULT true,
+	"difficulty" integer DEFAULT 0,
 	"shop_name" text,
 	"notes" text,
+	"url" text,
+	"hours" numeric(10, 2),
 	"created_at" timestamp DEFAULT now(),
 	CONSTRAINT "jobs_uuid_unique" UNIQUE("uuid")
+);
+--> statement-breakpoint
+CREATE TABLE "odometer_entries" (
+	"id" serial PRIMARY KEY NOT NULL,
+	"uuid" uuid DEFAULT gen_random_uuid() NOT NULL,
+	"type" text DEFAULT 'reading' NOT NULL,
+	"vehicle_id" serial NOT NULL,
+	"odometer" integer NOT NULL,
+	"notes" text,
+	"entry_date" timestamp NOT NULL,
+	"created_at" timestamp DEFAULT now(),
+	CONSTRAINT "odometer_entries_uuid_unique" UNIQUE("uuid")
+);
+--> statement-breakpoint
+CREATE TABLE "part_photos" (
+	"id" serial PRIMARY KEY NOT NULL,
+	"uuid" uuid DEFAULT gen_random_uuid() NOT NULL,
+	"part_id" serial NOT NULL,
+	"url" text NOT NULL,
+	"created_at" timestamp DEFAULT now(),
+	CONSTRAINT "part_photos_uuid_unique" UNIQUE("uuid")
 );
 --> statement-breakpoint
 CREATE TABLE "parts" (
@@ -51,6 +84,7 @@ CREATE TABLE "parts" (
 	"manufacturer" text,
 	"cost" numeric(10, 2) DEFAULT '0.00',
 	"quantity" integer DEFAULT 1 NOT NULL,
+	"url" text,
 	CONSTRAINT "parts_uuid_unique" UNIQUE("uuid")
 );
 --> statement-breakpoint
@@ -80,8 +114,6 @@ CREATE TABLE "tags" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"uuid" uuid DEFAULT gen_random_uuid() NOT NULL,
 	"name" text NOT NULL,
-	"is_preset" boolean DEFAULT false,
-	"user_id" serial,
 	"created_at" timestamp DEFAULT now(),
 	CONSTRAINT "tags_uuid_unique" UNIQUE("uuid")
 );
@@ -128,11 +160,15 @@ CREATE TABLE "verificationToken" (
 --> statement-breakpoint
 ALTER TABLE "account" ADD CONSTRAINT "account_userId_user_id_fk" FOREIGN KEY ("userId") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "fuel_entries" ADD CONSTRAINT "fuel_entries_vehicle_id_vehicles_id_fk" FOREIGN KEY ("vehicle_id") REFERENCES "public"."vehicles"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "fuel_entries" ADD CONSTRAINT "fuel_entries_odometer_id_odometer_entries_id_fk" FOREIGN KEY ("odometer_id") REFERENCES "public"."odometer_entries"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "job_photos" ADD CONSTRAINT "job_photos_job_id_jobs_id_fk" FOREIGN KEY ("job_id") REFERENCES "public"."jobs"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "jobs" ADD CONSTRAINT "jobs_vehicle_id_vehicles_id_fk" FOREIGN KEY ("vehicle_id") REFERENCES "public"."vehicles"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "jobs" ADD CONSTRAINT "jobs_odometer_id_odometer_entries_id_fk" FOREIGN KEY ("odometer_id") REFERENCES "public"."odometer_entries"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "odometer_entries" ADD CONSTRAINT "odometer_entries_vehicle_id_vehicles_id_fk" FOREIGN KEY ("vehicle_id") REFERENCES "public"."vehicles"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "part_photos" ADD CONSTRAINT "part_photos_part_id_parts_id_fk" FOREIGN KEY ("part_id") REFERENCES "public"."parts"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "parts" ADD CONSTRAINT "parts_record_id_records_id_fk" FOREIGN KEY ("record_id") REFERENCES "public"."records"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "record_tags" ADD CONSTRAINT "record_tags_record_id_records_id_fk" FOREIGN KEY ("record_id") REFERENCES "public"."records"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "record_tags" ADD CONSTRAINT "record_tags_tag_id_tags_id_fk" FOREIGN KEY ("tag_id") REFERENCES "public"."tags"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "records" ADD CONSTRAINT "records_job_id_jobs_id_fk" FOREIGN KEY ("job_id") REFERENCES "public"."jobs"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "session" ADD CONSTRAINT "session_userId_user_id_fk" FOREIGN KEY ("userId") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "tags" ADD CONSTRAINT "tags_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "vehicles" ADD CONSTRAINT "vehicles_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;

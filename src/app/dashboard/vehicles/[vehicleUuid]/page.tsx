@@ -211,28 +211,30 @@ export default function VehicleDetailPage() {
 
       {/* Vehicle Stats */}
       <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8">
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center space-x-2">
-              <Gauge className="h-5 w-5 text-blue-600" />
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">
-                  Current Odometer
-                </p>
-                <p className="text-2xl font-bold">
-                  {vehicle.currentOdometer.toLocaleString()}
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  {milesDrivenPerDay(
-                    vehicle.initialOdometer,
-                    vehicle.currentOdometer,
-                    new Date(vehicle.purchaseDate || ""),
-                    new Date()
-                  )}
-                </p>
+        <Card className="cursor-pointer hover:bg-accent/50 transition-colors">
+          <Link href={`/dashboard/vehicles/${vehicle.uuid}/odometer`}>
+            <CardContent className="pt-6">
+              <div className="flex items-center space-x-2">
+                <Gauge className="h-5 w-5 text-blue-600" />
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">
+                    Current Odometer
+                  </p>
+                  <p className="text-2xl font-bold">
+                    {vehicle.currentOdometer.toLocaleString()}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    {milesDrivenPerDay(
+                      vehicle.initialOdometer,
+                      vehicle.currentOdometer,
+                      new Date(vehicle.purchaseDate || ""),
+                      new Date()
+                    )}
+                  </p>
+                </div>
               </div>
-            </div>
-          </CardContent>
+            </CardContent>
+          </Link>
         </Card>
 
         <Card>

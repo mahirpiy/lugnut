@@ -3,6 +3,7 @@ import { db } from "@/lib/db";
 import {
   jobPhotos,
   jobs,
+  odometerEntries,
   partPhotos,
   parts,
   records,
@@ -50,8 +51,24 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 
     // Get all jobs for this vehicle
     const vehicleJobs = await db
-      .select()
+      .select({
+        // Job fields
+        id: jobs.id,
+        uuid: jobs.uuid,
+        title: jobs.title,
+        date: jobs.date,
+        laborCost: jobs.laborCost,
+        isDiy: jobs.isDiy,
+        shopName: jobs.shopName,
+        notes: jobs.notes,
+        hours: jobs.hours,
+        // Odometer fields
+        odometer: odometerEntries.odometer,
+        odometerDate: odometerEntries.entryDate,
+        odometerNotes: odometerEntries.notes,
+      })
       .from(jobs)
+      .innerJoin(odometerEntries, eq(jobs.odometerId, odometerEntries.id))
       .where(eq(jobs.vehicleId, vehicle[0].id))
       .orderBy(jobs.date);
 
@@ -168,83 +185,95 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       );
     }
 
-    // Create job without transaction (neon-http doesn't support transactions)
     try {
-      // Create job first
-      const [newJob] = await db
-        .insert(jobs)
-        .values({
-          vehicleId: vehicle[0].id,
-          title: validatedData.title,
-          date: validatedData.date,
-          odometer: validatedData.odometer,
-          laborCost: validatedData.laborCost?.toString() || "0.00",
-          isDiy: validatedData.isDiy, // New field
-          shopName: validatedData.shopName,
-          notes: validatedData.notes,
-          url: validatedData.url,
-          difficulty: validatedData.difficulty,
-          hours: validatedData.hours?.toString() || "0.00",
-        })
-        .returning();
-
-      if (validatedData.jobPhotos && validatedData.jobPhotos.length > 0) {
-        await db.insert(jobPhotos).values(
-          validatedData.jobPhotos.map((url) => ({
-            jobId: newJob.id,
-            url,
-          }))
+      const [newJob] = await db.transaction(async (tx) => {
+        // first create the odometer entry
+        const odometerId = await updateOdometer(
+          vehicle[0].id,
+          vehicle[0].currentOdometer,
+          validatedData.odometer,
+          "job",
+          validatedData.date
         );
-      }
 
-      // Create records and parts
-      for (const recordData of validatedData.records) {
-        const [newRecord] = await db
-          .insert(records)
+        if (odometerId instanceof Error) {
+          throw new Error("Failed to create odometer entry");
+        }
+
+        // Create job first
+        const [newJob] = await tx
+          .insert(jobs)
           .values({
-            jobId: newJob.id,
-            title: recordData.title,
-            notes: recordData.notes,
+            vehicleId: vehicle[0].id,
+            title: validatedData.title,
+            date: validatedData.date,
+            odometerId: odometerId,
+            laborCost: validatedData.laborCost?.toString() || "0.00",
+            isDiy: validatedData.isDiy, // New field
+            shopName: validatedData.shopName,
+            notes: validatedData.notes,
+            url: validatedData.url,
+            difficulty: validatedData.difficulty,
+            hours: validatedData.hours?.toString() || "0.00",
           })
           .returning();
 
-        // Create parts for this record
-        for (const partData of recordData.parts) {
-          const [newPart] = await db
-            .insert(parts)
+        if (validatedData.jobPhotos && validatedData.jobPhotos.length > 0) {
+          await tx.insert(jobPhotos).values(
+            validatedData.jobPhotos.map((url) => ({
+              jobId: newJob.id,
+              url,
+            }))
+          );
+        }
+
+        // Create records and parts
+        for (const recordData of validatedData.records) {
+          const [newRecord] = await tx
+            .insert(records)
             .values({
-              recordId: newRecord.id,
-              name: partData.name,
-              partNumber: partData.partNumber,
-              manufacturer: partData.manufacturer,
-              cost: partData.cost?.toString() || "0.00",
-              quantity: partData.quantity,
-              url: partData.url,
+              jobId: newJob.id,
+              title: recordData.title,
+              notes: recordData.notes,
             })
             .returning();
 
-          if (partData.partPhotos && partData.partPhotos.length > 0) {
-            await db.insert(partPhotos).values(
-              partData.partPhotos.map((url) => ({
-                partId: newPart.id,
-                url,
-              }))
-            );
+          // Create parts for this record
+          for (const partData of recordData.parts) {
+            const [newPart] = await tx
+              .insert(parts)
+              .values({
+                recordId: newRecord.id,
+                name: partData.name,
+                partNumber: partData.partNumber,
+                manufacturer: partData.manufacturer,
+                cost: partData.cost?.toString() || "0.00",
+                quantity: partData.quantity,
+                url: partData.url,
+              })
+              .returning();
+
+            if (partData.partPhotos && partData.partPhotos.length > 0) {
+              await tx.insert(partPhotos).values(
+                partData.partPhotos.map((url) => ({
+                  partId: newPart.id,
+                  url,
+                }))
+              );
+            }
+          }
+
+          // Create record-tag relationships
+          for (const tagId of recordData.tagIds) {
+            await tx.insert(recordTags).values({
+              recordId: newRecord.id,
+              tagId: tagId,
+            });
           }
         }
 
-        // Create record-tag relationships
-        for (const tagId of recordData.tagIds) {
-          await db.insert(recordTags).values({
-            recordId: newRecord.id,
-            tagId: tagId,
-          });
-        }
-      }
-
-      if (validatedData.odometer > vehicleData.currentOdometer) {
-        await updateOdometer(vehicleUuid, validatedData.odometer);
-      }
+        return [newJob];
+      });
 
       return NextResponse.json(newJob, { status: 201 });
     } catch (insertError) {

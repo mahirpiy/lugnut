@@ -87,7 +87,7 @@ export default function NewVehiclePage() {
       <div className="mb-6">
         <Link
           href="/dashboard"
-          className="inline-flex items-center text-sm text-gray-600 hover:text-gray-900 mb-4"
+          className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground mb-4"
         >
           <ArrowLeft className="h-4 w-4 mr-1" />
           Back to Dashboard
@@ -95,10 +95,10 @@ export default function NewVehiclePage() {
         <div className="flex items-center space-x-3">
           <Car className="h-8 w-8 text-stone-600" />
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">
+            <h1 className="text-2xl font-bold text-foreground">
               Add New Vehicle
             </h1>
-            <p className="text-gray-600">
+            <p className="text-muted-foreground">
               Enter your vehicle information to get started
             </p>
           </div>
@@ -137,7 +137,7 @@ export default function NewVehiclePage() {
                 <Label htmlFor="model">Model *</Label>
                 <Input
                   id="model"
-                  placeholder="Camry, F-150, 3 Series..."
+                  placeholder="4Runner, F-150, M3..."
                   {...register("model")}
                 />
                 {errors.model && (
@@ -218,7 +218,7 @@ export default function NewVehiclePage() {
                       onChange: handleInitialOdometerChange,
                     })}
                   />
-                  <p className="text-xs text-gray-500">
+                  <p className="text-xs text-muted-foreground">
                     Odometer reading when you acquired the vehicle
                   </p>
                   {errors.initialOdometer && (
@@ -238,7 +238,7 @@ export default function NewVehiclePage() {
                     min={initialOdometer}
                     {...register("currentOdometer", { valueAsNumber: true })}
                   />
-                  <p className="text-xs text-gray-500">
+                  <p className="text-xs text-muted-foreground">
                     Current odometer reading
                   </p>
                   {errors.currentOdometer && (

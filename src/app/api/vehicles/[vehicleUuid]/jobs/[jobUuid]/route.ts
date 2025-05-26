@@ -3,6 +3,7 @@ import { db } from "@/lib/db";
 import {
   jobPhotos,
   jobs,
+  odometerEntries,
   partPhotos,
   parts,
   records,
@@ -32,8 +33,12 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 
     // Verify vehicle ownership and get job
     const jobData = await db
-      .select()
+      .select({
+        job: jobs,
+        odometer: odometerEntries.odometer,
+      })
       .from(jobs)
+      .innerJoin(odometerEntries, eq(jobs.odometerId, odometerEntries.id))
       .innerJoin(vehicles, eq(jobs.vehicleId, vehicles.id))
       .where(
         and(
@@ -49,7 +54,8 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       return NextResponse.json({ error: "Job not found" }, { status: 404 });
     }
 
-    const job = jobData[0].jobs;
+    const job = jobData[0].job;
+    const odometer = jobData[0].odometer;
 
     // Then get all photos for this job
     const photos = await db
@@ -134,7 +140,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       id: job.id,
       title: job.title,
       date: job.date,
-      odometer: job.odometer,
+      odometer: odometer,
       laborCost: job.laborCost,
       isDiy: job.isDiy, // Include isDiy field
       shopName: job.shopName,

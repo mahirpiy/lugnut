@@ -1,6 +1,6 @@
 import { authOptions } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { fuelEntries, vehicles } from "@/lib/db/schema";
+import { fuelEntries, odometerEntries, vehicles } from "@/lib/db/schema";
 import { updateOdometer } from "@/utils/odometer";
 import { and, desc, eq } from "drizzle-orm";
 import { getServerSession } from "next-auth";
@@ -72,10 +72,22 @@ export async function GET(request: Request, { params }: RouteParams) {
 
     // Get all fuel entries for this vehicle
     const entries = await db
-      .select()
+      .select({
+        fuelId: fuelEntries.id,
+        date: fuelEntries.date,
+        odometer: odometerEntries.odometer,
+        gallons: fuelEntries.gallons,
+        totalCost: fuelEntries.totalCost,
+        gasStation: fuelEntries.gasStation,
+        notes: fuelEntries.notes,
+      })
       .from(fuelEntries)
+      .innerJoin(
+        odometerEntries,
+        eq(fuelEntries.odometerId, odometerEntries.id)
+      )
       .where(eq(fuelEntries.vehicleId, vehicle[0].id))
-      .orderBy(desc(fuelEntries.date), desc(fuelEntries.odometer));
+      .orderBy(desc(fuelEntries.date), desc(odometerEntries.odometer));
 
     // Calculate MPG for each entry (except the first one)
     const enrichedEntries = entries.map((entry, index) => {
@@ -167,24 +179,35 @@ export async function POST(request: Request, { params }: RouteParams) {
       );
     }
 
-    // Create fuel entry
-    const [newEntry] = await db
-      .insert(fuelEntries)
-      .values({
-        vehicleId: vehicle[0].id,
-        date: validatedData.date,
-        odometer: validatedData.odometer,
-        gallons: validatedData.gallons.toString(),
-        totalCost: validatedData.totalCost?.toString(),
-        gasStation: validatedData.gasStation,
-        notes: validatedData.notes,
-      })
-      .returning();
+    const newEntry = await db.transaction(async (tx) => {
+      const odometerId = await updateOdometer(
+        vehicle[0].id,
+        vehicle[0].currentOdometer,
+        validatedData.odometer,
+        "fueling",
+        validatedData.date
+      );
 
-    // Update vehicle's current odometer if this entry is higher
-    if (validatedData.odometer > vehicleData.currentOdometer) {
-      await updateOdometer(vehicleUuid, validatedData.odometer);
-    }
+      if (odometerId instanceof Error) {
+        throw new Error("Failed to create odometer entry");
+      }
+
+      // Create fuel entry
+      const [newEntry] = await tx
+        .insert(fuelEntries)
+        .values({
+          vehicleId: vehicle[0].id,
+          date: validatedData.date,
+          odometerId: odometerId,
+          gallons: validatedData.gallons.toString(),
+          totalCost: validatedData.totalCost?.toString(),
+          gasStation: validatedData.gasStation,
+          notes: validatedData.notes,
+        })
+        .returning();
+
+      return newEntry;
+    });
 
     return NextResponse.json(newEntry, { status: 201 });
   } catch (error) {

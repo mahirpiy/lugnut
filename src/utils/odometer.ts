@@ -1,17 +1,40 @@
 import { db } from "@/lib/db";
-import { vehicles } from "@/lib/db/schema";
+import { odometerEntries, vehicles } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 
 export async function updateOdometer(
-  vehicleUuid: string,
-  newOdometer: number
-): Promise<Error | null> {
+  vehicleId: number,
+  oldOdometer: number,
+  newOdometer: number,
+  type: "reading" | "fueling" | "job",
+  date: Date
+): Promise<number | Error> {
   try {
-    await db
-      .update(vehicles)
-      .set({ currentOdometer: newOdometer, updatedAt: new Date() })
-      .where(eq(vehicles.uuid, vehicleUuid));
-    return null;
+    const odometerId = await db.transaction(async (tx) => {
+      const [odometerRecord] = await tx
+        .insert(odometerEntries)
+        .values({
+          vehicleId: vehicleId,
+          odometer: newOdometer,
+          type: type,
+          entryDate: date,
+        })
+        .returning();
+
+      // if the odometer is less than the old odometer, return
+      if (newOdometer < oldOdometer) {
+        return odometerRecord.id;
+      }
+
+      await tx
+        .update(vehicles)
+        .set({ currentOdometer: newOdometer, updatedAt: new Date() })
+        .where(eq(vehicles.id, vehicleId));
+
+      return odometerRecord.id;
+    });
+
+    return odometerId;
   } catch (error) {
     console.error("Error updating odometer:", error);
     return error as Error;

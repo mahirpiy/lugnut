@@ -1,6 +1,6 @@
 import { authOptions } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { vehicles } from "@/lib/db/schema";
+import { odometerEntries, vehicles } from "@/lib/db/schema";
 import { vehicleSchema } from "@/lib/validations/vehicle";
 import { count, eq } from "drizzle-orm";
 import { getServerSession } from "next-auth";
@@ -65,15 +65,26 @@ export async function POST(request: NextRequest) {
 
     const validatedData = vehicleSchema.parse(transformedBody);
 
-    const newVehicle = await db
-      .insert(vehicles)
-      .values({
-        userId: session.user.id,
-        ...validatedData,
-      })
-      .returning();
+    const newVehicle = await db.transaction(async (tx) => {
+      const vehicle = await tx
+        .insert(vehicles)
+        .values({
+          userId: session.user.id,
+          ...validatedData,
+        })
+        .returning();
 
-    return NextResponse.json(newVehicle[0], { status: 201 });
+      await tx.insert(odometerEntries).values({
+        vehicleId: vehicle[0].id,
+        odometer: validatedData.initialOdometer,
+        type: "initial",
+        entryDate: new Date(),
+      });
+
+      return vehicle[0];
+    });
+
+    return NextResponse.json(newVehicle, { status: 201 });
   } catch (error) {
     console.error("Create vehicle error:", error);
     return NextResponse.json(

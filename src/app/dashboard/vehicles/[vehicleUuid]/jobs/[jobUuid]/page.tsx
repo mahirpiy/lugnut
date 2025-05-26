@@ -151,7 +151,11 @@ export default function JobDetailPage() {
           <div>
             <h1 className="text-2xl font-bold text-foreground">{job.title}</h1>
             <p className="text-muted-foreground">
-              {new Date(job.date).toLocaleDateString()}
+              {new Date(job.date).toLocaleDateString("en-US", {
+                month: "long",
+                day: "numeric",
+                year: "numeric",
+              })}
             </p>
           </div>
         </div>
@@ -260,7 +264,7 @@ export default function JobDetailPage() {
       <div className="space-y-6">
         <h2 className="text-xl font-bold">Maintenance Records</h2>
         {job.records.map((record) => (
-          <Card key={record.uuid} className="mb-8">
+          <Card key={`record-${record.uuid}`} className="mb-8">
             <CardHeader className="bg-muted">
               <div className="flex items-start justify-between">
                 <div>

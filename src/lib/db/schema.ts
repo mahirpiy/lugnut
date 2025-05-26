@@ -92,6 +92,19 @@ export const vehicles = pgTable("vehicles", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+export const odometerEntries = pgTable("odometer_entries", {
+  id: serial("id").primaryKey(),
+  uuid: uuid("uuid").defaultRandom().unique().notNull(),
+  type: text("type").notNull().default("reading"),
+  vehicleId: serial("vehicle_id")
+    .notNull()
+    .references(() => vehicles.id, { onDelete: "cascade" }),
+  odometer: integer("odometer").notNull(),
+  notes: text("notes"),
+  entryDate: timestamp("entry_date", { mode: "date" }).notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 export const jobs = pgTable("jobs", {
   id: serial("id").primaryKey(),
   uuid: uuid("uuid").defaultRandom().unique().notNull(),
@@ -100,7 +113,9 @@ export const jobs = pgTable("jobs", {
     .references(() => vehicles.id, { onDelete: "cascade" }),
   title: text("title").notNull(),
   date: timestamp("date", { mode: "date" }).notNull(),
-  odometer: integer("odometer").notNull(),
+  odometerId: serial("odometer_id")
+    .notNull()
+    .references(() => odometerEntries.id, { onDelete: "cascade" }),
   laborCost: decimal("labor_cost", { precision: 10, scale: 2 }).default("0.00"),
   isDiy: boolean("is_diy").default(true),
   difficulty: integer("difficulty").default(0),
@@ -165,7 +180,9 @@ export const fuelEntries = pgTable("fuel_entries", {
     .notNull()
     .references(() => vehicles.id, { onDelete: "cascade" }),
   date: timestamp("date", { mode: "date" }).notNull(),
-  odometer: integer("odometer").notNull(),
+  odometerId: serial("odometer_id")
+    .notNull()
+    .references(() => odometerEntries.id, { onDelete: "cascade" }),
   gallons: decimal("gallons", { precision: 8, scale: 3 }).notNull(),
   totalCost: decimal("total_cost", { precision: 10, scale: 2 }),
   gasStation: text("gas_station"),

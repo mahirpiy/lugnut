@@ -1,1 +1,0 @@
-ALTER TABLE "jobs" ADD COLUMN "hours" numeric(10, 2);
