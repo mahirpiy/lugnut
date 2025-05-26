@@ -36,6 +36,13 @@
       "when": 1748148837593,
       "tag": "0004_curly_machine_man",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1748221099086,
+      "tag": "0005_freezing_robin_chapel",
+      "breakpoints": true
     }
   ]
 }

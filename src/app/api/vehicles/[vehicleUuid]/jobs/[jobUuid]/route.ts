@@ -1,6 +1,7 @@
 import { authOptions } from "@/lib/auth";
 import { db } from "@/lib/db";
 import {
+  jobPhotos,
   jobs,
   parts,
   records,
@@ -48,6 +49,12 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     }
 
     const job = jobData[0].jobs;
+
+    // Then get all photos for this job
+    const photos = await db
+      .select()
+      .from(jobPhotos)
+      .where(eq(jobPhotos.jobId, job.id));
 
     // Get all records for this job
     const jobRecords = await db
@@ -123,6 +130,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       totalCost,
       hours: job.hours,
       difficulty: job.difficulty,
+      photos: photos.map((photo) => photo.url),
     };
 
     return NextResponse.json(response);

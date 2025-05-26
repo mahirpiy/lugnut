@@ -89,6 +89,9 @@ export default function VehicleDetailPage() {
         const jobsResponse = await fetch(`/api/vehicles/${vehicleUuid}/jobs`);
         if (jobsResponse.ok) {
           const jobsData = await jobsResponse.json();
+          jobsData.sort((a: Job, b: Job) => {
+            return new Date(b.date).getTime() - new Date(a.date).getTime();
+          });
           setJobs(jobsData);
         }
 

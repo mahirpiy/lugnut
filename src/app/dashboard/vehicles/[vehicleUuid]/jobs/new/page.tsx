@@ -9,9 +9,9 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { FileUpload } from "@/components/ui/file-upload";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { PhotoUploadModal } from "@/components/ui/photo-upload-modal";
 import { Separator } from "@/components/ui/separator";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
@@ -19,7 +19,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { jobSchema, type JobInput } from "@/lib/validations/job";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowLeft, Wrench } from "lucide-react";
-import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -47,8 +46,8 @@ export default function NewJobPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [tags, setTags] = useState<Tag[]>([]);
-  const [jobPhotos, setJobPhotos] = useState<string[]>([]);
   const [vehicle, setVehicle] = useState<Vehicle | null>(null);
+  const [jobPhotos, setJobPhotos] = useState<string[]>([]);
   const router = useRouter();
 
   const {
@@ -166,20 +165,20 @@ export default function NewJobPage() {
     router.push(`/dashboard/vehicles/${vehicleUuid}`);
   };
 
-  const handleRemovePhoto = async (photo: string) => {
-    setJobPhotos(jobPhotos.filter((p) => p !== photo));
-    setValue(
-      "jobPhotos",
-      jobPhotos.filter((p) => p !== photo)
-    );
+  // const handleRemovePhoto = async (photo: { url: string; name: string }) => {
+  //   setJobPhotos(jobPhotos.filter((p) => p.url !== photo.url));
+  //   setValue(
+  //     "jobPhotos",
+  //     jobPhotos.filter((p) => p.url !== photo.url)
+  //   );
 
-    // Delete orphaned files
-    await fetch("/api/uploadthing/delete", {
-      method: "DELETE",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ fileKeys: [photo] }),
-    });
-  };
+  //   // Delete orphaned files
+  //   await fetch("/api/uploadthing/delete", {
+  //     method: "DELETE",
+  //     headers: { "Content-Type": "application/json" },
+  //     body: JSON.stringify({ fileKeys: [photo] }),
+  //   });
+  // };
 
   if (!vehicle) {
     return (
@@ -210,9 +209,6 @@ export default function NewJobPage() {
           <Wrench className="h-8 w-8 text-stone-600" />
           <div>
             <h1 className="text-2xl font-bold text-foreground">Add New Job</h1>
-            <p className="text-muted-foreground">
-              Record maintenance work for {displayName}
-            </p>
           </div>
         </div>
       </div>
@@ -411,47 +407,24 @@ export default function NewJobPage() {
             </div>
             <div className="space-y-2">
               <Label>Job Photos (Optional)</Label>
-
-              <FileUpload
+              <p className="text-xs text-muted-foreground">
+                Add photos to document your work (optional)
+              </p>
+              <PhotoUploadModal
                 endpoint="jobImage"
                 onUploadComplete={(files) => {
-                  const urls = files.map((f) => f.url);
-                  setJobPhotos((prev) => [...prev, ...urls]);
-                  setValue("jobPhotos", [...jobPhotos, ...urls]); // Update form data
-                  console.log(urls);
+                  setJobPhotos(files.map((file) => file.url));
+                  setValue(
+                    "jobPhotos",
+                    files.map((file) => file.url)
+                  );
                 }}
-                onUploadError={(error) => setError(error.message)}
+                onUploadError={(error) => {
+                  console.error("Photo upload error:", error);
+                  setError("Failed to upload photos. Please try again.");
+                }}
+                maxFiles={5}
               />
-
-              {/* Show uploaded photos immediately */}
-              {jobPhotos.length > 0 && (
-                <div className="mt-4">
-                  <p className="text-sm text-muted-foreground mb-2">
-                    Uploaded Photos ({jobPhotos.length}/5)
-                  </p>
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                    {jobPhotos.map((url, index) => (
-                      <div key={index} className="relative group">
-                        <Image
-                          src={url}
-                          alt={`Photo ${index + 1}`}
-                          width={200}
-                          height={96}
-                          className="w-full h-24 object-cover rounded border"
-                        />
-                        {/* Optional: Remove button */}
-                        <button
-                          type="button"
-                          onClick={() => handleRemovePhoto(url)}
-                          className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-5 h-5 text-xs opacity-0 group-hover:opacity-100 transition-opacity"
-                        >
-                          ×
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
             </div>
           </CardContent>
         </Card>

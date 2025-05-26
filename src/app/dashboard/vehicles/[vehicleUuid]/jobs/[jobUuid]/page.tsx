@@ -13,6 +13,7 @@ import {
   ScrollText,
   Wrench,
 } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -57,6 +58,7 @@ interface Job {
   url?: string;
   difficulty: number;
   hours?: number;
+  photos?: string[];
 }
 
 interface Vehicle {
@@ -269,6 +271,29 @@ export default function JobDetailPage() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Job Photos */}
+      {job.photos && job.photos.length > 0 && (
+        <div className="mb-8">
+          <h2 className="text-xl font-bold mb-4">Job Photos</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {job.photos.map((photo, index) => (
+              <div
+                key={photo}
+                className="aspect-square relative rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow cursor-pointer"
+                onClick={() => window.open(photo, "_blank")}
+              >
+                <Image
+                  src={photo}
+                  alt={`Job Photo ${index + 1}`}
+                  fill
+                  className="object-cover hover:scale-105 transition-transform duration-200"
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Records */}
       <div className="space-y-6">

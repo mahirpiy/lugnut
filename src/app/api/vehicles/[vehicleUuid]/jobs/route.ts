@@ -1,7 +1,16 @@
 import { authOptions } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { jobs, parts, records, recordTags, vehicles } from "@/lib/db/schema";
+import {
+  jobPhotos,
+  jobs,
+  partPhotos,
+  parts,
+  records,
+  recordTags,
+  vehicles,
+} from "@/lib/db/schema";
 import { jobSchema } from "@/lib/validations/job";
+import { updateOdometer } from "@/utils/odometer";
 import { and, count, eq } from "drizzle-orm";
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
@@ -179,6 +188,15 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         })
         .returning();
 
+      if (validatedData.jobPhotos && validatedData.jobPhotos.length > 0) {
+        await db.insert(jobPhotos).values(
+          validatedData.jobPhotos.map((url) => ({
+            jobId: newJob.id,
+            url,
+          }))
+        );
+      }
+
       // Create records and parts
       for (const recordData of validatedData.records) {
         const [newRecord] = await db
@@ -192,15 +210,27 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 
         // Create parts for this record
         for (const partData of recordData.parts) {
-          await db.insert(parts).values({
-            recordId: newRecord.id,
-            name: partData.name,
-            partNumber: partData.partNumber,
-            manufacturer: partData.manufacturer,
-            cost: partData.cost?.toString() || "0.00",
-            quantity: partData.quantity,
-            url: partData.url,
-          });
+          const [newPart] = await db
+            .insert(parts)
+            .values({
+              recordId: newRecord.id,
+              name: partData.name,
+              partNumber: partData.partNumber,
+              manufacturer: partData.manufacturer,
+              cost: partData.cost?.toString() || "0.00",
+              quantity: partData.quantity,
+              url: partData.url,
+            })
+            .returning();
+
+          if (partData.partPhotos && partData.partPhotos.length > 0) {
+            await db.insert(partPhotos).values(
+              partData.partPhotos.map((url) => ({
+                partId: newPart.id,
+                url,
+              }))
+            );
+          }
         }
 
         // Create record-tag relationships
@@ -212,15 +242,8 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         }
       }
 
-      // Update vehicle's current odometer only if this job's odometer is higher
       if (validatedData.odometer > vehicleData.currentOdometer) {
-        await db
-          .update(vehicles)
-          .set({
-            currentOdometer: validatedData.odometer,
-            updatedAt: new Date(),
-          })
-          .where(eq(vehicles.id, vehicle[0].id));
+        await updateOdometer(vehicleUuid, validatedData.odometer);
       }
 
       return NextResponse.json(newJob, { status: 201 });

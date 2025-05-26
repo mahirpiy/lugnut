@@ -17,6 +17,7 @@ export const partSchema = z.object({
   cost: z.number().min(0, "Cost cannot be negative").optional(),
   quantity: z.number().int().min(1, "Quantity must be at least 1"),
   url: z.string().url("Please enter a valid URL").optional().or(z.literal("")),
+  partPhotos: z.array(z.string()).optional(),
 });
 
 export const recordSchema = z.object({
