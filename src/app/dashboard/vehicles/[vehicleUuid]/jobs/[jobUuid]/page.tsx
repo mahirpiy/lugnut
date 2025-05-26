@@ -244,9 +244,11 @@ export default function JobDetailPage() {
           <TabsTrigger value="costs" className="flex-1">
             Costs
           </TabsTrigger>
-          <TabsTrigger value="photos" className="flex-1">
-            Photos
-          </TabsTrigger>
+          {job.photos && job.photos.length > 0 && (
+            <TabsTrigger value="photos" className="flex-1">
+              Photos ({job.photos.length})
+            </TabsTrigger>
+          )}
         </TabsList>
 
         <TabsContent value="records" className="space-y-6">

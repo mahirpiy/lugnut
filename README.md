@@ -1,6 +1,6 @@
 ## Lugnut
 
-Lugnut is a tool for managing your vehicle maintenance records. I built it because I was tired of using Excel to manage my vehicle maintenance records and needed a new side project to play with. Money would be cool so I might monetize this in some way. If you're actually reading this on GitHub, I'll give you all the paid features for free.
+Lugnut is a tool for managing your vehicle maintenance records. I built it because I was tired of using Excel to manage my vehicle maintenance records and needed a new side project to play with. Money would be cool so I might monetize this in some way. If you're actually reading this on GitHub (email mahir@piyarali.io with the subject line "Lugnut2025") and I'll give you all the paid features for free.
 
 ### Features
 
@@ -12,16 +12,16 @@ Lugnut is a tool for managing your vehicle maintenance records. I built it becau
 ### Tech Stack
 
 - Next.js with Tailwind CSS
-- Neon (postgres) with Drizzle
+- Drizzle
 - NextAuth
 - Vercel
+- Uploadthing
 
 ### Future Plans
 
 1. Data export -- I hate apps that don't let me export my data
 1. I wanna make money so I'll probs set up a subscription model
 1. In the name of making money, might as well add some ads for Rock Auto or local shops
-1. Image and video support for records
 1. Maintenance scheduling or planning
 
 ### Long Shot Features

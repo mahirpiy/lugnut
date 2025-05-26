@@ -1,5 +1,6 @@
 "use client";
 
+import AddJob from "@/components/clickable/AddJob";
 import { BackToVehicle } from "@/components/clickable/BackToVehicle";
 import { Button } from "@/components/ui/button";
 import {
@@ -120,12 +121,7 @@ export default function VehicleJobsPage() {
               All maintenance jobs for this vehicle
             </CardDescription>
           </div>
-          <Button asChild>
-            <Link href={`/dashboard/vehicles/${vehicleUuid}/jobs/new`}>
-              <Plus className="h-4 w-4 mr-2" />
-              Add Job
-            </Link>
-          </Button>
+          <AddJob vehicleUuid={vehicleUuid as string} jobCount={jobs.length} />
         </CardHeader>
         <CardContent>
           {jobs.length === 0 ? (
