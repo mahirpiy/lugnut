@@ -124,9 +124,17 @@ export default function JobDetailPage() {
       {/* Odometer Entries */}
       <Card className="mb-8">
         <CardHeader>
-          <CardTitle className="flex items-center space-x-2">
-            <ScrollText className="h-5 w-5" />
-            <span>Odometer History</span>
+          <CardTitle className="flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <ScrollText className="h-5 w-5" />
+              <span>Odometer History</span>
+            </div>
+            <Button asChild size="sm">
+              <Link href={`/dashboard/vehicles/${vehicleUuid}/odometer/new`}>
+                <Gauge className="h-4 w-4 mr-2" />
+                Add Reading
+              </Link>
+            </Button>
           </CardTitle>
         </CardHeader>
         <CardContent>

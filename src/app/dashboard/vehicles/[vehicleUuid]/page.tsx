@@ -212,6 +212,14 @@ export default function VehicleDetailPage() {
                 </Link>
               </Button>
             )}
+            {isPaid && (
+              <Button asChild variant="outline">
+                <Link href={`/dashboard/vehicles/${vehicle.uuid}/odometer/new`}>
+                  <Gauge className="h-4 w-4 mr-2" />
+                  Add Odometer
+                </Link>
+              </Button>
+            )}
           </div>
         </div>
       </div>
