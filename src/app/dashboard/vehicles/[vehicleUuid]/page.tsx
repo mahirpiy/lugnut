@@ -191,12 +191,19 @@ export default function VehicleDetailPage() {
             )}
           </div>
           <div className="flex space-x-2">
-            <Button asChild>
-              <Link href={`/dashboard/vehicles/${vehicle.uuid}/jobs/new`}>
+            {!isPaid && jobs.length >= 2 ? (
+              <Button variant="outline">
                 <Plus className="h-4 w-4 mr-2" />
-                Add Job
-              </Link>
-            </Button>
+                Upgrade to add more jobs
+              </Button>
+            ) : (
+              <Button asChild>
+                <Link href={`/dashboard/vehicles/${vehicle.uuid}/jobs/new`}>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Job
+                </Link>
+              </Button>
+            )}
             {isPaid && (
               <Button asChild variant="outline">
                 <Link href={`/dashboard/vehicles/${vehicle.uuid}/fuel/new`}>
@@ -310,20 +317,21 @@ export default function VehicleDetailPage() {
             </CardContent>
           </Card>
         ) : (
-          <Card className="border-orange-200 bg-orange-50">
+          <Card className="relative">
+            <div className="absolute inset-0 backdrop-blur-[1px] bg-background/60 z-10 flex items-center justify-center">
+              <Button variant="outline">Upgrade to track fuel</Button>
+            </div>
             <CardContent className="pt-6">
               <div className="flex items-center space-x-2">
-                <Fuel className="h-5 w-5 text-orange-600" />
+                <Fuel className="h-5 w-5 text-cyan-600" />
                 <div>
-                  <p className="text-sm font-medium text-orange-900">
-                    Fuel Tracking
+                  <p className="text-sm font-medium text-muted-foreground">
+                    Average MPG
                   </p>
-                  <p className="text-sm font-bold text-orange-800">
-                    Pro Feature
+                  <p className="text-2xl font-bold">23.0</p>
+                  <p className="text-xs text-muted-foreground">
+                    miles per tank
                   </p>
-                  <Button variant="outline" size="sm" className="mt-1">
-                    Upgrade
-                  </Button>
                 </div>
               </div>
             </CardContent>

@@ -18,7 +18,7 @@ export function formatDiyHours(diyHours: number): string {
   if (hours > 0) parts.push(`${hours}h`);
   if (minutes > 0) parts.push(`${minutes}m`);
 
-  return `${parts.join(" ") || "0h"} spent DIYing`;
+  return `${parts.join(" ") || "0h"} spent wrenching`;
 }
 
 export function calculateMilesPerTank(fuelOdometers: number[]): string {

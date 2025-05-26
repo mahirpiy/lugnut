@@ -14,7 +14,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowLeft, Fuel } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -53,18 +53,13 @@ interface Vehicle {
   initialOdometer: number;
 }
 
-interface NewFuelEntryPageProps {
-  params: {
-    vehicleUuid: string;
-  };
-}
-
-export default function NewFuelEntryPage({ params }: NewFuelEntryPageProps) {
+export default function NewFuelEntryPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [vehicle, setVehicle] = useState<Vehicle | null>(null);
   const router = useRouter();
 
+  const { vehicleUuid } = useParams();
   const {
     register,
     handleSubmit,
@@ -89,7 +84,7 @@ export default function NewFuelEntryPage({ params }: NewFuelEntryPageProps) {
   useEffect(() => {
     const fetchVehicle = async () => {
       try {
-        const response = await fetch(`/api/vehicles/${params.vehicleUuid}`);
+        const response = await fetch(`/api/vehicles/${vehicleUuid}`);
         if (response.ok) {
           const vehicleData = await response.json();
           setVehicle(vehicleData);
@@ -102,14 +97,14 @@ export default function NewFuelEntryPage({ params }: NewFuelEntryPageProps) {
     };
 
     fetchVehicle();
-  }, [params.vehicleUuid, setValue]);
+  }, [vehicleUuid, setValue]);
 
   const onSubmit = async (data: FuelEntryInput) => {
     setIsLoading(true);
     setError("");
 
     try {
-      const response = await fetch(`/api/vehicles/${params.vehicleUuid}/fuel`, {
+      const response = await fetch(`/api/vehicles/${vehicleUuid}/fuel`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -124,7 +119,7 @@ export default function NewFuelEntryPage({ params }: NewFuelEntryPageProps) {
         return;
       }
 
-      router.push(`/dashboard/vehicles/${params.vehicleUuid}`);
+      router.push(`/dashboard/vehicles/${vehicleUuid}`);
     } catch (err) {
       console.error(err);
       setError("Something went wrong. Please try again.");
@@ -151,7 +146,7 @@ export default function NewFuelEntryPage({ params }: NewFuelEntryPageProps) {
     <div className="max-w-2xl mx-auto px-4 py-8">
       <div className="mb-6">
         <Link
-          href={`/dashboard/vehicles/${params.vehicleUuid}`}
+          href={`/dashboard/vehicles/${vehicleUuid}`}
           className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground mb-4"
         >
           <ArrowLeft className="h-4 w-4 mr-1" />
@@ -287,9 +282,7 @@ export default function NewFuelEntryPage({ params }: NewFuelEntryPageProps) {
 
         <div className="mt-6 flex space-x-4">
           <Button type="button" variant="outline" className="flex-1" asChild>
-            <Link href={`/dashboard/vehicles/${params.vehicleUuid}`}>
-              Cancel
-            </Link>
+            <Link href={`/dashboard/vehicles/${vehicleUuid}`}>Cancel</Link>
           </Button>
           <Button type="submit" className="flex-1" disabled={isLoading}>
             {isLoading ? "Adding Entry..." : "Add Fuel Entry"}
