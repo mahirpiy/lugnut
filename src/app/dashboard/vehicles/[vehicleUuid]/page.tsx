@@ -1,29 +1,14 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   calculateDiyLaborSavedString,
   calculateMilesPerTank,
   formatDiyHours,
   milesDrivenPerDay,
 } from "@/utils/vehicleInsights";
-import {
-  ArrowLeft,
-  Calendar,
-  DollarSign,
-  Fuel,
-  Gauge,
-  Map,
-  Plus,
-  Wrench,
-} from "lucide-react";
+import { ArrowLeft, DollarSign, Fuel, Gauge, Plus, Wrench } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -150,7 +135,6 @@ export default function VehicleDetailPage() {
 
   const displayName =
     vehicle.nickname || `${vehicle.year} ${vehicle.make} ${vehicle.model}`;
-  const totalMilesDriven = vehicle.currentOdometer - vehicle.initialOdometer;
   const totalSpent = jobs.reduce((sum, job) => {
     return sum + parseFloat(job.laborCost) + parseFloat(job.totalPartsCost);
   }, 0);
@@ -224,21 +208,21 @@ export default function VehicleDetailPage() {
         </div>
       </div>
 
-      {/* Vehicle Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8">
-        <Card className="cursor-pointer hover:bg-accent/50 transition-colors">
+      {/* Vehicle Stats Dashboard */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <Card className="cursor-pointer hover:bg-accent/80 hover:scale-[1.02] transition-all duration-200">
           <Link href={`/dashboard/vehicles/${vehicle.uuid}/odometer`}>
-            <CardContent className="pt-6">
-              <div className="flex items-center space-x-2">
-                <Gauge className="h-5 w-5 text-blue-600" />
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">
-                    Current Odometer
+            <CardContent className="p-8">
+              <div className="flex items-center space-x-4">
+                <Gauge className="h-8 w-8 text-blue-600" />
+                <div className="flex-1">
+                  <p className="text-lg font-medium text-muted-foreground">
+                    Odometer
                   </p>
-                  <p className="text-3xl font-bold">
+                  <p className="text-4xl font-bold mt-2">
                     {vehicle.currentOdometer.toLocaleString()}
                   </p>
-                  <p className="text-xs text-muted-foreground">
+                  <p className="text-sm text-muted-foreground mt-2">
                     {milesDrivenPerDay(
                       vehicle.initialOdometer,
                       vehicle.currentOdometer,
@@ -252,93 +236,84 @@ export default function VehicleDetailPage() {
           </Link>
         </Card>
 
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center space-x-2">
-              <Wrench className="h-5 w-5 text-green-600" />
-              <div>
-                <p className="text-md font-medium text-muted-foreground">
-                  Total Jobs
-                </p>
-                <p className="text-3xl font-bold">{jobs.length}</p>
-                <p className="text-xs text-muted-foreground">
-                  {`${formatDiyHours(totalDiyHours)}`}
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center space-x-2">
-              <DollarSign className="h-5 w-5 text-orange-600" />
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">
-                  Total Spent
-                </p>
-                <p className="text-3xl font-bold">${totalSpent.toFixed(2)}</p>
-                <p className="text-xs text-muted-foreground">
-                  {`${calculateDiyLaborSavedString(totalDiyHours)}`}
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center space-x-2">
-              <Map className="h-5 w-5 text-purple-600" />
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">
-                  Miles Driven
-                </p>
-                <p className="text-3xl font-bold">
-                  {totalMilesDriven.toLocaleString()}
-                </p>
-                <p className="text-xs text-muted-foreground">since purchase</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {isPaid ? (
-          <Card>
-            <CardContent className="pt-6">
-              <div className="flex items-center space-x-2">
-                <Fuel className="h-5 w-5 text-cyan-600" />
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">
-                    Average MPG
+        <Card className="cursor-pointer hover:bg-accent/80 hover:scale-[1.02] transition-all duration-200">
+          <Link href={`/dashboard/vehicles/${vehicle.uuid}/jobs`}>
+            <CardContent className="p-8">
+              <div className="flex items-center space-x-4">
+                <Wrench className="h-8 w-8 text-green-600" />
+                <div className="flex-1">
+                  <p className="text-lg font-medium text-muted-foreground">
+                    Maintenance Jobs
                   </p>
-                  <p className="text-3xl font-bold">
-                    {averageMpg > 0 ? averageMpg.toFixed(1) : "--"}
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    {`${calculateMilesPerTank(
-                      fuelEntries.map((entry) => entry.odometer)
-                    )}`}
+                  <p className="text-4xl font-bold mt-2">{jobs.length}</p>
+                  <p className="text-sm text-muted-foreground mt-2">
+                    {`${formatDiyHours(totalDiyHours)}`}
                   </p>
                 </div>
               </div>
             </CardContent>
+          </Link>
+        </Card>
+
+        <Card className="cursor-pointer hover:bg-accent/80 hover:scale-[1.02] transition-all duration-200">
+          <Link href={`/dashboard/vehicles/${vehicle.uuid}/costs`}>
+            <CardContent className="p-8">
+              <div className="flex items-center space-x-4">
+                <DollarSign className="h-8 w-8 text-orange-600" />
+                <div className="flex-1">
+                  <p className="text-lg font-medium text-muted-foreground">
+                    Costs
+                  </p>
+                  <p className="text-4xl font-bold mt-2">
+                    ${totalSpent.toFixed(2)}
+                  </p>
+                  <p className="text-sm text-muted-foreground mt-2">
+                    {`${calculateDiyLaborSavedString(totalDiyHours)}`}
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Link>
+        </Card>
+
+        {isPaid ? (
+          <Card className="cursor-pointer hover:bg-accent/80 hover:scale-[1.02] transition-all duration-200">
+            <Link href={`/dashboard/vehicles/${vehicle.uuid}/fuel`}>
+              <CardContent className="p-8">
+                <div className="flex items-center space-x-4">
+                  <Fuel className="h-8 w-8 text-cyan-600" />
+                  <div className="flex-1">
+                    <p className="text-lg font-medium text-muted-foreground">
+                      Fuel Economy
+                    </p>
+                    <p className="text-4xl font-bold mt-2">
+                      {averageMpg > 0 ? `${averageMpg.toFixed(1)} MPG` : "--"}
+                    </p>
+                    <p className="text-sm text-muted-foreground mt-2">
+                      {`${calculateMilesPerTank(
+                        fuelEntries.map((entry) => entry.odometer)
+                      )}`}
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Link>
           </Card>
         ) : (
           <Card className="relative">
             <div className="absolute inset-0 backdrop-blur-[1px] bg-background/60 z-10 flex items-center justify-center">
               <Button variant="outline">Upgrade to track fuel</Button>
             </div>
-            <CardContent className="pt-6">
-              <div className="flex items-center space-x-2">
-                <Fuel className="h-5 w-5 text-cyan-600" />
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">
+            <CardContent className="p-8">
+              <div className="flex items-center space-x-4">
+                <Fuel className="h-8 w-8 text-cyan-600" />
+                <div className="flex-1">
+                  <p className="text-lg font-medium text-muted-foreground">
                     Average MPG
                   </p>
-                  <p className="text-3xl font-bold">23.0</p>
-                  <p className="text-xs text-muted-foreground">
-                    192 miles per tank
+                  <p className="text-4xl font-bold mt-2">23.4 MPG</p>
+                  <p className="text-sm text-muted-foreground mt-2">
+                    Upgrade to track fuel economy
                   </p>
                 </div>
               </div>
@@ -348,7 +323,7 @@ export default function VehicleDetailPage() {
       </div>
 
       {/* Recent Jobs */}
-      <Card>
+      {/* <Card>
         <CardHeader>
           <CardTitle>Maintenance History</CardTitle>
           <CardDescription>
@@ -432,7 +407,7 @@ export default function VehicleDetailPage() {
             </div>
           )}
         </CardContent>
-      </Card>
+      </Card> */}
     </div>
   );
 }

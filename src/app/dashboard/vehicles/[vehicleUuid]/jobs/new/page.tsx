@@ -1,5 +1,6 @@
 "use client";
 
+import { BackToVehicle } from "@/components/clickable/BackToVehicle";
 import { RecordForm } from "@/components/forms/RecordForm";
 import { Button } from "@/components/ui/button";
 import {
@@ -18,7 +19,7 @@ import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { jobSchema, type JobInput } from "@/lib/validations/job";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ArrowLeft, Wrench } from "lucide-react";
+import { Wrench } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -209,14 +210,10 @@ export default function NewJobPage() {
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
       <div className="mb-6">
-        <button
-          type="button"
-          onClick={handleFormExit}
-          className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground mb-4 bg-transparent border-none cursor-pointer"
-        >
-          <ArrowLeft className="h-4 w-4 mr-1" />
-          Back to {displayName}
-        </button>
+        <BackToVehicle
+          vehicleUuid={vehicleUuid as string}
+          displayName={displayName}
+        />
         <div className="flex items-center space-x-3">
           <Wrench className="h-8 w-8 text-stone-600" />
           <div>
