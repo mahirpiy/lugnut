@@ -31,13 +31,13 @@ const fuelEntrySchema = z.object({
 
 interface RouteParams {
   params: {
-    vehicleUuid: string;
+    vehicleId: string;
   };
 }
 
 // GET all fuel entries for a vehicle
 export async function GET(request: Request, { params }: RouteParams) {
-  const { vehicleUuid } = await params;
+  const { vehicleId } = await params;
 
   try {
     const session = await getServerSession(authOptions);
@@ -47,7 +47,7 @@ export async function GET(request: Request, { params }: RouteParams) {
     }
 
     // Check if user has paid access
-    if (!session.user.isPaid) {
+    if (!session.user.hasActiveSubscription) {
       return NextResponse.json(
         { error: "Fuel tracking requires a paid subscription" },
         { status: 403 }
@@ -59,10 +59,7 @@ export async function GET(request: Request, { params }: RouteParams) {
       .select()
       .from(vehicles)
       .where(
-        and(
-          eq(vehicles.uuid, vehicleUuid),
-          eq(vehicles.userId, session.user.id)
-        )
+        and(eq(vehicles.id, vehicleId), eq(vehicles.userId, session.user.id))
       )
       .limit(1);
 
@@ -129,7 +126,7 @@ export async function GET(request: Request, { params }: RouteParams) {
 
 // POST create new fuel entry
 export async function POST(request: Request, { params }: RouteParams) {
-  const { vehicleUuid } = await params;
+  const { vehicleId } = await params;
 
   try {
     const session = await getServerSession(authOptions);
@@ -139,7 +136,7 @@ export async function POST(request: Request, { params }: RouteParams) {
     }
 
     // Check if user has paid access
-    if (!session.user.isPaid) {
+    if (!session.user.hasActiveSubscription) {
       return NextResponse.json(
         { error: "Fuel tracking requires a paid subscription" },
         { status: 403 }
@@ -151,10 +148,7 @@ export async function POST(request: Request, { params }: RouteParams) {
       .select()
       .from(vehicles)
       .where(
-        and(
-          eq(vehicles.uuid, vehicleUuid),
-          eq(vehicles.userId, session.user.id)
-        )
+        and(eq(vehicles.id, vehicleId), eq(vehicles.userId, session.user.id))
       )
       .limit(1);
 

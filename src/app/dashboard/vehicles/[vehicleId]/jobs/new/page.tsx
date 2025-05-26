@@ -17,6 +17,8 @@ import { Separator } from "@/components/ui/separator";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
+import { Tag } from "@/lib/interfaces/tag";
+import { Vehicle } from "@/lib/interfaces/vehicle";
 import { jobSchema, type JobInput } from "@/lib/validations/job";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Wrench } from "lucide-react";
@@ -24,25 +26,8 @@ import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 
-interface Tag {
-  id: number;
-  uuid: string;
-  name: string;
-  isPreset: boolean;
-}
-
-interface Vehicle {
-  uuid: string;
-  make: string;
-  model: string;
-  year: number;
-  nickname?: string;
-  currentOdometer: number;
-  initialOdometer: number;
-}
-
 export default function NewJobPage() {
-  const { vehicleUuid } = useParams();
+  const { vehicleId } = useParams();
 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
@@ -95,7 +80,7 @@ export default function NewJobPage() {
     const fetchData = async () => {
       try {
         // Fetch vehicle data
-        const vehicleResponse = await fetch(`/api/vehicles/${vehicleUuid}`);
+        const vehicleResponse = await fetch(`/api/vehicles/${vehicleId}`);
         if (vehicleResponse.ok) {
           const vehicleData = await vehicleResponse.json();
           setVehicle(vehicleData);
@@ -115,7 +100,7 @@ export default function NewJobPage() {
     };
 
     fetchData();
-  }, [vehicleUuid, setValue]);
+  }, [vehicleId, setValue]);
 
   const onSubmit = async (data: JobInput) => {
     setIsLoading(true);
@@ -127,7 +112,7 @@ export default function NewJobPage() {
         delete data.url;
       }
 
-      const response = await fetch(`/api/vehicles/${vehicleUuid}/jobs`, {
+      const response = await fetch(`/api/vehicles/${vehicleId}/jobs`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -142,7 +127,7 @@ export default function NewJobPage() {
         return;
       }
 
-      router.push(`/dashboard/vehicles/${vehicleUuid}`);
+      router.push(`/dashboard/vehicles/${vehicleId}`);
     } catch (err) {
       console.error("Error creating job:", err);
       setError("Something went wrong. Please try again.");
@@ -164,7 +149,7 @@ export default function NewJobPage() {
     }
 
     // Navigate away
-    router.push(`/dashboard/vehicles/${vehicleUuid}`);
+    router.push(`/dashboard/vehicles/${vehicleId}`);
   };
 
   const onPartPhotoUpload = async (
@@ -177,21 +162,6 @@ export default function NewJobPage() {
       files.map((f) => f.url)
     );
   };
-
-  // const handleRemovePhoto = async (photo: { url: string; name: string }) => {
-  //   setJobPhotos(jobPhotos.filter((p) => p.url !== photo.url));
-  //   setValue(
-  //     "jobPhotos",
-  //     jobPhotos.filter((p) => p.url !== photo.url)
-  //   );
-
-  //   // Delete orphaned files
-  //   await fetch("/api/uploadthing/delete", {
-  //     method: "DELETE",
-  //     headers: { "Content-Type": "application/json" },
-  //     body: JSON.stringify({ fileKeys: [photo] }),
-  //   });
-  // };
 
   if (!vehicle) {
     return (
@@ -211,7 +181,7 @@ export default function NewJobPage() {
     <div className="max-w-4xl mx-auto px-4 py-8">
       <div className="mb-6">
         <BackToVehicle
-          vehicleUuid={vehicleUuid as string}
+          vehicleId={vehicleId as string}
           displayName={displayName}
         />
         <div className="flex items-center space-x-3">

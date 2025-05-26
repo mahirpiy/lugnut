@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Check vehicle limit for free users
-    if (!session.user.isPaid) {
+    if (!session.user.hasActiveSubscription) {
       const vehicleCount = await db
         .select({ count: count() })
         .from(vehicles)

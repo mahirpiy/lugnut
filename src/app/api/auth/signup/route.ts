@@ -8,7 +8,7 @@ import { NextRequest, NextResponse } from "next/server";
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { name, email, password } = signUpSchema.parse(body);
+    const { name, email, password, zipCode } = signUpSchema.parse(body);
 
     // Check if user already exists
     const existingUser = await db
@@ -34,6 +34,7 @@ export async function POST(request: NextRequest) {
         name,
         email,
         password: hashedPassword,
+        zipCode,
       })
       .returning();
 

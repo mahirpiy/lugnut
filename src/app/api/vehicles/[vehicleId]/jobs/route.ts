@@ -18,14 +18,14 @@ import { NextRequest, NextResponse } from "next/server";
 
 interface RouteParams {
   params: {
-    vehicleUuid: string;
+    vehicleId: string;
   };
 }
 
 // GET all jobs for a vehicle
 export async function GET(request: NextRequest, { params }: RouteParams) {
   try {
-    const { vehicleUuid } = await params;
+    const { vehicleId } = await params;
 
     const session = await getServerSession(authOptions);
 
@@ -38,10 +38,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       .select()
       .from(vehicles)
       .where(
-        and(
-          eq(vehicles.uuid, vehicleUuid),
-          eq(vehicles.userId, session.user.id)
-        )
+        and(eq(vehicles.id, vehicleId), eq(vehicles.userId, session.user.id))
       )
       .limit(1);
 
@@ -54,7 +51,6 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       .select({
         // Job fields
         id: jobs.id,
-        uuid: jobs.uuid,
         title: jobs.title,
         date: jobs.date,
         laborCost: jobs.laborCost,
@@ -107,7 +103,6 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
           notes: job.notes,
           totalPartsCount,
           totalPartsCost: totalPartsCost.toFixed(2),
-          uuid: job.uuid,
           hours: job.hours ? parseFloat(job.hours) : 0,
         };
       })
@@ -126,7 +121,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 // POST create new job
 export async function POST(request: NextRequest, { params }: RouteParams) {
   try {
-    const { vehicleUuid } = await params;
+    const { vehicleId } = await params;
 
     const session = await getServerSession(authOptions);
 
@@ -139,10 +134,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       .select()
       .from(vehicles)
       .where(
-        and(
-          eq(vehicles.uuid, vehicleUuid),
-          eq(vehicles.userId, session.user.id)
-        )
+        and(eq(vehicles.id, vehicleId), eq(vehicles.userId, session.user.id))
       )
       .limit(1);
 
@@ -151,7 +143,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     }
 
     // Check job limit for free users
-    if (!session.user.isPaid) {
+    if (!session.user.hasActiveSubscription) {
       const jobCount = await db
         .select({ count: count() })
         .from(jobs)

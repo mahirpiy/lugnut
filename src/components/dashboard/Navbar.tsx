@@ -25,7 +25,7 @@ export function Navbar() {
               <span className="text-sm">
                 {session?.user?.name || session?.user?.email}
               </span>
-              {session?.user?.isPaid && (
+              {session?.user?.hasActiveSubscription && (
                 <span className="px-2 py-1 text-xs bg-muted text-muted-foreground rounded-full">
                   Pro
                 </span>

@@ -3,7 +3,6 @@
 import AddJob from "@/components/clickable/AddJob";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { canAddFuelEntry, canAddOdometerEntry } from "@/utils/subscription";
 import {
   calculateDiyLaborSavedString,
   calculateMilesPerTank,
@@ -11,12 +10,13 @@ import {
   milesDrivenPerDay,
 } from "@/utils/vehicleInsights";
 import { ArrowLeft, DollarSign, Fuel, Gauge, Lock, Wrench } from "lucide-react";
+import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 interface Vehicle {
-  uuid: string;
+  id: string;
   make: string;
   model: string;
   year: number;
@@ -54,26 +54,26 @@ interface FuelEntry {
 }
 
 export default function VehicleDetailPage() {
-  const { vehicleUuid } = useParams();
+  const { vehicleId } = useParams();
+  const { data: session } = useSession();
 
   const [vehicle, setVehicle] = useState<Vehicle | null>(null);
   const [jobs, setJobs] = useState<Job[]>([]);
   const [fuelEntries, setFuelEntries] = useState<FuelEntry[]>([]);
   const [loading, setLoading] = useState(true);
-  const [isPaid, setIsPaid] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         // Fetch vehicle
-        const vehicleResponse = await fetch(`/api/vehicles/${vehicleUuid}`);
+        const vehicleResponse = await fetch(`/api/vehicles/${vehicleId}`);
         if (vehicleResponse.ok) {
           const vehicleData = await vehicleResponse.json();
           setVehicle(vehicleData);
         }
 
         // Fetch jobs
-        const jobsResponse = await fetch(`/api/vehicles/${vehicleUuid}/jobs`);
+        const jobsResponse = await fetch(`/api/vehicles/${vehicleId}/jobs`);
         if (jobsResponse.ok) {
           const jobsData = await jobsResponse.json();
           jobsData.sort((a: Job, b: Job) => {
@@ -83,14 +83,10 @@ export default function VehicleDetailPage() {
         }
 
         // Fetch fuel entries (only for paid users)
-        const fuelResponse = await fetch(`/api/vehicles/${vehicleUuid}/fuel`);
+        const fuelResponse = await fetch(`/api/vehicles/${vehicleId}/fuel`);
         if (fuelResponse.ok) {
           const fuelData = await fuelResponse.json();
           setFuelEntries(fuelData);
-          setIsPaid(true);
-        } else if (fuelResponse.status === 403) {
-          // User doesn't have paid access
-          setIsPaid(false);
         }
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -100,7 +96,7 @@ export default function VehicleDetailPage() {
     };
 
     fetchData();
-  }, [vehicleUuid]);
+  }, [vehicleId]);
 
   const totalDiyHours = jobs.reduce((sum, job) => {
     if (job.isDiy && job.hours && job.hours > 0) {
@@ -177,18 +173,18 @@ export default function VehicleDetailPage() {
             )}
           </div>
           <div className="flex space-x-2">
-            <AddJob vehicleUuid={vehicle.uuid} jobCount={jobs.length} />
-            {canAddFuelEntry(isPaid) && (
+            <AddJob vehicleId={vehicle.id} />
+            {session?.user?.hasActiveSubscription && (
               <Button asChild variant="outline">
-                <Link href={`/dashboard/vehicles/${vehicle.uuid}/fuel/new`}>
+                <Link href={`/dashboard/vehicles/${vehicle.id}/fuel/new`}>
                   <Fuel className="h-4 w-4 mr-2" />
                   Add Fuel
                 </Link>
               </Button>
             )}
-            {canAddOdometerEntry(isPaid) && (
+            {session?.user?.hasActiveSubscription && (
               <Button asChild variant="outline">
-                <Link href={`/dashboard/vehicles/${vehicle.uuid}/odometer/new`}>
+                <Link href={`/dashboard/vehicles/${vehicle.id}/odometer/new`}>
                   <Gauge className="h-4 w-4 mr-2" />
                   Add Odometer
                 </Link>
@@ -199,7 +195,7 @@ export default function VehicleDetailPage() {
       </div>
 
       {/* Premium Upgrade Card for non-paid users */}
-      {!isPaid && (
+      {!session?.user?.hasActiveSubscription && (
         <Card className="mb-6 bg-orange-50 dark:bg-orange-950/20 border-orange-200 dark:border-orange-900">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
@@ -225,7 +221,7 @@ export default function VehicleDetailPage() {
       {/* Vehicle Stats Dashboard */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
         <Card className="cursor-pointer hover:bg-accent/80 hover:scale-[1.02] transition-all duration-200">
-          <Link href={`/dashboard/vehicles/${vehicle.uuid}/odometer`}>
+          <Link href={`/dashboard/vehicles/${vehicle.id}/odometer`}>
             <CardContent className="p-8">
               <div className="flex items-center space-x-4">
                 <Gauge className="h-8 w-8 text-blue-600" />
@@ -251,7 +247,7 @@ export default function VehicleDetailPage() {
         </Card>
 
         <Card className="cursor-pointer hover:bg-accent/80 hover:scale-[1.02] transition-all duration-200">
-          <Link href={`/dashboard/vehicles/${vehicle.uuid}/jobs`}>
+          <Link href={`/dashboard/vehicles/${vehicle.id}/jobs`}>
             <CardContent className="p-8">
               <div className="flex items-center space-x-4">
                 <Wrench className="h-8 w-8 text-green-600" />
@@ -269,49 +265,55 @@ export default function VehicleDetailPage() {
           </Link>
         </Card>
 
-        <Card className="cursor-pointer hover:bg-accent/80 hover:scale-[1.02] transition-all duration-200">
-          <Link href={`/dashboard/vehicles/${vehicle.uuid}/costs`}>
+        <Card className="relative group">
+          <div className="absolute inset-0 flex items-center justify-center bg-background/80 opacity-0 group-hover:opacity-100 transition-opacity z-10">
+            <p className="text-muted-foreground font-medium">
+              Detailed cost analysis coming soon
+            </p>
+          </div>
+          <CardContent className="p-8">
+            <div className="flex items-center space-x-4">
+              <DollarSign className="h-8 w-8 text-orange-600" />
+              <div className="flex-1">
+                <p className="text-lg font-medium text-muted-foreground">
+                  Costs
+                </p>
+                <p className="text-4xl font-bold mt-2">
+                  ${totalSpent.toFixed(2)}
+                </p>
+                <p className="text-sm text-muted-foreground mt-2">
+                  {`${calculateDiyLaborSavedString(totalDiyHours)}`}
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {session?.user?.hasActiveSubscription ? (
+          <Card className="relative group">
+            <div className="absolute inset-0 flex items-center justify-center bg-background/80 opacity-0 group-hover:opacity-100 transition-opacity z-10">
+              <p className="text-muted-foreground font-medium">
+                Detailed fuel analysis coming soon
+              </p>
+            </div>
             <CardContent className="p-8">
               <div className="flex items-center space-x-4">
-                <DollarSign className="h-8 w-8 text-orange-600" />
+                <Fuel className="h-8 w-8 text-cyan-600" />
                 <div className="flex-1">
                   <p className="text-lg font-medium text-muted-foreground">
-                    Costs
+                    Fuel Economy
                   </p>
                   <p className="text-4xl font-bold mt-2">
-                    ${totalSpent.toFixed(2)}
+                    {averageMpg > 0 ? `${averageMpg.toFixed(1)} MPG` : "--"}
                   </p>
                   <p className="text-sm text-muted-foreground mt-2">
-                    {`${calculateDiyLaborSavedString(totalDiyHours)}`}
+                    {`${calculateMilesPerTank(
+                      fuelEntries.map((entry) => entry.odometer)
+                    )}`}
                   </p>
                 </div>
               </div>
             </CardContent>
-          </Link>
-        </Card>
-
-        {isPaid ? (
-          <Card className="cursor-pointer hover:bg-accent/80 hover:scale-[1.02] transition-all duration-200">
-            <Link href={`/dashboard/vehicles/${vehicle.uuid}/fuel`}>
-              <CardContent className="p-8">
-                <div className="flex items-center space-x-4">
-                  <Fuel className="h-8 w-8 text-cyan-600" />
-                  <div className="flex-1">
-                    <p className="text-lg font-medium text-muted-foreground">
-                      Fuel Economy
-                    </p>
-                    <p className="text-4xl font-bold mt-2">
-                      {averageMpg > 0 ? `${averageMpg.toFixed(1)} MPG` : "--"}
-                    </p>
-                    <p className="text-sm text-muted-foreground mt-2">
-                      {`${calculateMilesPerTank(
-                        fuelEntries.map((entry) => entry.odometer)
-                      )}`}
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Link>
           </Card>
         ) : (
           <Card className="relative">

@@ -20,11 +20,17 @@ export default function UpgradePage() {
   const [selectedPlan, setSelectedPlan] = useState<string>("");
   const [jobQuantity, setJobQuantity] = useState<number>(0);
   const [fuelQuantity, setFuelQuantity] = useState<number>(0);
+  const [odometerQuantity, setOdometerQuantity] = useState<number>(0);
   const [vehicleQuantity, setVehicleQuantity] = useState<number>(0);
   const calculateTotal = () => {
     if (selectedPlan === "monthly") return 10;
     if (selectedPlan === "yearly") return 100;
-    return vehicleQuantity * 5 + jobQuantity * 2.5 + fuelQuantity * 1;
+    return (
+      vehicleQuantity * 5 +
+      jobQuantity * 2.5 +
+      fuelQuantity * 1 +
+      odometerQuantity * 1
+    );
   };
 
   return (
@@ -41,9 +47,7 @@ export default function UpgradePage() {
         <ul className="list-decimal pl-6 mb-6 space-y-2">
           <li>Fuel Tracking</li>
           <li>Odometer Tracking</li>
-          <li>
-            Unlimited photos per job, and the ability to upload part photos
-          </li>
+          <li>Unlimited photos for jobs and their parts.</li>
           <li>
             The ability to connect with other Luggers to share tips, advice, and
             help you work on your own car{" "}
@@ -77,12 +81,12 @@ export default function UpgradePage() {
               </p>
               <ul className="list-disc pl-6 space-y-2">
                 <li>
-                  <span className="font-semibold">$5.00</span> per vehicle.
-                  Includes 1 free job with unlimited records, parts and photos.
+                  <span className="font-semibold">$5.00</span> per vehicle. Jobs
+                  not included.
                 </li>
                 <li>
                   <span className="font-semibold">$2.50</span> per job.
-                  Unlimited records, parts and photos
+                  Unlimited records and parts.
                 </li>
                 <li>
                   <span className="font-semibold">$1.00</span> per fuel record
@@ -184,6 +188,20 @@ export default function UpgradePage() {
                     min="0"
                     value={fuelQuantity}
                     onChange={(e) => setFuelQuantity(Number(e.target.value))}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="odometer">
+                    Number of Odometer Records ($1.00 each)
+                  </Label>
+                  <Input
+                    id="odometer"
+                    type="number"
+                    min="0"
+                    value={odometerQuantity}
+                    onChange={(e) =>
+                      setOdometerQuantity(Number(e.target.value))
+                    }
                   />
                 </div>
               </div>

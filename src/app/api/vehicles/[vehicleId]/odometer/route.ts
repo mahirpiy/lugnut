@@ -22,13 +22,13 @@ const odometerEntrySchema = z.object({
 
 interface RouteParams {
   params: {
-    vehicleUuid: string;
+    vehicleId: string;
   };
 }
 
 export async function GET(request: Request, { params }: RouteParams) {
   try {
-    const { vehicleUuid } = await params;
+    const { vehicleId } = await params;
 
     const session = await getServerSession(authOptions);
 
@@ -41,10 +41,7 @@ export async function GET(request: Request, { params }: RouteParams) {
       .from(odometerEntries)
       .innerJoin(vehicles, eq(odometerEntries.vehicleId, vehicles.id))
       .where(
-        and(
-          eq(vehicles.uuid, vehicleUuid),
-          eq(vehicles.userId, session.user.id)
-        )
+        and(eq(vehicles.id, vehicleId), eq(vehicles.userId, session.user.id))
       );
 
     const toReturn = entries.map((entry) => entry.odometerEntries);
@@ -58,7 +55,7 @@ export async function GET(request: Request, { params }: RouteParams) {
 
 export async function POST(request: Request, { params }: RouteParams) {
   try {
-    const { vehicleUuid } = await params;
+    const { vehicleId } = await params;
 
     const session = await getServerSession(authOptions);
 
@@ -67,7 +64,7 @@ export async function POST(request: Request, { params }: RouteParams) {
     }
 
     // Check if user has paid access
-    if (!session.user.isPaid) {
+    if (!session.user.hasActiveSubscription) {
       return NextResponse.json(
         { error: "Fuel tracking requires a paid subscription" },
         { status: 403 }
@@ -79,10 +76,7 @@ export async function POST(request: Request, { params }: RouteParams) {
       .select()
       .from(vehicles)
       .where(
-        and(
-          eq(vehicles.uuid, vehicleUuid),
-          eq(vehicles.userId, session.user.id)
-        )
+        and(eq(vehicles.id, vehicleId), eq(vehicles.userId, session.user.id))
       )
       .limit(1);
 

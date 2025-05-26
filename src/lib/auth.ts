@@ -3,8 +3,21 @@ import bcrypt from "bcryptjs";
 import { eq } from "drizzle-orm";
 import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
+import { UsageCredits } from "../../types/next-auth";
 import { db } from "./db";
-import { accounts, sessions, users, verificationTokens } from "./db/schema";
+import {
+  accounts,
+  paygUsageCredits,
+  sessions,
+  subscriptions,
+  users,
+  verificationTokens,
+} from "./db/schema";
+import {
+  SubscriptionStatus,
+  SubscriptionType,
+  UsageCreditType,
+} from "./enums/upgrades";
 
 export const authOptions: NextAuthOptions = {
   adapter: DrizzleAdapter(db, {
@@ -64,15 +77,10 @@ export const authOptions: NextAuthOptions = {
     async session({ session, token }) {
       if (token && session.user) {
         session.user.id = token.id as string;
-
-        // Get user's paid status
-        const userData = await db
-          .select({ isPaid: users.isPaid })
-          .from(users)
-          .where(eq(users.id, token.id as string))
-          .limit(1);
-
-        session.user.isPaid = userData[0]?.isPaid || false;
+        session.user.hasActiveSubscription = await userHasActiveSubscription(
+          session.user.id
+        );
+        session.user.usageCredits = await getUserUsageCredits(session.user.id);
       }
       return session;
     },
@@ -82,3 +90,64 @@ export const authOptions: NextAuthOptions = {
     newUser: "/auth/signup",
   },
 };
+
+async function userHasActiveSubscription(userId: string): Promise<boolean> {
+  const subscription = await db
+    .select()
+    .from(subscriptions)
+    .where(eq(subscriptions.userId, userId));
+
+  const hasActiveSubscription =
+    subscription.some((sub) => sub.status === SubscriptionStatus.ACTIVE) ||
+    subscription.some((sub) => sub.status === SubscriptionType.PERMANENT);
+
+  return hasActiveSubscription;
+}
+
+async function getUserUsageCredits(userId: string): Promise<UsageCredits> {
+  const usageCredits = await db
+    .select()
+    .from(paygUsageCredits)
+    .where(eq(paygUsageCredits.userId, userId));
+
+  const vehicleCredits = usageCredits.filter(
+    (credit) => credit.creditType === UsageCreditType.VEHICLE
+  );
+  const jobCredits = usageCredits.filter(
+    (credit) => credit.creditType === UsageCreditType.JOB
+  );
+  const fuelCredits = usageCredits.filter(
+    (credit) => credit.creditType === UsageCreditType.FUEL
+  );
+  const odometerCredits = usageCredits.filter(
+    (credit) => credit.creditType === UsageCreditType.ODOMETER
+  );
+
+  return {
+    vehicle: {
+      total: vehicleCredits.reduce(
+        (acc, credit) => acc + credit.purchasedCount,
+        0
+      ),
+      used: vehicleCredits.reduce((acc, credit) => acc + credit.usedCount, 0),
+    },
+    job: {
+      total: jobCredits.reduce((acc, credit) => acc + credit.purchasedCount, 0),
+      used: jobCredits.reduce((acc, credit) => acc + credit.usedCount, 0),
+    },
+    fuel: {
+      total: fuelCredits.reduce(
+        (acc, credit) => acc + credit.purchasedCount,
+        0
+      ),
+      used: fuelCredits.reduce((acc, credit) => acc + credit.usedCount, 0),
+    },
+    odometer: {
+      total: odometerCredits.reduce(
+        (acc, credit) => acc + credit.purchasedCount,
+        0
+      ),
+      used: odometerCredits.reduce((acc, credit) => acc + credit.usedCount, 0),
+    },
+  };
+}

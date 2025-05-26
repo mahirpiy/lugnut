@@ -71,7 +71,7 @@ interface Vehicle {
 }
 
 export default function JobDetailPage() {
-  const { vehicleUuid, jobUuid } = useParams();
+  const { vehicleId, jobId } = useParams();
   const [job, setJob] = useState<Job | null>(null);
   const [vehicle, setVehicle] = useState<Vehicle | null>(null);
   const [loading, setLoading] = useState(true);
@@ -80,7 +80,7 @@ export default function JobDetailPage() {
     const fetchData = async () => {
       try {
         // Fetch vehicle
-        const vehicleResponse = await fetch(`/api/vehicles/${vehicleUuid}`);
+        const vehicleResponse = await fetch(`/api/vehicles/${vehicleId}`);
         if (vehicleResponse.ok) {
           const vehicleData = await vehicleResponse.json();
           setVehicle(vehicleData);
@@ -88,7 +88,7 @@ export default function JobDetailPage() {
 
         // Fetch job details
         const jobResponse = await fetch(
-          `/api/vehicles/${vehicleUuid}/jobs/${jobUuid}`
+          `/api/vehicles/${vehicleId}/jobs/${jobId}`
         );
         if (jobResponse.ok) {
           const jobData = await jobResponse.json();
@@ -103,7 +103,7 @@ export default function JobDetailPage() {
     };
 
     fetchData();
-  }, [vehicleUuid, jobUuid]);
+  }, [vehicleId, jobId]);
 
   if (loading) {
     return (
@@ -123,7 +123,7 @@ export default function JobDetailPage() {
           <CardContent className="pt-6 text-center">
             <p>Job not found</p>
             <Button asChild className="mt-4">
-              <Link href={`/dashboard/vehicles/${vehicleUuid}`}>
+              <Link href={`/dashboard/vehicles/${vehicleId}`}>
                 Back to Vehicle
               </Link>
             </Button>
@@ -141,7 +141,7 @@ export default function JobDetailPage() {
       {/* Header */}
       <div className="mb-6">
         <Link
-          href={`/dashboard/vehicles/${vehicleUuid}`}
+          href={`/dashboard/vehicles/${vehicleId}`}
           className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground mb-4"
         >
           <ArrowLeft className="h-4 w-4 mr-1" />

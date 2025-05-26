@@ -1,25 +1,14 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Vehicle } from "@/lib/interfaces/vehicle";
 import { Gauge, Gift, IdCard } from "lucide-react";
 import Link from "next/link";
-
-interface Vehicle {
-  uuid: string;
-  make: string;
-  model: string;
-  year: number;
-  nickname?: string;
-  currentOdometer: number;
-  createdAt: Date;
-  licensePlate?: string;
-  purchaseDate?: Date;
-}
-
 interface VehicleCardProps {
   vehicle: Vehicle;
 }
 
 export function VehicleCard({ vehicle }: VehicleCardProps) {
+  console.log(vehicle);
   const displayName =
     vehicle.nickname || `${vehicle.year} ${vehicle.make} ${vehicle.model}`;
 
@@ -57,12 +46,10 @@ export function VehicleCard({ vehicle }: VehicleCardProps) {
         )}
         <div className="flex space-x-2">
           <Button asChild className="flex-1">
-            <Link href={`/dashboard/vehicles/${vehicle.uuid}`}>
-              View Details
-            </Link>
+            <Link href={`/dashboard/vehicles/${vehicle.id}`}>View Details</Link>
           </Button>
           <Button asChild variant="outline" className="flex-1">
-            <Link href={`/dashboard/vehicles/${vehicle.uuid}/jobs/new`}>
+            <Link href={`/dashboard/vehicles/${vehicle.id}/jobs/new`}>
               Add Job
             </Link>
           </Button>

@@ -7,15 +7,15 @@ import { NextRequest, NextResponse } from "next/server";
 
 interface RouteParams {
   params: {
-    vehicleUuid: string;
+    vehicleId: string;
   };
 }
 
 export async function GET(request: NextRequest, { params }: RouteParams) {
   try {
-    const session = await getServerSession(authOptions);
+    const { vehicleId } = await params;
 
-    params = await params;
+    const session = await getServerSession(authOptions);
 
     if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -25,10 +25,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       .select()
       .from(vehicles)
       .where(
-        and(
-          eq(vehicles.uuid, params.vehicleUuid),
-          eq(vehicles.userId, session.user.id)
-        )
+        and(eq(vehicles.id, vehicleId), eq(vehicles.userId, session.user.id))
       )
       .limit(1);
 

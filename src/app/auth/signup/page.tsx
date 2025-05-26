@@ -131,6 +131,18 @@ export default function SignUpPage() {
                 </p>
               )}
             </div>
+            <div className="space-y-2">
+              <Label htmlFor="zipCode">Zip Code</Label>
+              <Input
+                id="zipCode"
+                type="text"
+                placeholder="Enter your zip code"
+                {...register("zipCode")}
+              />
+              {errors.zipCode && (
+                <p className="text-sm text-red-600">{errors.zipCode.message}</p>
+              )}
+            </div>
           </CardContent>
           <CardFooter className="flex flex-col space-y-4">
             <Button type="submit" className="w-full" disabled={isLoading}>

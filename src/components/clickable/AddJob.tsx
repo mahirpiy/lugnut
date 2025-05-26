@@ -1,22 +1,14 @@
-import { canAddJob } from "@/utils/subscription";
 import { Lock, Wrench } from "lucide-react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { Button } from "../ui/button";
 
-export default function AddJob({
-  vehicleUuid,
-  jobCount,
-}: {
-  vehicleUuid: string;
-  jobCount: number;
-}) {
+export default function AddJob({ vehicleId }: { vehicleId: string }) {
   const { data: session } = useSession();
-  const isPaid = session?.user?.isPaid ?? false;
-  if (canAddJob(isPaid, jobCount)) {
+  if (session?.user?.hasActiveSubscription) {
     return (
       <Button asChild>
-        <Link href={`/dashboard/vehicles/${vehicleUuid}/jobs/new`}>
+        <Link href={`/dashboard/vehicles/${vehicleId}/jobs/new`}>
           <Wrench className="h-4 w-4 mr-2" />
           Add Job
         </Link>

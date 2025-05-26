@@ -3,12 +3,12 @@ import { odometerEntries, vehicles } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 
 export async function updateOdometer(
-  vehicleId: number,
+  vehicleId: string,
   oldOdometer: number,
   newOdometer: number,
   type: "reading" | "fueling" | "job",
   date: Date
-): Promise<number | Error> {
+): Promise<string | Error> {
   try {
     const odometerId = await db.transaction(async (tx) => {
       const [odometerRecord] = await tx

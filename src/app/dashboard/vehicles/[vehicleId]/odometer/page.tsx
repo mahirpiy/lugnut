@@ -2,29 +2,17 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { OdometerEntry } from "@/lib/interfaces/odometer-entry";
+import { Vehicle } from "@/lib/interfaces/vehicle";
 import { ArrowLeft, Gauge, ScrollText } from "lucide-react";
+import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
-interface OdometerEntry {
-  uuid: string;
-  type: string;
-  odometer: number;
-  notes: string;
-  entryDate: string;
-}
-
-interface Vehicle {
-  uuid: string;
-  make: string;
-  model: string;
-  year: number;
-  nickname?: string;
-}
-
-export default function JobDetailPage() {
-  const { vehicleUuid } = useParams();
+export default function OdometerPage() {
+  const { vehicleId } = useParams();
+  const { data: session } = useSession();
   const [vehicle, setVehicle] = useState<Vehicle | null>(null);
   const [entries, setEntries] = useState<OdometerEntry[] | null>(null);
   const [loading, setLoading] = useState(true);
@@ -33,7 +21,7 @@ export default function JobDetailPage() {
     const fetchData = async () => {
       try {
         // Fetch vehicle
-        const vehicleResponse = await fetch(`/api/vehicles/${vehicleUuid}`);
+        const vehicleResponse = await fetch(`/api/vehicles/${vehicleId}`);
         if (vehicleResponse.ok) {
           const vehicleData = await vehicleResponse.json();
           setVehicle(vehicleData);
@@ -41,7 +29,7 @@ export default function JobDetailPage() {
 
         // Fetch job details
         const odometerResponse = await fetch(
-          `/api/vehicles/${vehicleUuid}/odometer`
+          `/api/vehicles/${vehicleId}/odometer`
         );
         if (odometerResponse.ok) {
           const odometerData = await odometerResponse.json();
@@ -59,7 +47,7 @@ export default function JobDetailPage() {
     };
 
     fetchData();
-  }, [vehicleUuid]);
+  }, [vehicleId]);
 
   if (loading) {
     return (
@@ -77,9 +65,9 @@ export default function JobDetailPage() {
       <div className="max-w-4xl mx-auto px-4 py-8">
         <Card>
           <CardContent className="pt-6 text-center">
-            <p>Job not found</p>
+            <p>Vehicle not found</p>
             <Button asChild className="mt-4">
-              <Link href={`/dashboard/vehicles/${vehicleUuid}`}>
+              <Link href={`/dashboard/vehicles/${vehicleId}`}>
                 Back to Vehicle
               </Link>
             </Button>
@@ -97,7 +85,7 @@ export default function JobDetailPage() {
       {/* Header */}
       <div className="mb-6">
         <Link
-          href={`/dashboard/vehicles/${vehicleUuid}`}
+          href={`/dashboard/vehicles/${vehicleId}`}
           className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground mb-4"
         >
           <ArrowLeft className="h-4 w-4 mr-1" />
@@ -129,12 +117,14 @@ export default function JobDetailPage() {
               <ScrollText className="h-5 w-5" />
               <span>Odometer History</span>
             </div>
-            <Button asChild size="sm">
-              <Link href={`/dashboard/vehicles/${vehicleUuid}/odometer/new`}>
-                <Gauge className="h-4 w-4 mr-2" />
-                Add Reading
-              </Link>
-            </Button>
+            {session?.user?.hasActiveSubscription && (
+              <Button asChild size="sm">
+                <Link href={`/dashboard/vehicles/${vehicleId}/odometer/new`}>
+                  <Gauge className="h-4 w-4 mr-2" />
+                  Add Reading
+                </Link>
+              </Button>
+            )}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -142,7 +132,7 @@ export default function JobDetailPage() {
             {entries &&
               entries.map((entry) => (
                 <div
-                  key={entry.uuid}
+                  key={`${entry.id}-${entry.odometer}`}
                   className="flex items-center justify-between p-4 bg-muted rounded-lg"
                 >
                   <div className="flex items-center space-x-3">

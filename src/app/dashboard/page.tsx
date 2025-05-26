@@ -8,22 +8,11 @@ import {
   CardDescription,
   CardTitle,
 } from "@/components/ui/card";
+import { Vehicle } from "@/lib/interfaces/vehicle";
 import { Car, Plus } from "lucide-react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-
-interface Vehicle {
-  uuid: string;
-  make: string;
-  model: string;
-  year: number;
-  nickname?: string;
-  licensePlate?: string;
-  currentOdometer: number;
-  createdAt: string;
-}
-
 export default function DashboardPage() {
   const { data: session } = useSession();
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
@@ -69,7 +58,8 @@ export default function DashboardPage() {
     );
   }
 
-  const canAddVehicle = session?.user?.isPaid || vehicles.length < 1;
+  const canAddVehicle =
+    session?.user?.hasActiveSubscription || vehicles.length < 1;
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
@@ -136,7 +126,7 @@ export default function DashboardPage() {
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {vehicles.map((vehicle) => (
               <VehicleCard
-                key={vehicle.uuid}
+                key={vehicle.id}
                 vehicle={{
                   ...vehicle,
                   createdAt: new Date(vehicle.createdAt),

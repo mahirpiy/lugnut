@@ -10,26 +10,14 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Vehicle } from "@/lib/interfaces/vehicle";
 import { Calendar, Gauge, Plus, Wrench } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
-interface Vehicle {
-  uuid: string;
-  make: string;
-  model: string;
-  year: number;
-  nickname?: string;
-  currentOdometer: number;
-  vin?: string;
-  initialOdometer: number;
-  purchaseDate?: string;
-  createdAt: string;
-}
-
 interface Job {
-  uuid: string;
+  id: string;
   title: string;
   date: string;
   odometer: number;
@@ -43,7 +31,7 @@ interface Job {
 }
 
 export default function VehicleJobsPage() {
-  const { vehicleUuid } = useParams();
+  const { vehicleId } = useParams();
   const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
   const [vehicle, setVehicle] = useState<Vehicle | null>(null);
@@ -52,14 +40,14 @@ export default function VehicleJobsPage() {
     const fetchData = async () => {
       try {
         // Fetch vehicle details
-        const vehicleResponse = await fetch(`/api/vehicles/${vehicleUuid}`);
+        const vehicleResponse = await fetch(`/api/vehicles/${vehicleId}`);
         if (vehicleResponse.ok) {
           const vehicleData = await vehicleResponse.json();
           setVehicle(vehicleData);
         }
 
         // Fetch jobs
-        const response = await fetch(`/api/vehicles/${vehicleUuid}/jobs`);
+        const response = await fetch(`/api/vehicles/${vehicleId}/jobs`);
         if (response.ok) {
           const jobsData = await response.json();
           jobsData.sort((a: Job, b: Job) => {
@@ -75,7 +63,7 @@ export default function VehicleJobsPage() {
     };
 
     fetchData();
-  }, [vehicleUuid]);
+  }, [vehicleId]);
 
   if (loading) {
     return (
@@ -109,7 +97,7 @@ export default function VehicleJobsPage() {
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
       <BackToVehicle
-        vehicleUuid={vehicleUuid as string}
+        vehicleId={vehicleId as string}
         displayName={displayName}
       />
 
@@ -121,7 +109,7 @@ export default function VehicleJobsPage() {
               All maintenance jobs for this vehicle
             </CardDescription>
           </div>
-          <AddJob vehicleUuid={vehicleUuid as string} jobCount={jobs.length} />
+          <AddJob vehicleId={vehicleId as string} />
         </CardHeader>
         <CardContent>
           {jobs.length === 0 ? (
@@ -134,7 +122,7 @@ export default function VehicleJobsPage() {
                 Start tracking your vehicle maintenance by adding your first job
               </p>
               <Button asChild>
-                <Link href={`/dashboard/vehicles/${vehicleUuid}/jobs/new`}>
+                <Link href={`/dashboard/vehicles/${vehicleId}/jobs/new`}>
                   <Plus className="h-4 w-4 mr-2" />
                   Add First Job
                 </Link>
@@ -144,11 +132,11 @@ export default function VehicleJobsPage() {
             <div className="space-y-4">
               {jobs.map((job) => (
                 <Card
-                  key={job.uuid}
+                  key={job.id}
                   className="border-muted hover:shadow-md transition-shadow cursor-pointer"
                 >
                   <Link
-                    href={`/dashboard/vehicles/${vehicleUuid}/jobs/${job.uuid}`}
+                    href={`/dashboard/vehicles/${vehicleId}/jobs/${job.id}`}
                   >
                     <CardContent className="pt-4">
                       <div className="flex items-start justify-between">
