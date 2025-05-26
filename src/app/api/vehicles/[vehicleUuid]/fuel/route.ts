@@ -1,6 +1,7 @@
 import { authOptions } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { fuelEntries, vehicles } from "@/lib/db/schema";
+import { updateOdometer } from "@/utils/odometer";
 import { and, desc, eq } from "drizzle-orm";
 import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
@@ -182,13 +183,7 @@ export async function POST(request: Request, { params }: RouteParams) {
 
     // Update vehicle's current odometer if this entry is higher
     if (validatedData.odometer > vehicleData.currentOdometer) {
-      await db
-        .update(vehicles)
-        .set({
-          currentOdometer: validatedData.odometer,
-          updatedAt: new Date(),
-        })
-        .where(eq(vehicles.id, vehicle[0].id));
+      await updateOdometer(vehicleUuid, validatedData.odometer);
     }
 
     return NextResponse.json(newEntry, { status: 201 });
