@@ -3,13 +3,14 @@ import { db } from "@/lib/db";
 import {
   jobPhotos,
   jobs,
+  partPhotos,
   parts,
   records,
   recordTags,
   tags,
   vehicles,
 } from "@/lib/db/schema";
-import { and, eq } from "drizzle-orm";
+import { and, eq, inArray } from "drizzle-orm";
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -72,6 +73,13 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
           .from(parts)
           .where(eq(parts.recordId, record.records.id));
 
+        const partIds = recordParts.map((part) => part.id);
+
+        const partPhotosData = await db
+          .select()
+          .from(partPhotos)
+          .where(inArray(partPhotos.partId, partIds));
+
         // Get tags for this record
         const recordTagsData = await db
           .select({
@@ -98,6 +106,12 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
             manufacturer: part.manufacturer,
             cost: part.cost,
             quantity: part.quantity,
+            partPhotos: partPhotosData
+              .filter((photo) => photo.partId === part.id)
+              .map((photo) => ({
+                url: photo.url,
+                uuid: photo.uuid,
+              })),
           })),
           tags: recordTagsData.map((tag) => ({
             id: tag.tagId,

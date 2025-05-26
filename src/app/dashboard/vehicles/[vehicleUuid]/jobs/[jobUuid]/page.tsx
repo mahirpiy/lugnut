@@ -26,6 +26,7 @@ interface Part {
   cost: string;
   quantity: number;
   url?: string;
+  partPhotos?: { url: string; uuid: string }[];
 }
 
 interface Tag {
@@ -91,6 +92,7 @@ export default function JobDetailPage() {
         );
         if (jobResponse.ok) {
           const jobData = await jobResponse.json();
+          console.log({ jobData });
           setJob(jobData);
         }
       } catch (error) {
@@ -362,6 +364,24 @@ export default function JobDetailPage() {
                         </p>
                       )}
                     </div>
+                    {part.partPhotos && part.partPhotos.length > 0 && (
+                      <div className="flex gap-2">
+                        {part.partPhotos.map((photo, index) => (
+                          <div
+                            key={photo.uuid}
+                            className="w-[70px] h-[70px] relative rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow cursor-pointer"
+                            onClick={() => window.open(photo.url, "_blank")}
+                          >
+                            <Image
+                              src={photo.url}
+                              alt={`Part Photo ${index + 1}`}
+                              fill
+                              className="object-cover hover:scale-105 transition-transform duration-200"
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>

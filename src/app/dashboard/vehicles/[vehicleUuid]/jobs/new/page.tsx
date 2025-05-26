@@ -77,6 +77,7 @@ export default function NewJobPage() {
               manufacturer: "",
               cost: 0,
               quantity: 1,
+              partPhotos: [],
             },
           ],
           notes: "",
@@ -163,6 +164,17 @@ export default function NewJobPage() {
 
     // Navigate away
     router.push(`/dashboard/vehicles/${vehicleUuid}`);
+  };
+
+  const onPartPhotoUpload = async (
+    recordIndex: number,
+    partIndex: number,
+    files: { url: string; name: string }[]
+  ) => {
+    setValue(
+      `records.${recordIndex}.parts.${partIndex}.partPhotos`,
+      files.map((f) => f.url)
+    );
   };
 
   // const handleRemovePhoto = async (photo: { url: string; name: string }) => {
@@ -439,6 +451,7 @@ export default function NewJobPage() {
           tags={tags}
           watch={watch}
           setValue={setValue}
+          onPartPhotoUpload={onPartPhotoUpload}
         />
 
         {/* Submit Section */}

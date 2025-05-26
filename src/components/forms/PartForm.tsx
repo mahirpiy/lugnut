@@ -9,21 +9,30 @@ import { Plus, Trash2 } from "lucide-react";
 import {
   Control,
   FieldErrors,
-  UseFormRegister,
   useFieldArray,
+  UseFormRegister,
+  UseFormWatch,
 } from "react-hook-form";
+import { PhotoUploadModal } from "../ui/photo-upload-modal";
 
 interface PartFormProps {
   control: Control<JobInput>;
   recordIndex: number;
   register: UseFormRegister<JobInput>;
   errors: FieldErrors<JobInput>;
+  onPartPhotoUpload: (
+    recordIndex: number,
+    partIndex: number,
+    files: { url: string; name: string }[]
+  ) => Promise<void>;
+  watch: UseFormWatch<JobInput>;
 }
 
 export function PartForm({
   control,
   recordIndex,
   register,
+  onPartPhotoUpload,
   errors,
 }: PartFormProps) {
   const { fields, append, remove } = useFieldArray({
@@ -39,6 +48,7 @@ export function PartForm({
       cost: 0,
       quantity: 1,
       url: undefined,
+      partPhotos: [],
     });
   };
 
@@ -178,6 +188,23 @@ export function PartForm({
                 type="url"
                 {...register(`records.${recordIndex}.parts.${partIndex}.url`)}
                 placeholder="https://example.com/part"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label>Part Photos (Optional)</Label>
+              <p className="text-xs text-muted-foreground">
+                Add photos to document your parts (optional)
+              </p>
+              <PhotoUploadModal
+                endpoint="partImage"
+                onUploadComplete={(files) => {
+                  onPartPhotoUpload(recordIndex, partIndex, files);
+                }}
+                onUploadError={(error) => {
+                  console.error("Photo upload error:", error);
+                }}
+                maxFiles={2}
               />
             </div>
           </CardContent>

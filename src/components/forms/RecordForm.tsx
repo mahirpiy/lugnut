@@ -33,6 +33,11 @@ interface RecordFormProps {
   tags: Tag[];
   watch: UseFormWatch<JobInput>;
   setValue: UseFormSetValue<JobInput>;
+  onPartPhotoUpload: (
+    recordIndex: number,
+    partIndex: number,
+    files: { url: string; name: string }[]
+  ) => Promise<void>;
 }
 
 export function RecordForm({
@@ -42,6 +47,7 @@ export function RecordForm({
   tags,
   watch,
   setValue,
+  onPartPhotoUpload,
 }: RecordFormProps) {
   const { fields, append, remove } = useFieldArray({
     control,
@@ -53,7 +59,14 @@ export function RecordForm({
       title: "",
       tagIds: [],
       parts: [
-        { name: "", partNumber: "", manufacturer: "", cost: 0, quantity: 1 },
+        {
+          name: "",
+          partNumber: "",
+          manufacturer: "",
+          cost: 0,
+          quantity: 1,
+          partPhotos: [],
+        },
       ],
       notes: "",
     });
@@ -152,6 +165,8 @@ export function RecordForm({
                 recordIndex={recordIndex}
                 register={register}
                 errors={errors}
+                watch={watch}
+                onPartPhotoUpload={onPartPhotoUpload}
               />
 
               {/* Record Notes */}
