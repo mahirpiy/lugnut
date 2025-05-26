@@ -3,12 +3,17 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
+  canAddFuelEntry,
+  canAddJob,
+  canAddOdometerEntry,
+} from "@/utils/subscription";
+import {
   calculateDiyLaborSavedString,
   calculateMilesPerTank,
   formatDiyHours,
   milesDrivenPerDay,
 } from "@/utils/vehicleInsights";
-import { ArrowLeft, DollarSign, Fuel, Gauge, Plus, Wrench } from "lucide-react";
+import { ArrowLeft, DollarSign, Fuel, Gauge, Lock, Wrench } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -175,20 +180,20 @@ export default function VehicleDetailPage() {
             )}
           </div>
           <div className="flex space-x-2">
-            {!isPaid && jobs.length >= 2 ? (
-              <Button variant="outline">
-                <Plus className="h-4 w-4 mr-2" />
-                You&apos;ve hit the limit of free jobs. Upgrade to add more.
-              </Button>
-            ) : (
+            {canAddJob(isPaid, jobs.length) ? (
               <Button asChild>
                 <Link href={`/dashboard/vehicles/${vehicle.uuid}/jobs/new`}>
-                  <Plus className="h-4 w-4 mr-2" />
+                  <Wrench className="h-4 w-4 mr-2" />
                   Add Job
                 </Link>
               </Button>
+            ) : (
+              <Button disabled>
+                <Lock className="h-4 w-4 mr-2" />
+                You&apos;ve hit the limit of free jobs. Upgrade now to add more.
+              </Button>
             )}
-            {isPaid && (
+            {canAddFuelEntry(isPaid) && (
               <Button asChild variant="outline">
                 <Link href={`/dashboard/vehicles/${vehicle.uuid}/fuel/new`}>
                   <Fuel className="h-4 w-4 mr-2" />
@@ -196,7 +201,7 @@ export default function VehicleDetailPage() {
                 </Link>
               </Button>
             )}
-            {isPaid && (
+            {canAddOdometerEntry(isPaid) && (
               <Button asChild variant="outline">
                 <Link href={`/dashboard/vehicles/${vehicle.uuid}/odometer/new`}>
                   <Gauge className="h-4 w-4 mr-2" />
@@ -207,6 +212,28 @@ export default function VehicleDetailPage() {
           </div>
         </div>
       </div>
+
+      {/* Premium Upgrade Card for non-paid users */}
+      {!isPaid && (
+        <Card className="mb-6 bg-orange-50 dark:bg-orange-950/20 border-orange-200 dark:border-orange-900">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div className="space-y-1">
+                <h3 className="font-semibold text-orange-800 dark:text-orange-400">
+                  Upgrade to Premium
+                </h3>
+                <p className="text-orange-700/90 dark:text-orange-400/90">
+                  Track an unlimited number of vehicles and jobs, monitor fuel
+                  economy and unlock advanced insights about your vehicle.
+                </p>
+              </div>
+              <Button className="bg-orange-600 hover:bg-orange-700 text-white">
+                Upgrade Now
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Vehicle Stats Dashboard */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
