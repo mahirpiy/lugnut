@@ -194,7 +194,7 @@ export default function VehicleDetailPage() {
             {!isPaid && jobs.length >= 2 ? (
               <Button variant="outline">
                 <Plus className="h-4 w-4 mr-2" />
-                Upgrade to add more jobs
+                You&apos;ve hit the limit of free jobs. Upgrade to add more.
               </Button>
             ) : (
               <Button asChild>
@@ -227,7 +227,7 @@ export default function VehicleDetailPage() {
                   <p className="text-sm font-medium text-muted-foreground">
                     Current Odometer
                   </p>
-                  <p className="text-2xl font-bold">
+                  <p className="text-3xl font-bold">
                     {vehicle.currentOdometer.toLocaleString()}
                   </p>
                   <p className="text-xs text-muted-foreground">
@@ -249,10 +249,10 @@ export default function VehicleDetailPage() {
             <div className="flex items-center space-x-2">
               <Wrench className="h-5 w-5 text-green-600" />
               <div>
-                <p className="text-sm font-medium text-muted-foreground">
+                <p className="text-md font-medium text-muted-foreground">
                   Total Jobs
                 </p>
-                <p className="text-2xl font-bold">{jobs.length}</p>
+                <p className="text-3xl font-bold">{jobs.length}</p>
                 <p className="text-xs text-muted-foreground">
                   {`${formatDiyHours(totalDiyHours)}`}
                 </p>
@@ -269,7 +269,7 @@ export default function VehicleDetailPage() {
                 <p className="text-sm font-medium text-muted-foreground">
                   Total Spent
                 </p>
-                <p className="text-2xl font-bold">${totalSpent.toFixed(2)}</p>
+                <p className="text-3xl font-bold">${totalSpent.toFixed(2)}</p>
                 <p className="text-xs text-muted-foreground">
                   {`${calculateDiyLaborSavedString(totalDiyHours)}`}
                 </p>
@@ -286,7 +286,7 @@ export default function VehicleDetailPage() {
                 <p className="text-sm font-medium text-muted-foreground">
                   Miles Driven
                 </p>
-                <p className="text-2xl font-bold">
+                <p className="text-3xl font-bold">
                   {totalMilesDriven.toLocaleString()}
                 </p>
                 <p className="text-xs text-muted-foreground">since purchase</p>
@@ -304,7 +304,7 @@ export default function VehicleDetailPage() {
                   <p className="text-sm font-medium text-muted-foreground">
                     Average MPG
                   </p>
-                  <p className="text-2xl font-bold">
+                  <p className="text-3xl font-bold">
                     {averageMpg > 0 ? averageMpg.toFixed(1) : "--"}
                   </p>
                   <p className="text-xs text-muted-foreground">
@@ -328,9 +328,9 @@ export default function VehicleDetailPage() {
                   <p className="text-sm font-medium text-muted-foreground">
                     Average MPG
                   </p>
-                  <p className="text-2xl font-bold">23.0</p>
+                  <p className="text-3xl font-bold">23.0</p>
                   <p className="text-xs text-muted-foreground">
-                    miles per tank
+                    192 miles per tank
                   </p>
                 </div>
               </div>
