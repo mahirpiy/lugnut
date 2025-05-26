@@ -25,9 +25,16 @@ export default function AddJob({
   }
 
   return (
-    <Button disabled>
-      <Lock className="h-4 w-4 mr-2" />
-      You&apos;ve hit the limit of free jobs. Upgrade now to add more.
+    <Button
+      asChild
+      className="bg-orange-50 dark:bg-orange-950/20 border-orange-200 dark:border-orange-900"
+    >
+      <Link href="/dashboard/upgrade">
+        <Lock className="h-4 w-4 mr-2 text-orange-800 dark:text-orange-400" />
+        <p className="font-semibold text-orange-800 dark:text-orange-400">
+          You&apos;ve hit the limit of free jobs. Upgrade to add more.
+        </p>
+      </Link>
     </Button>
   );
 }

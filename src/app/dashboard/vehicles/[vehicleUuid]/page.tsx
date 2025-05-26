@@ -1,12 +1,9 @@
 "use client";
 
+import AddJob from "@/components/clickable/AddJob";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import {
-  canAddFuelEntry,
-  canAddJob,
-  canAddOdometerEntry,
-} from "@/utils/subscription";
+import { canAddFuelEntry, canAddOdometerEntry } from "@/utils/subscription";
 import {
   calculateDiyLaborSavedString,
   calculateMilesPerTank,
@@ -180,19 +177,7 @@ export default function VehicleDetailPage() {
             )}
           </div>
           <div className="flex space-x-2">
-            {canAddJob(isPaid, jobs.length) ? (
-              <Button asChild>
-                <Link href={`/dashboard/vehicles/${vehicle.uuid}/jobs/new`}>
-                  <Wrench className="h-4 w-4 mr-2" />
-                  Add Job
-                </Link>
-              </Button>
-            ) : (
-              <Button disabled>
-                <Lock className="h-4 w-4 mr-2" />
-                You&apos;ve hit the limit of free jobs. Upgrade now to add more.
-              </Button>
-            )}
+            <AddJob vehicleUuid={vehicle.uuid} jobCount={jobs.length} />
             {canAddFuelEntry(isPaid) && (
               <Button asChild variant="outline">
                 <Link href={`/dashboard/vehicles/${vehicle.uuid}/fuel/new`}>
@@ -227,9 +212,11 @@ export default function VehicleDetailPage() {
                   economy and unlock advanced insights about your vehicle.
                 </p>
               </div>
-              <Button className="bg-orange-600 hover:bg-orange-700 text-white">
-                Upgrade Now
-              </Button>
+              <Link href="/dashboard/upgrade">
+                <Button className="bg-orange-600 hover:bg-orange-700 text-white">
+                  Upgrade Now
+                </Button>
+              </Link>
             </div>
           </CardContent>
         </Card>
@@ -329,7 +316,17 @@ export default function VehicleDetailPage() {
         ) : (
           <Card className="relative">
             <div className="absolute inset-0 backdrop-blur-[1px] bg-background/60 z-10 flex items-center justify-center">
-              <Button variant="outline">Upgrade to track fuel</Button>
+              <Button
+                asChild
+                className="bg-orange-50 dark:bg-orange-950/20 border-orange-200 dark:border-orange-900"
+              >
+                <Link href="/dashboard/upgrade">
+                  <Lock className="h-4 w-4 mr-2 text-orange-800 dark:text-orange-400" />
+                  <p className="font-semibold text-orange-800 dark:text-orange-400">
+                    Upgrade to track fuel records
+                  </p>
+                </Link>
+              </Button>
             </div>
             <CardContent className="p-8">
               <div className="flex items-center space-x-4">

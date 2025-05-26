@@ -73,6 +73,28 @@ export default function DashboardPage() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
+      {!canAddVehicle && (
+        <Card className="mb-6 bg-orange-50 dark:bg-orange-950/20 border-orange-200 dark:border-orange-900">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div className="space-y-1">
+                <h3 className="font-semibold text-orange-800 dark:text-orange-400">
+                  Vehicle Limit Reached
+                </h3>
+                <p className="text-orange-700/90 dark:text-orange-400/90">
+                  Free accounts are limited to 1 vehicle. Upgrade to add
+                  unlimited vehicles, jobs and fuel records.
+                </p>
+              </div>
+              <Link href="/dashboard/upgrade">
+                <Button className="bg-orange-600 hover:bg-orange-700 text-white">
+                  Upgrade Now
+                </Button>
+              </Link>
+            </div>
+          </CardContent>
+        </Card>
+      )}
       <div className="flex justify-between items-center mb-8">
         <div>
           <h1 className="text-3xl font-bold text-foreground">Your Vehicles</h1>
@@ -80,6 +102,7 @@ export default function DashboardPage() {
             Manage your vehicle maintenance records
           </p>
         </div>
+
         {canAddVehicle && (
           <Button asChild>
             <Link href="/dashboard/vehicles/new">
@@ -121,26 +144,6 @@ export default function DashboardPage() {
               />
             ))}
           </div>
-          {!canAddVehicle && (
-            <Card className="mt-6 border-orange-200 bg-orange-50">
-              <CardContent className="pt-6">
-                <div className="flex items-center space-x-3">
-                  <div className="flex-1">
-                    <h3 className="font-medium text-orange-900">
-                      Vehicle Limit Reached
-                    </h3>
-                    <p className="text-sm text-orange-700">
-                      Free accounts are limited to 1 vehicle. Upgrade to add
-                      unlimited vehicles.
-                    </p>
-                  </div>
-                  <Button variant="outline" size="sm">
-                    Upgrade
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          )}
         </>
       )}
     </div>
