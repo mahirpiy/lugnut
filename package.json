@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
+    "build-migrate": "next build && npx drizzle-kit migrate",
     "start": "next start",
     "lint": "next lint",
     "db:generate": "npx drizzle-kit generate",
