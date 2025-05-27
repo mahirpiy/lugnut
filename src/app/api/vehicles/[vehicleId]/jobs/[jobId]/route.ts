@@ -15,16 +15,12 @@ import { and, eq, inArray } from "drizzle-orm";
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
 
-interface RouteParams {
-  params: {
-    vehicleId: string;
-    jobId: string;
-  };
-}
-
-export async function GET(request: NextRequest, { params }: RouteParams) {
+export async function GET(
+  request: NextRequest,
+  { params }: { params: { vehicleId: string; jobId: string } }
+) {
   try {
-    const { vehicleId, jobId } = await params;
+    const { vehicleId, jobId } = params;
     const session = await getServerSession(authOptions);
 
     if (!session?.user?.id) {

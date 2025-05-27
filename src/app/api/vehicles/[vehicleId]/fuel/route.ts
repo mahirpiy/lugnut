@@ -4,7 +4,7 @@ import { fuelEntries, odometerEntries, vehicles } from "@/lib/db/schema";
 import { updateOdometer } from "@/utils/odometer";
 import { and, desc, eq } from "drizzle-orm";
 import { getServerSession } from "next-auth";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 
 const fuelEntrySchema = z.object({
@@ -29,15 +29,12 @@ const fuelEntrySchema = z.object({
     .optional(),
 });
 
-interface RouteParams {
-  params: {
-    vehicleId: string;
-  };
-}
-
 // GET all fuel entries for a vehicle
-export async function GET(request: Request, { params }: RouteParams) {
-  const { vehicleId } = await params;
+export async function GET(
+  request: NextRequest,
+  { params }: { params: { vehicleId: string } }
+) {
+  const { vehicleId } = params;
 
   try {
     const session = await getServerSession(authOptions);
@@ -125,8 +122,11 @@ export async function GET(request: Request, { params }: RouteParams) {
 }
 
 // POST create new fuel entry
-export async function POST(request: Request, { params }: RouteParams) {
-  const { vehicleId } = await params;
+export async function POST(
+  request: NextRequest,
+  { params }: { params: { vehicleId: string } }
+) {
+  const { vehicleId } = params;
 
   try {
     const session = await getServerSession(authOptions);

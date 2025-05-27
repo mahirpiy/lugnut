@@ -5,15 +5,12 @@ import { and, eq } from "drizzle-orm";
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
 
-interface RouteParams {
-  params: {
-    vehicleId: string;
-  };
-}
-
-export async function GET(request: NextRequest, { params }: RouteParams) {
+export async function GET(
+  request: NextRequest,
+  { params }: { params: { vehicleId: string } }
+) {
   try {
-    const { vehicleId } = await params;
+    const { vehicleId } = params;
 
     const session = await getServerSession(authOptions);
 

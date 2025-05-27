@@ -4,7 +4,7 @@ import { odometerEntries, vehicles } from "@/lib/db/schema";
 import { updateOdometer } from "@/utils/odometer";
 import { and, eq } from "drizzle-orm";
 import { getServerSession } from "next-auth";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 
 const odometerEntrySchema = z.object({
@@ -20,15 +20,12 @@ const odometerEntrySchema = z.object({
     .optional(),
 });
 
-interface RouteParams {
-  params: {
-    vehicleId: string;
-  };
-}
-
-export async function GET(request: Request, { params }: RouteParams) {
+export async function GET(
+  request: NextRequest,
+  { params }: { params: { vehicleId: string } }
+) {
   try {
-    const { vehicleId } = await params;
+    const { vehicleId } = params;
 
     const session = await getServerSession(authOptions);
 
@@ -53,9 +50,12 @@ export async function GET(request: Request, { params }: RouteParams) {
   }
 }
 
-export async function POST(request: Request, { params }: RouteParams) {
+export async function POST(
+  request: NextRequest,
+  { params }: { params: { vehicleId: string } }
+) {
   try {
-    const { vehicleId } = await params;
+    const { vehicleId } = params;
 
     const session = await getServerSession(authOptions);
 

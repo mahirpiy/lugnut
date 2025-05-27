@@ -16,16 +16,13 @@ import { and, count, eq } from "drizzle-orm";
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
 
-interface RouteParams {
-  params: {
-    vehicleId: string;
-  };
-}
-
 // GET all jobs for a vehicle
-export async function GET(request: NextRequest, { params }: RouteParams) {
+export async function GET(
+  request: NextRequest,
+  { params }: { params: { vehicleId: string } }
+) {
   try {
-    const { vehicleId } = await params;
+    const { vehicleId } = params;
 
     const session = await getServerSession(authOptions);
 
@@ -119,9 +116,12 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 }
 
 // POST create new job
-export async function POST(request: NextRequest, { params }: RouteParams) {
+export async function POST(
+  request: NextRequest,
+  { params }: { params: { vehicleId: string } }
+) {
   try {
-    const { vehicleId } = await params;
+    const { vehicleId } = params;
 
     const session = await getServerSession(authOptions);
 
