@@ -183,8 +183,7 @@ export default function HomePage() {
             <span className="font-bold">Lugnut</span>
           </div>
           <p className="text-muted-foreground">
-            © 2025 Overbrook Holdings LLC. Built for DIY mechanics who care
-            about the details.
+            Built for DIY mechanics who care about the details.
           </p>
         </div>
       </footer>
