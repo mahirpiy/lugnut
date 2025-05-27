@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Tag } from "@/lib/interfaces/tag";
 import { cn } from "@/lib/utils";
 import { JobInput } from "@/lib/validations/job";
 import { Plus, Trash2 } from "lucide-react";
@@ -18,12 +19,6 @@ import {
   useFieldArray,
 } from "react-hook-form";
 import { PartForm } from "./PartForm";
-
-interface Tag {
-  id: string;
-  name: string;
-  isPreset: boolean;
-}
 
 interface RecordFormProps {
   control: Control<JobInput>;
