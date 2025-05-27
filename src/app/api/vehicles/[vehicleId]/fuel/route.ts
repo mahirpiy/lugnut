@@ -30,10 +30,8 @@ const fuelEntrySchema = z.object({
 });
 
 // GET all fuel entries for a vehicle
-export async function GET(
-  request: NextRequest,
-  { params }: { params: { vehicleId: string } }
-) {
+export async function GET(request: NextRequest, props: { params: Promise<{ vehicleId: string }> }) {
+  const params = await props.params;
   const { vehicleId } = params;
 
   try {
@@ -122,10 +120,8 @@ export async function GET(
 }
 
 // POST create new fuel entry
-export async function POST(
-  request: NextRequest,
-  { params }: { params: { vehicleId: string } }
-) {
+export async function POST(request: NextRequest, props: { params: Promise<{ vehicleId: string }> }) {
+  const params = await props.params;
   const { vehicleId } = params;
 
   try {

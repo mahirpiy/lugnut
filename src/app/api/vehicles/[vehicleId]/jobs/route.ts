@@ -17,10 +17,8 @@ import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
 
 // GET all jobs for a vehicle
-export async function GET(
-  request: NextRequest,
-  { params }: { params: { vehicleId: string } }
-) {
+export async function GET(request: NextRequest, props: { params: Promise<{ vehicleId: string }> }) {
+  const params = await props.params;
   try {
     const { vehicleId } = params;
 
@@ -116,10 +114,8 @@ export async function GET(
 }
 
 // POST create new job
-export async function POST(
-  request: NextRequest,
-  { params }: { params: { vehicleId: string } }
-) {
+export async function POST(request: NextRequest, props: { params: Promise<{ vehicleId: string }> }) {
+  const params = await props.params;
   try {
     const { vehicleId } = params;
 
