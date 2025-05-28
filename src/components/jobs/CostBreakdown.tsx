@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { calculateDiyLaborSavedString } from "@/utils/vehicleInsights";
-import { DollarSign } from "lucide-react";
+import { Receipt } from "lucide-react";
 
 interface CostBreakdownProps {
   job: {
@@ -18,7 +18,7 @@ export default function CostBreakdown({ job }: CostBreakdownProps) {
     <Card className="mb-8">
       <CardHeader>
         <CardTitle className="flex items-center space-x-2">
-          <DollarSign className="h-5 w-5" />
+          <Receipt className="h-5 w-5" />
           <span>Cost Breakdown</span>
         </CardTitle>
       </CardHeader>

@@ -19,7 +19,7 @@ import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 interface Part {
-  uuid: string;
+  id: string;
   name: string;
   partNumber?: string;
   manufacturer?: string;
@@ -285,7 +285,7 @@ export default function JobDetailPage() {
                 <div className="space-y-4">
                   {record.parts.map((part) => (
                     <div
-                      key={part.uuid}
+                      key={part.id}
                       className="flex items-center justify-between p-4 bg-muted-foreground rounded-lg"
                     >
                       <div className="flex items-center space-x-3">
