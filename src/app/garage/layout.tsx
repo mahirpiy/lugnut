@@ -1,11 +1,11 @@
 "use client";
 
-import { Navbar } from "@/components/dashboard/Navbar";
+import { Navbar } from "@/components/garage/Navbar";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
-export default function DashboardLayout({
+export default function GarageLayout({
   children,
 }: {
   children: React.ReactNode;

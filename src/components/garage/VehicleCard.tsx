@@ -46,10 +46,10 @@ export function VehicleCard({ vehicle }: VehicleCardProps) {
         )}
         <div className="flex space-x-2">
           <Button asChild className="flex-1">
-            <Link href={`/dashboard/vehicles/${vehicle.id}`}>View Details</Link>
+            <Link href={`/garage/vehicles/${vehicle.id}`}>View Details</Link>
           </Button>
           <Button asChild variant="outline" className="flex-1">
-            <Link href={`/dashboard/vehicles/${vehicle.id}/jobs/new`}>
+            <Link href={`/garage/vehicles/${vehicle.id}/jobs/new`}>
               Add Job
             </Link>
           </Button>

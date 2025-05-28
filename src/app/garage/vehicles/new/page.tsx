@@ -73,7 +73,7 @@ export default function NewVehiclePage() {
         return;
       }
 
-      router.push("/dashboard");
+      router.push("/garage");
     } catch (err) {
       console.error(err);
       setError("Something went wrong. Please try again.");
@@ -86,11 +86,11 @@ export default function NewVehiclePage() {
     <div className="max-w-2xl mx-auto px-4 py-8">
       <div className="mb-6">
         <Link
-          href="/dashboard"
+          href="/garage"
           className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground mb-4"
         >
           <ArrowLeft className="h-4 w-4 mr-1" />
-          Back to Dashboard
+          Back to Garage
         </Link>
         <div className="flex items-center space-x-3">
           <Car className="h-8 w-8 text-stone-600" />
@@ -276,7 +276,7 @@ export default function NewVehiclePage() {
                 className="flex-1"
                 asChild
               >
-                <Link href="/dashboard">Cancel</Link>
+                <Link href="/garage">Cancel</Link>
               </Button>
               <Button type="submit" className="flex-1" disabled={isLoading}>
                 {isLoading ? "Adding Vehicle..." : "Add Vehicle"}

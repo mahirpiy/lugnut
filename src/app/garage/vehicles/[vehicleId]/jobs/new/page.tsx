@@ -127,7 +127,7 @@ export default function NewJobPage() {
         return;
       }
 
-      router.push(`/dashboard/vehicles/${vehicleId}`);
+      router.push(`/garage/vehicles/${vehicleId}`);
     } catch (err) {
       console.error("Error creating job:", err);
       setError("Something went wrong. Please try again.");
@@ -148,8 +148,7 @@ export default function NewJobPage() {
       });
     }
 
-    // Navigate away
-    router.push(`/dashboard/vehicles/${vehicleId}`);
+    router.push(`/garage/vehicles/${vehicleId}`);
   };
 
   const onPartPhotoUpload = async (

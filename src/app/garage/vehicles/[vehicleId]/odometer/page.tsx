@@ -67,7 +67,7 @@ export default function OdometerPage() {
           <CardContent className="pt-6 text-center">
             <p>Vehicle not found</p>
             <Button asChild className="mt-4">
-              <Link href={`/dashboard/vehicles/${vehicleId}`}>
+              <Link href={`/garage/vehicles/${vehicleId}`}>
                 Back to Vehicle
               </Link>
             </Button>
@@ -85,7 +85,7 @@ export default function OdometerPage() {
       {/* Header */}
       <div className="mb-6">
         <Link
-          href={`/dashboard/vehicles/${vehicleId}`}
+          href={`/garage/vehicles/${vehicleId}`}
           className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground mb-4"
         >
           <ArrowLeft className="h-4 w-4 mr-1" />
@@ -119,7 +119,7 @@ export default function OdometerPage() {
             </div>
             {session?.user?.hasActiveSubscription && (
               <Button asChild size="sm">
-                <Link href={`/dashboard/vehicles/${vehicleId}/odometer/new`}>
+                <Link href={`/garage/vehicles/${vehicleId}/odometer/new`}>
                   <Gauge className="h-4 w-4 mr-2" />
                   Add Reading
                 </Link>

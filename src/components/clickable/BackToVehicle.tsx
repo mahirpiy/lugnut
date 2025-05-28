@@ -12,7 +12,7 @@ export function BackToVehicle({
 }) {
   return (
     <Link
-      href={`/dashboard/vehicles/${vehicleId}`}
+      href={`/garage/vehicles/${vehicleId}`}
       className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground mb-4"
     >
       <ArrowLeft className="h-4 w-4 mr-1" />

@@ -83,7 +83,7 @@ export default function VehicleJobsPage() {
           <CardContent className="pt-6 text-center">
             <p>Vehicle not found</p>
             <Button asChild className="mt-4">
-              <Link href="/dashboard">Back to Dashboard</Link>
+              <Link href="/garage">Back to Garage</Link>
             </Button>
           </CardContent>
         </Card>
@@ -122,7 +122,7 @@ export default function VehicleJobsPage() {
                 Start tracking your vehicle maintenance by adding your first job
               </p>
               <Button asChild>
-                <Link href={`/dashboard/vehicles/${vehicleId}/jobs/new`}>
+                <Link href={`/garage/vehicles/${vehicleId}/jobs/new`}>
                   <Plus className="h-4 w-4 mr-2" />
                   Add First Job
                 </Link>
@@ -135,9 +135,7 @@ export default function VehicleJobsPage() {
                   key={job.id}
                   className="border-muted hover:shadow-md transition-shadow cursor-pointer"
                 >
-                  <Link
-                    href={`/dashboard/vehicles/${vehicleId}/jobs/${job.id}`}
-                  >
+                  <Link href={`/garage/vehicles/${vehicleId}/jobs/${job.id}`}>
                     <CardContent className="pt-4">
                       <div className="flex items-start justify-between">
                         <div className="flex-1">

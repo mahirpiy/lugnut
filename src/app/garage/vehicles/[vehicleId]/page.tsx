@@ -123,7 +123,7 @@ export default function VehicleDetailPage() {
           <CardContent className="pt-6 text-center">
             <p>Vehicle not found</p>
             <Button asChild className="mt-4">
-              <Link href="/dashboard">Back to Dashboard</Link>
+              <Link href="/garage">Back to Garage</Link>
             </Button>
           </CardContent>
         </Card>
@@ -152,11 +152,11 @@ export default function VehicleDetailPage() {
       {/* Header */}
       <div className="mb-6">
         <Link
-          href="/dashboard"
+          href="/garage"
           className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground mb-4"
         >
           <ArrowLeft className="h-4 w-4 mr-1" />
-          Back to Dashboard
+          Back to Garage
         </Link>
         <div className="flex items-center justify-between">
           <div>
@@ -176,7 +176,7 @@ export default function VehicleDetailPage() {
             <AddJob vehicleId={vehicle.id} />
             {session?.user?.hasActiveSubscription && (
               <Button asChild variant="outline">
-                <Link href={`/dashboard/vehicles/${vehicle.id}/fuel/new`}>
+                <Link href={`/garage/vehicles/${vehicle.id}/fuel/new`}>
                   <Fuel className="h-4 w-4 mr-2" />
                   Add Fuel
                 </Link>
@@ -184,7 +184,7 @@ export default function VehicleDetailPage() {
             )}
             {session?.user?.hasActiveSubscription && (
               <Button asChild variant="outline">
-                <Link href={`/dashboard/vehicles/${vehicle.id}/odometer/new`}>
+                <Link href={`/garage/vehicles/${vehicle.id}/odometer/new`}>
                   <Gauge className="h-4 w-4 mr-2" />
                   Add Odometer
                 </Link>
@@ -194,21 +194,20 @@ export default function VehicleDetailPage() {
         </div>
       </div>
 
-      {/* Premium Upgrade Card for non-paid users */}
       {!session?.user?.hasActiveSubscription && (
         <Card className="mb-6 bg-orange-50 dark:bg-orange-950/20 border-orange-200 dark:border-orange-900">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div className="space-y-1">
                 <h3 className="font-semibold text-orange-800 dark:text-orange-400">
-                  Upgrade to Premium
+                  Upgrade your garage
                 </h3>
                 <p className="text-orange-700/90 dark:text-orange-400/90">
                   Track an unlimited number of vehicles and jobs, monitor fuel
                   economy and unlock advanced insights about your vehicle.
                 </p>
               </div>
-              <Link href="/dashboard/upgrade">
+              <Link href="/garage/upgrade">
                 <Button className="bg-orange-600 hover:bg-orange-700 text-white">
                   Upgrade Now
                 </Button>
@@ -218,10 +217,9 @@ export default function VehicleDetailPage() {
         </Card>
       )}
 
-      {/* Vehicle Stats Dashboard */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
         <Card className="cursor-pointer hover:bg-accent/80 hover:scale-[1.02] transition-all duration-200">
-          <Link href={`/dashboard/vehicles/${vehicle.id}/odometer`}>
+          <Link href={`/garage/vehicles/${vehicle.id}/odometer`}>
             <CardContent className="p-8">
               <div className="flex items-center space-x-4">
                 <Gauge className="h-8 w-8 text-blue-600" />
@@ -247,7 +245,7 @@ export default function VehicleDetailPage() {
         </Card>
 
         <Card className="cursor-pointer hover:bg-accent/80 hover:scale-[1.02] transition-all duration-200">
-          <Link href={`/dashboard/vehicles/${vehicle.id}/jobs`}>
+          <Link href={`/garage/vehicles/${vehicle.id}/jobs`}>
             <CardContent className="p-8">
               <div className="flex items-center space-x-4">
                 <Wrench className="h-8 w-8 text-green-600" />
@@ -322,7 +320,7 @@ export default function VehicleDetailPage() {
                 asChild
                 className="bg-orange-50 dark:bg-orange-950/20 border-orange-200 dark:border-orange-900"
               >
-                <Link href="/dashboard/upgrade">
+                <Link href="/garage/upgrade">
                   <Lock className="h-4 w-4 mr-2 text-orange-800 dark:text-orange-400" />
                   <p className="font-semibold text-orange-800 dark:text-orange-400">
                     Upgrade to track fuel records

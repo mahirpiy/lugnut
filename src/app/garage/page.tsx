@@ -1,6 +1,6 @@
 "use client";
 
-import { VehicleCard } from "@/components/dashboard/VehicleCard";
+import { VehicleCard } from "@/components/garage/VehicleCard";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -13,7 +13,7 @@ import { Car, Plus } from "lucide-react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-export default function DashboardPage() {
+export default function GaragePage() {
   const { data: session } = useSession();
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [loading, setLoading] = useState(true);
@@ -76,7 +76,7 @@ export default function DashboardPage() {
                   unlimited vehicles, jobs and fuel records.
                 </p>
               </div>
-              <Link href="/dashboard/upgrade">
+              <Link href="/garage/upgrade">
                 <Button className="bg-orange-600 hover:bg-orange-700 text-white">
                   Upgrade Now
                 </Button>
@@ -95,7 +95,7 @@ export default function DashboardPage() {
 
         {canAddVehicle && (
           <Button asChild>
-            <Link href="/dashboard/vehicles/new">
+            <Link href="/garage/vehicles/new">
               <Plus className="h-4 w-4 mr-2" />
               Add Vehicle
             </Link>
@@ -113,7 +113,7 @@ export default function DashboardPage() {
             </CardDescription>
             {canAddVehicle && (
               <Button asChild>
-                <Link href="/dashboard/vehicles/new">
+                <Link href="/garage/vehicles/new">
                   <Plus className="h-4 w-4 mr-2" />
                   Add Your First Vehicle
                 </Link>

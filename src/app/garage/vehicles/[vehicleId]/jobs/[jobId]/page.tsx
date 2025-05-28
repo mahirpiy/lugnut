@@ -30,13 +30,13 @@ interface Part {
 }
 
 interface Tag {
-  uuid: string;
+  id: string;
   name: string;
   isPreset: boolean;
 }
 
 interface Record {
-  uuid: string;
+  id: string;
   title: string;
   notes?: string;
   parts: Part[];
@@ -123,7 +123,7 @@ export default function JobDetailPage() {
           <CardContent className="pt-6 text-center">
             <p>Job not found</p>
             <Button asChild className="mt-4">
-              <Link href={`/dashboard/vehicles/${vehicleId}`}>
+              <Link href={`/garage/vehicles/${vehicleId}`}>
                 Back to Vehicle
               </Link>
             </Button>
@@ -141,7 +141,7 @@ export default function JobDetailPage() {
       {/* Header */}
       <div className="mb-6">
         <Link
-          href={`/dashboard/vehicles/${vehicleId}`}
+          href={`/garage/vehicles/${vehicleId}`}
           className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground mb-4"
         >
           <ArrowLeft className="h-4 w-4 mr-1" />
@@ -253,7 +253,7 @@ export default function JobDetailPage() {
 
         <TabsContent value="records" className="space-y-6">
           {job.records.map((record) => (
-            <Card key={`record-${record.uuid}`} className="mb-8">
+            <Card key={`record-${record.id}`} className="mb-8">
               <CardHeader className="bg-muted">
                 <div className="flex items-start justify-between">
                   <div>
@@ -261,7 +261,7 @@ export default function JobDetailPage() {
                     <div className="flex flex-wrap gap-2 mt-3">
                       {record.tags.map((tag) => (
                         <Badge
-                          key={`tag-${tag.uuid}`}
+                          key={`tag-${tag.id}`}
                           variant={tag.isPreset ? "default" : "secondary"}
                           className="bg-muted border-muted-foreground"
                         >
