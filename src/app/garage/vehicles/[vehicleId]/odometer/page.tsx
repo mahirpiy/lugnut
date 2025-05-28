@@ -1,10 +1,11 @@
 "use client";
 
+import OdometerTile from "@/components/odometer/odometer-tile";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { OdometerEntry } from "@/lib/interfaces/odometer-entry";
 import { Vehicle } from "@/lib/interfaces/vehicle";
-import { ArrowLeft, Gauge, ScrollText } from "lucide-react";
+import { ArrowLeft, Car, Gauge, Plus } from "lucide-react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
@@ -92,19 +93,12 @@ export default function OdometerPage() {
           Back to {displayName}
         </Link>
         <div className="flex items-center space-x-3">
-          <Gauge className="h-8 w-8 text-muted-foreground" />
+          <Car className="h-8 w-8 text-muted-foreground" />
           <div>
             <h1 className="text-2xl font-bold text-foreground">
               {vehicle.nickname ||
                 `${vehicle.year} ${vehicle.make} ${vehicle.model}`}
             </h1>
-            {/* <p className="text-muted-foreground">
-              {new Date(job.date).toLocaleDateString("en-US", {
-                month: "long",
-                day: "numeric",
-                year: "numeric",
-              })}
-            </p> */}
           </div>
         </div>
       </div>
@@ -114,13 +108,13 @@ export default function OdometerPage() {
         <CardHeader>
           <CardTitle className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
-              <ScrollText className="h-5 w-5" />
+              <Gauge className="h-5 w-5" />
               <span>Odometer History</span>
             </div>
             {session?.user?.hasActiveSubscription && (
               <Button asChild size="sm">
                 <Link href={`/garage/vehicles/${vehicleId}/odometer/new`}>
-                  <Gauge className="h-4 w-4 mr-2" />
+                  <Plus className="h-4 w-4 mr-2" />
                   Add Reading
                 </Link>
               </Button>
@@ -128,34 +122,10 @@ export default function OdometerPage() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {entries &&
               entries.map((entry) => (
-                <div
-                  key={`${entry.id}-${entry.odometer}`}
-                  className="flex items-center justify-between p-4 bg-muted rounded-lg"
-                >
-                  <div className="flex items-center space-x-3">
-                    <Gauge className="h-5 w-5 text-muted-foreground" />
-                    <div>
-                      <p className="font-medium">
-                        {entry.odometer.toLocaleString()} miles
-                      </p>
-                      <p className="text-sm text-muted-foreground">
-                        {new Date(entry.entryDate).toLocaleDateString("en-US", {
-                          month: "long",
-                          day: "numeric",
-                          year: "numeric",
-                        })}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-sm text-muted-foreground capitalize">
-                      {entry.type}
-                    </p>
-                  </div>
-                </div>
+                <OdometerTile key={entry.id} entry={entry} />
               ))}
           </div>
         </CardContent>
