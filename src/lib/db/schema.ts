@@ -116,7 +116,7 @@ export const vehicles = pgTable("vehicles", {
 });
 
 export const odometerEntries = pgTable("odometer_entries", {
-  id: uuid("uuid").defaultRandom().unique().notNull(),
+  id: uuid("id").defaultRandom().notNull().primaryKey(),
   type: text("type").notNull().default("reading"),
   vehicleId: uuid("vehicle_id")
     .notNull()
