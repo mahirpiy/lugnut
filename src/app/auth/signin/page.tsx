@@ -14,7 +14,6 @@ import { Label } from "@/components/ui/label";
 import { signInSchema, type SignInInput } from "@/lib/validations/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { signIn } from "next-auth/react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -103,11 +102,11 @@ export default function SignInPage() {
               )}
             </div>
           </CardContent>
-          <CardFooter className="flex flex-col space-y-4">
+          <CardFooter className="flex flex-col space-y-4 mt-4">
             <Button type="submit" className="w-full" disabled={isLoading}>
               {isLoading ? "Signing in..." : "Sign In"}
             </Button>
-            <p className="text-sm text-center text-muted-foreground">
+            {/* <p className="text-sm text-center text-muted-foreground">
               Don&apos;t have an account?{" "}
               <Link
                 href="/auth/signup"
@@ -115,7 +114,7 @@ export default function SignInPage() {
               >
                 Sign up
               </Link>
-            </p>
+            </p> */}
           </CardFooter>
         </form>
       </Card>
