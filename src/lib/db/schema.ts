@@ -225,10 +225,36 @@ export const partPhotos = pgTable("part_photos", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+export const serviceIntervals = pgTable("service_intervals", {
+  id: uuid("id").defaultRandom().notNull().primaryKey(),
+  vehicleId: uuid("vehicle_id")
+    .notNull()
+    .references(() => vehicles.id, { onDelete: "cascade" }),
+  name: text("name").notNull(),
+  mileageInterval: integer("mileage_interval"),
+  monthInterval: integer("month_interval"),
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const serviceIntervalTags = pgTable(
+  "service_interval_tags",
+  {
+    serviceIntervalId: uuid("service_interval_id")
+      .notNull()
+      .references(() => serviceIntervals.id, { onDelete: "cascade" }),
+    tagId: uuid("tag_id")
+      .notNull()
+      .references(() => tags.id, { onDelete: "cascade" }),
+  },
+  (table) => ({
+    pk: primaryKey({ columns: [table.serviceIntervalId, table.tagId] }),
+  })
+);
+
 // Relations
 export const usersRelations = relations(users, ({ many }) => ({
   vehicles: many(vehicles),
-  customTags: many(tags),
 }));
 
 export const vehiclesRelations = relations(vehicles, ({ one, many }) => ({
@@ -238,6 +264,7 @@ export const vehiclesRelations = relations(vehicles, ({ one, many }) => ({
   }),
   jobs: many(jobs),
   fuelEntries: many(fuelEntries),
+  serviceIntervals: many(serviceIntervals),
 }));
 
 export const jobsRelations = relations(jobs, ({ one, many }) => ({
@@ -281,3 +308,28 @@ export const fuelEntriesRelations = relations(fuelEntries, ({ one }) => ({
     references: [vehicles.id],
   }),
 }));
+
+export const serviceIntervalsRelations = relations(
+  serviceIntervals,
+  ({ one, many }) => ({
+    vehicle: one(vehicles, {
+      fields: [serviceIntervals.vehicleId],
+      references: [vehicles.id],
+    }),
+    tags: many(serviceIntervalTags),
+  })
+);
+
+export const serviceIntervalTagsRelations = relations(
+  serviceIntervalTags,
+  ({ one }) => ({
+    serviceInterval: one(serviceIntervals, {
+      fields: [serviceIntervalTags.serviceIntervalId],
+      references: [serviceIntervals.id],
+    }),
+    tag: one(tags, {
+      fields: [serviceIntervalTags.tagId],
+      references: [tags.id],
+    }),
+  })
+);
