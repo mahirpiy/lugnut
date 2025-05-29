@@ -225,7 +225,7 @@ export default function NewJobPage() {
                 <Label htmlFor="date">Date *</Label>
                 <Input
                   id="date"
-                  type="date"
+                  type="datetime-local"
                   {...register("date", {
                     setValueAs: (value) => new Date(value),
                   })}

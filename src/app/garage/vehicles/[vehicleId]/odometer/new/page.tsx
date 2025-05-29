@@ -145,10 +145,10 @@ export default function NewOdometerEntryPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="date">Date *</Label>
+                <Label htmlFor="date">Date & Time *</Label>
                 <Input
                   id="date"
-                  type="date"
+                  type="datetime-local"
                   {...register("date", {
                     setValueAs: (value) => new Date(value),
                   })}
