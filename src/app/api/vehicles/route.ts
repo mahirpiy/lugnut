@@ -60,7 +60,7 @@ export async function POST(request: NextRequest) {
     // Transform the purchaseDate string to a Date object before validation
     const transformedBody = {
       ...body,
-      purchaseDate: body.purchaseDate ? new Date(body.purchaseDate) : undefined,
+      purchaseDate: new Date(body.purchaseDate),
     };
 
     const validatedData = vehicleSchema.parse(transformedBody);
@@ -78,7 +78,7 @@ export async function POST(request: NextRequest) {
         vehicleId: vehicle[0].id,
         odometer: validatedData.initialOdometer,
         type: "initial",
-        entryDate: new Date(),
+        entryDate: validatedData.purchaseDate,
       });
 
       return vehicle[0];

@@ -42,13 +42,10 @@ export const vehicleSchema = z
       .number()
       .min(0, "Current odometer must be positive")
       .max(10000000, "Current odometer seems too high"),
-    purchaseDate: z
-      .date()
-      .optional()
-      .refine((date) => {
-        if (!date) return true;
-        return date <= new Date();
-      }, "Purchase date cannot be in the future"),
+    purchaseDate: z.date().refine((date) => {
+      if (!date) return true;
+      return date <= new Date();
+    }, "Purchase date cannot be in the future"),
   })
   .refine((data) => data.currentOdometer >= data.initialOdometer, {
     message:
