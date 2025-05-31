@@ -154,6 +154,10 @@ export const records = pgTable("records", {
     .references(() => jobs.id, { onDelete: "cascade" }),
   title: text("title").notNull(),
   notes: text("notes"),
+  serviceIntervalId: uuid("service_interval_id").references(
+    () => serviceIntervals.id,
+    { onDelete: "cascade" }
+  ),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
@@ -282,6 +286,10 @@ export const recordsRelations = relations(records, ({ one, many }) => ({
   }),
   parts: many(parts),
   recordTags: many(recordTags),
+  serviceInterval: one(serviceIntervals, {
+    fields: [records.serviceIntervalId],
+    references: [serviceIntervals.id],
+  }),
 }));
 
 export const partsRelations = relations(parts, ({ one }) => ({
@@ -317,6 +325,7 @@ export const serviceIntervalsRelations = relations(
       references: [vehicles.id],
     }),
     tags: many(serviceIntervalTags),
+    records: many(records),
   })
 );
 

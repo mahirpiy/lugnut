@@ -1,11 +1,15 @@
 import { authOptions } from "@/lib/auth";
 import { db } from "@/lib/db";
 import {
+  jobs,
+  odometerEntries,
+  records,
   serviceIntervals,
   serviceIntervalTags,
+  tags,
   vehicles,
 } from "@/lib/db/schema";
-import { and, eq } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -17,10 +21,53 @@ export async function GET(
     const params = await props.params;
     const { vehicleId } = params;
 
-    const intervals = await db
-      .select()
-      .from(serviceIntervals)
-      .where(eq(serviceIntervals.vehicleId, vehicleId));
+    const [baseIntervals, intervalRecords] = await Promise.all([
+      // Query 1: Get intervals with their tags
+      db
+        .select({
+          id: serviceIntervals.id,
+          name: serviceIntervals.name,
+          mileageInterval: serviceIntervals.mileageInterval,
+          monthInterval: serviceIntervals.monthInterval,
+          notes: serviceIntervals.notes,
+          tags: sql<
+            string[]
+          >`array_remove(array_agg(DISTINCT ${tags.name}), null)`.as("tags"),
+        })
+        .from(serviceIntervals)
+        .leftJoin(
+          serviceIntervalTags,
+          eq(serviceIntervals.id, serviceIntervalTags.serviceIntervalId)
+        )
+        .leftJoin(tags, eq(serviceIntervalTags.tagId, tags.id))
+        .where(eq(serviceIntervals.vehicleId, vehicleId))
+        .groupBy(serviceIntervals.id),
+
+      // Query 2: Get all records with their job dates and odometer readings
+      db
+        .select({
+          serviceIntervalId: records.serviceIntervalId,
+          id: records.id,
+          title: records.title,
+          odometer: odometerEntries.odometer,
+          date: jobs.date ?? odometerEntries.entryDate,
+          jobId: jobs.id,
+        })
+        .from(records)
+        .leftJoin(jobs, eq(records.jobId, jobs.id))
+        .leftJoin(odometerEntries, eq(jobs.odometerId, odometerEntries.id))
+        .where(eq(jobs.vehicleId, vehicleId)),
+    ]);
+
+    // Combine the results
+    const intervals = baseIntervals.map((interval) => {
+      return {
+        ...interval,
+        lastServiced: intervalRecords
+          .filter((record) => record.serviceIntervalId === interval.id)
+          .sort((a, b) => b.date!.getTime() - a.date!.getTime())[0],
+      };
+    });
 
     return NextResponse.json(intervals);
   } catch (error) {
