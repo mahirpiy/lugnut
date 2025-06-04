@@ -3,13 +3,22 @@
 import AddJob from "@/components/clickable/AddJob";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { ServiceInterval } from "@/lib/interfaces/service-interval";
 import {
   calculateDiyLaborSavedString,
   calculateMilesPerTank,
   formatDiyHours,
   milesDrivenPerDay,
 } from "@/utils/vehicleInsights";
-import { ArrowLeft, DollarSign, Fuel, Gauge, Lock, Wrench } from "lucide-react";
+import {
+  ArrowLeft,
+  DollarSign,
+  Fuel,
+  Gauge,
+  Hourglass,
+  Lock,
+  Wrench,
+} from "lucide-react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
@@ -60,6 +69,9 @@ export default function VehicleDetailPage() {
   const [vehicle, setVehicle] = useState<Vehicle | null>(null);
   const [jobs, setJobs] = useState<Job[]>([]);
   const [fuelEntries, setFuelEntries] = useState<FuelEntry[]>([]);
+  const [serviceIntervals, setServiceIntervals] = useState<ServiceInterval[]>(
+    []
+  );
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -87,6 +99,15 @@ export default function VehicleDetailPage() {
         if (fuelResponse.ok) {
           const fuelData = await fuelResponse.json();
           setFuelEntries(fuelData);
+        }
+
+        // Fetch service intervals
+        const intervalsResponse = await fetch(
+          `/api/vehicles/${vehicleId}/service-intervals`
+        );
+        if (intervalsResponse.ok) {
+          const intervalsData = await intervalsResponse.json();
+          setServiceIntervals(intervalsData);
         }
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -146,6 +167,11 @@ export default function VehicleDetailPage() {
       ? validMpgEntries.reduce((sum, entry) => sum + (entry.mpg || 0), 0) /
         validMpgEntries.length
       : 0;
+
+  const { count, message } = getServiceIntervalStatus(
+    serviceIntervals,
+    vehicle.currentOdometer
+  );
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
@@ -217,17 +243,17 @@ export default function VehicleDetailPage() {
         </Card>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <Card className="cursor-pointer hover:bg-accent/80 hover:scale-[1.02] transition-all duration-200">
           <Link href={`/garage/vehicles/${vehicle.id}/odometer`}>
-            <CardContent className="p-8">
+            <CardContent className="p-6">
               <div className="flex items-center space-x-4">
                 <Gauge className="h-8 w-8 text-blue-600" />
                 <div className="flex-1">
                   <p className="text-lg font-medium text-muted-foreground">
                     Odometer
                   </p>
-                  <p className="text-4xl font-bold mt-2">
+                  <p className="text-3xl font-bold mt-2">
                     {vehicle.currentOdometer.toLocaleString()}
                   </p>
                   <p className="text-sm text-muted-foreground mt-2">
@@ -245,15 +271,38 @@ export default function VehicleDetailPage() {
         </Card>
 
         <Card className="cursor-pointer hover:bg-accent/80 hover:scale-[1.02] transition-all duration-200">
+          <Link href={`/garage/vehicles/${vehicle.id}/service`}>
+            <CardContent className="p-6">
+              <div className="flex items-center space-x-4">
+                <Hourglass className="h-8 w-8 text-purple-600" />
+                <div className="flex-1">
+                  <p className="text-lg font-medium text-muted-foreground">
+                    Service Intervals
+                  </p>
+                  <p className="text-3xl font-bold mt-2">
+                    {typeof count === "number" && count > 0
+                      ? count.toLocaleString()
+                      : "--"}
+                  </p>
+                  <p className="text-sm text-muted-foreground mt-2">
+                    {message}
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Link>
+        </Card>
+
+        <Card className="cursor-pointer hover:bg-accent/80 hover:scale-[1.02] transition-all duration-200">
           <Link href={`/garage/vehicles/${vehicle.id}/jobs`}>
-            <CardContent className="p-8">
+            <CardContent className="p-6">
               <div className="flex items-center space-x-4">
                 <Wrench className="h-8 w-8 text-green-600" />
                 <div className="flex-1">
                   <p className="text-lg font-medium text-muted-foreground">
                     Maintenance Jobs
                   </p>
-                  <p className="text-4xl font-bold mt-2">{jobs.length}</p>
+                  <p className="text-3xl font-bold mt-2">{jobs.length}</p>
                   <p className="text-sm text-muted-foreground mt-2">
                     {`${formatDiyHours(totalDiyHours)}`}
                   </p>
@@ -263,7 +312,7 @@ export default function VehicleDetailPage() {
           </Link>
         </Card>
 
-        <Card className="relative group">
+        <Card className="relative group md:col-span-3 lg:col-span-1">
           <div className="absolute inset-0 flex items-center justify-center bg-background/80 opacity-0 group-hover:opacity-100 transition-opacity z-10">
             <p className="text-muted-foreground font-medium">
               Detailed cost analysis coming soon
@@ -288,7 +337,7 @@ export default function VehicleDetailPage() {
         </Card>
 
         {session?.user?.hasActiveSubscription ? (
-          <Card className="relative group">
+          <Card className="relative group md:col-span-3 lg:col-span-1">
             <div className="absolute inset-0 flex items-center justify-center bg-background/80 opacity-0 group-hover:opacity-100 transition-opacity z-10">
               <p className="text-muted-foreground font-medium">
                 Detailed fuel analysis coming soon
@@ -314,7 +363,7 @@ export default function VehicleDetailPage() {
             </CardContent>
           </Card>
         ) : (
-          <Card className="relative">
+          <Card className="relative md:col-span-3 lg:col-span-1">
             <div className="absolute inset-0 backdrop-blur-[1px] bg-background/60 z-10 flex items-center justify-center">
               <Button
                 asChild
@@ -347,4 +396,82 @@ export default function VehicleDetailPage() {
       </div>
     </div>
   );
+}
+
+function getServiceIntervalStatus(
+  intervals: ServiceInterval[],
+  currentOdometer: number
+) {
+  if (!intervals?.length) {
+    return { count: 0, message: "No service intervals" };
+  }
+
+  // Check for intervals without records
+  const noRecordIntervals = intervals.filter(
+    (interval) => !interval.lastServiced
+  );
+
+  // Check for past due intervals
+  const pastDueIntervals = intervals.filter((interval) => {
+    if (!interval.lastServiced) return false;
+
+    const milesDue = interval.mileageInterval
+      ? interval.lastServiced.odometer +
+        interval.mileageInterval -
+        currentOdometer
+      : null;
+
+    const dueDate = interval.monthInterval
+      ? new Date(interval.lastServiced.date).setMonth(
+          new Date(interval.lastServiced.date).getMonth() +
+            interval.monthInterval
+        )
+      : null;
+
+    return (
+      (milesDue !== null && milesDue < 0) || (dueDate && dueDate < Date.now())
+    );
+  });
+
+  if (pastDueIntervals.length > 0) {
+    return {
+      count: pastDueIntervals.length,
+      message: "service items past due",
+    };
+  }
+
+  if (noRecordIntervals.length > 0) {
+    return {
+      count: noRecordIntervals.length,
+      message: "missing service records",
+    };
+  }
+
+  // Find next upcoming service
+  const upcomingServices = intervals
+    .filter((interval) => interval.lastServiced)
+    .map((interval) => {
+      const milesDue = interval.mileageInterval
+        ? interval.lastServiced!.odometer +
+          interval.mileageInterval -
+          currentOdometer
+        : Infinity;
+
+      return {
+        name: interval.name,
+        milesDue: milesDue,
+      };
+    })
+    .filter((service) => service.milesDue > 0)
+    .sort((a, b) => a.milesDue - b.milesDue);
+
+  if (upcomingServices.length > 0) {
+    const nextService = upcomingServices[0];
+    return {
+      count: nextService.milesDue,
+      message: `miles until ${nextService.name}`,
+    };
+  }
+
+  return { count: 0, message: "No upcoming services" };
 }

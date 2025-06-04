@@ -13,7 +13,7 @@ import {
   CircleAlert,
   CircleCheck,
   CircleDashed,
-  Gauge,
+  Hourglass,
   Plus,
 } from "lucide-react";
 import Link from "next/link";
@@ -24,6 +24,7 @@ export default function ServicePage() {
   const { vehicleId } = useParams();
   const [vehicle, setVehicle] = useState<Vehicle | null>(null);
   const [intervals, setIntervals] = useState<ServiceInterval[] | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const [selectedInterval, setSelectedInterval] = useState<{
     id: string;
     name: string;
@@ -31,6 +32,7 @@ export default function ServicePage() {
 
   const fetchData = useCallback(async () => {
     try {
+      setIsLoading(true);
       // Fetch vehicle
       const vehicleResponse = await fetch(`/api/vehicles/${vehicleId}`);
       if (vehicleResponse.ok) {
@@ -51,6 +53,8 @@ export default function ServicePage() {
       }
     } catch (error) {
       console.error("Error fetching data:", error);
+    } finally {
+      setIsLoading(false);
     }
   }, [vehicleId]);
 
@@ -59,6 +63,17 @@ export default function ServicePage() {
   }, [fetchData]);
 
   if (!vehicle) {
+    if (isLoading) {
+      return (
+        <div className="max-w-4xl mx-auto px-4 py-8">
+          <div className="animate-pulse space-y-4">
+            <div className="h-8 bg-muted rounded w-1/4"></div>
+            <div className="h-48 bg-muted rounded"></div>
+          </div>
+        </div>
+      );
+    }
+
     return (
       <div className="max-w-4xl mx-auto px-4 py-8">
         <Card>
@@ -105,7 +120,7 @@ export default function ServicePage() {
         <CardHeader>
           <CardTitle className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
-              <Gauge className="h-5 w-5" />
+              <Hourglass className="h-5 w-5" />
               <span>Service Intervals</span>
             </div>
             <Button asChild size="sm">
