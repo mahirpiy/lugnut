@@ -1,5 +1,6 @@
 "use client";
 
+import { LinkRecordsModal } from "@/components/service/link-records-modal";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -17,56 +18,45 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 export default function ServicePage() {
   const { vehicleId } = useParams();
-  //   const { data: session } = useSession();
   const [vehicle, setVehicle] = useState<Vehicle | null>(null);
   const [intervals, setIntervals] = useState<ServiceInterval[] | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [selectedInterval, setSelectedInterval] = useState<{
+    id: string;
+    name: string;
+  } | null>(null);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        // Fetch vehicle
-        const vehicleResponse = await fetch(`/api/vehicles/${vehicleId}`);
-        if (vehicleResponse.ok) {
-          const vehicleData = await vehicleResponse.json();
-          setVehicle(vehicleData);
-        }
-
-        // Fetch job details
-        const intervalsResponse = await fetch(
-          `/api/vehicles/${vehicleId}/service-intervals`
-        );
-        if (intervalsResponse.ok) {
-          const intervalsData = await intervalsResponse.json();
-          intervalsData.sort((a: ServiceInterval, b: ServiceInterval) =>
-            a.name.localeCompare(b.name)
-          );
-          setIntervals(intervalsData);
-        }
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      } finally {
-        setLoading(false);
+  const fetchData = useCallback(async () => {
+    try {
+      // Fetch vehicle
+      const vehicleResponse = await fetch(`/api/vehicles/${vehicleId}`);
+      if (vehicleResponse.ok) {
+        const vehicleData = await vehicleResponse.json();
+        setVehicle(vehicleData);
       }
-    };
 
-    fetchData();
+      // Fetch intervals
+      const intervalsResponse = await fetch(
+        `/api/vehicles/${vehicleId}/service-intervals`
+      );
+      if (intervalsResponse.ok) {
+        const intervalsData = await intervalsResponse.json();
+        intervalsData.sort((a: ServiceInterval, b: ServiceInterval) =>
+          a.name.localeCompare(b.name)
+        );
+        setIntervals(intervalsData);
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
   }, [vehicleId]);
 
-  if (loading) {
-    return (
-      <div className="max-w-4xl mx-auto px-4 py-8">
-        <div className="animate-pulse space-y-4">
-          <div className="h-8 bg-muted rounded w-1/4"></div>
-          <div className="h-64 bg-muted rounded"></div>
-        </div>
-      </div>
-    );
-  }
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
   if (!vehicle) {
     return (
@@ -149,7 +139,6 @@ export default function ServicePage() {
             }) && (
               <>
                 <h3 className="font-semibold text-lg flex items-center gap-2 text-destructive">
-                  <AlertTriangle className="h-5 w-5" />
                   Past Due
                 </h3>
                 <div className="flex flex-col gap-4">
@@ -203,7 +192,13 @@ export default function ServicePage() {
                     .map((interval) => (
                       <div
                         key={interval.id}
-                        className="flex items-center justify-between p-4 bg-destructive/10 rounded-lg"
+                        className="flex items-center justify-between p-4 bg-destructive/10 rounded-lg transition-all hover:scale-[1.02] hover:shadow-sm hover:bg-destructive/20 cursor-pointer"
+                        onClick={() =>
+                          setSelectedInterval({
+                            id: interval.id,
+                            name: interval.name,
+                          })
+                        }
                       >
                         <div className="flex items-center space-x-3">
                           <CircleAlert className="h-5 w-5 text-destructive" />
@@ -315,7 +310,13 @@ export default function ServicePage() {
                     .map((interval) => (
                       <div
                         key={interval.id}
-                        className="flex items-center justify-between p-4 bg-muted rounded-lg"
+                        className="flex items-center justify-between p-4 bg-muted rounded-lg transition-all hover:scale-[1.02] hover:shadow-sm hover:bg-muted/70 cursor-pointer"
+                        onClick={() =>
+                          setSelectedInterval({
+                            id: interval.id,
+                            name: interval.name,
+                          })
+                        }
                       >
                         <div className="flex items-center space-x-3">
                           {!interval.lastServiced ? (
@@ -357,6 +358,17 @@ export default function ServicePage() {
           </div>
         </CardContent>
       </Card>
+
+      {selectedInterval && (
+        <LinkRecordsModal
+          isOpen={!!selectedInterval}
+          onClose={() => setSelectedInterval(null)}
+          intervalId={selectedInterval.id}
+          intervalName={selectedInterval.name}
+          vehicleId={vehicleId as string}
+          refreshData={fetchData}
+        />
+      )}
     </div>
   );
 }
@@ -493,12 +505,7 @@ function ServiceDueDisplay({
           ? `${Math.abs(milesDue).toLocaleString()} miles ago`
           : `${formatTimeRemaining(diffDays)} ago`;
 
-      return (
-        <>
-          <AlertTriangle className="h-4 w-4 inline mr-1" />
-          Due {pastDueText}
-        </>
-      );
+      return <>Due {pastDueText}</>;
     }
 
     return null;
