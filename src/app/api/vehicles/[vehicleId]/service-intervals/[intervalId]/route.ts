@@ -7,9 +7,10 @@ import { NextResponse } from "next/server";
 
 export async function GET(
   request: Request,
-  { params }: { params: { intervalId: string } }
+  props: { params: Promise<{ intervalId: string }> }
 ) {
   try {
+    const params = await props.params;
     const { intervalId } = params;
     const session = await getServerSession(authOptions);
 

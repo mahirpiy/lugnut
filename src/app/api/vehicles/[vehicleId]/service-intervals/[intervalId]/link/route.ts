@@ -7,9 +7,10 @@ import { NextResponse } from "next/server";
 
 export async function POST(
   req: Request,
-  { params }: { params: { vehicleId: string; intervalId: string } }
+  props: { params: Promise<{ vehicleId: string; intervalId: string }> }
 ) {
   try {
+    const params = await props.params;
     const session = await getServerSession(authOptions);
 
     if (!session?.user?.id) {

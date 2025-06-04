@@ -7,10 +7,11 @@ import { NextResponse } from "next/server";
 
 export async function GET(
   request: Request,
-  { params }: { params: { recordId: string } }
+  props: { params: Promise<{ vehicleId: string }> }
 ) {
   try {
-    const { recordId } = await params;
+    const params = await props.params;
+    const { vehicleId } = params;
     const session = await getServerSession(authOptions);
 
     if (!session?.user?.id) {
@@ -29,7 +30,7 @@ export async function GET(
       .from(records)
       .innerJoin(jobs, eq(records.jobId, jobs.id))
       .innerJoin(odometerEntries, eq(jobs.odometerId, odometerEntries.id))
-      .where(eq(records.id, recordId))
+      .where(eq(jobs.vehicleId, vehicleId))
       .then((results) => results[0]);
 
     if (!record) {
