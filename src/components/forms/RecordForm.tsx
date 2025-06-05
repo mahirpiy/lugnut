@@ -52,16 +52,7 @@ export function RecordForm({
     append({
       title: "",
       tagIds: [],
-      parts: [
-        {
-          name: "",
-          partNumber: "",
-          manufacturer: "",
-          cost: 0,
-          quantity: 1,
-          partPhotos: [],
-        },
-      ],
+      parts: [],
       notes: "",
     });
   };

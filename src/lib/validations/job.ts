@@ -29,7 +29,7 @@ export const recordSchema = z.object({
     .array(z.string())
     .min(1, "At least one tag is required")
     .max(5, "Maximum 5 tags allowed"),
-  parts: z.array(partSchema).min(1, "At least one part is required"),
+  parts: z.array(partSchema),
   notes: z
     .string()
     .max(1000, "Notes must be less than 1000 characters")
