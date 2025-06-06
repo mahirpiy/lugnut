@@ -10,30 +10,30 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { FileUpload } from "@/components/ui/file-upload"; // Your existing UploadThing component
 import { cn } from "@/lib/utils";
+import { getPhotoFileKey } from "@/utils/photo-upload";
 import { Eye, Upload, X } from "lucide-react";
 import Image from "next/image";
-import { useState } from "react";
+import { ChangeEvent, useState } from "react";
 
 interface PhotoUploadModalProps {
-  endpoint: "jobImage" | "partImage";
-  onUploadComplete: (files: { url: string; name: string }[]) => void;
-  onUploadError?: (error: Error) => void;
+  onUploadComplete: (files: UploadedPhoto[]) => void;
   className?: string;
   disabled?: boolean;
   maxFiles?: number;
+  storageFolder: "jobs" | "parts";
 }
 
-interface UploadedPhoto {
-  url: string;
+export interface UploadedPhoto {
+  file: File;
+  previewUrl: string;
   name: string;
+  filePath: string;
 }
 
 export function PhotoUploadModal({
-  endpoint,
   onUploadComplete,
-  onUploadError,
+  storageFolder,
   className,
   disabled = false,
   maxFiles = 5,
@@ -42,16 +42,35 @@ export function PhotoUploadModal({
   const [uploadedPhotos, setUploadedPhotos] = useState<UploadedPhoto[]>([]);
   const [previewPhoto, setPreviewPhoto] = useState<string | null>(null);
 
-  const handleUploadComplete = (files: { url: string; name: string }[]) => {
-    const newPhotos = [...uploadedPhotos, ...files];
-    setUploadedPhotos(newPhotos);
-    onUploadComplete(newPhotos);
+  const handleFileSelect = (e: ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files) return;
+
+    const newPhotos: UploadedPhoto[] = [];
+
+    Array.from(files).forEach((file) => {
+      if (uploadedPhotos.length + newPhotos.length >= maxFiles) return;
+
+      const previewUrl = URL.createObjectURL(file);
+      newPhotos.push({
+        file,
+        previewUrl,
+        name: file.name,
+        filePath: getPhotoFileKey(storageFolder),
+      });
+    });
+
+    const updatedPhotos = [...uploadedPhotos, ...newPhotos];
+    setUploadedPhotos(updatedPhotos);
+    onUploadComplete(updatedPhotos);
   };
 
   const removePhoto = (index: number) => {
+    // Clean up object URL to prevent memory leaks
+    URL.revokeObjectURL(uploadedPhotos[index].previewUrl);
+
     const newPhotos = uploadedPhotos.filter((_, i) => i !== index);
     setUploadedPhotos(newPhotos);
-    onUploadComplete(newPhotos);
   };
 
   const canUploadMore = uploadedPhotos.length < maxFiles;
@@ -86,67 +105,83 @@ export function PhotoUploadModal({
 
           <div className="space-y-6">
             {canUploadMore && (
-              <div className="border-2 border-dashed border-gray-200 rounded-lg p-2">
-                <FileUpload
-                  endpoint={endpoint}
-                  onUploadComplete={handleUploadComplete}
-                  onUploadError={onUploadError}
-                />
+              <div className="flex flex-col items-center justify-center rounded-lg border bg-muted/50 p-8 text-center">
+                <div className="flex flex-col items-center justify-center space-y-4">
+                  <div className="rounded-full bg-background p-3 ring-1 ring-border">
+                    <Upload className="h-6 w-6" />
+                  </div>
+                  <div className="space-y-2">
+                    <h3 className="text-sm font-medium">Upload photos</h3>
+                    <p className="text-sm text-muted-foreground">
+                      Drag and drop or click to upload
+                    </p>
+                  </div>
+                  <label className="relative">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      onChange={handleFileSelect}
+                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                    />
+                    <Button variant="secondary" size="sm">
+                      Select Files
+                    </Button>
+                  </label>
+                </div>
               </div>
             )}
 
             {/* Uploaded Photos Gallery */}
             {uploadedPhotos.length > 0 && (
-              <div className="space-y-3">
+              <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <h4 className="text-sm font-medium">
+                  <h4 className="text-sm font-medium leading-none">
                     Uploaded Photos ({uploadedPhotos.length}/{maxFiles})
                   </h4>
                   {!canUploadMore && (
-                    <p className="text-sm text-gray-500">
+                    <p className="text-sm text-muted-foreground">
                       Maximum photos reached
                     </p>
                   )}
                 </div>
 
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                   {uploadedPhotos.map((photo, index) => (
                     <div
                       key={index}
-                      className="relative group border rounded-lg overflow-hidden bg-gray-50"
+                      className="group relative aspect-square overflow-hidden rounded-lg bg-background ring-1 ring-border"
                     >
-                      <div className="aspect-square relative">
-                        <Image
-                          src={photo.url}
-                          alt={photo.name}
-                          width={1000}
-                          height={1000}
-                          className="w-full h-full object-cover"
-                        />
+                      <Image
+                        src={photo.previewUrl}
+                        alt={photo.name}
+                        width={1000}
+                        height={1000}
+                        className="h-full w-full object-cover transition-all"
+                      />
 
-                        {/* Overlay with actions */}
-                        <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-all duration-200 flex items-center justify-center space-x-2 opacity-0 group-hover:opacity-100">
-                          <Button
-                            variant="secondary"
-                            size="sm"
-                            onClick={() => setPreviewPhoto(photo.url)}
-                            className="h-8 w-8 p-0"
-                          >
-                            <Eye className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            variant="destructive"
-                            size="sm"
-                            onClick={() => removePhoto(index)}
-                            className="h-8 w-8 p-0"
-                          >
-                            <X className="h-4 w-4" />
-                          </Button>
-                        </div>
+                      {/* Overlay with actions */}
+                      <div className="absolute inset-0 flex items-center justify-center gap-2 bg-black/50 opacity-0 transition-all group-hover:opacity-100">
+                        <Button
+                          variant="secondary"
+                          size="icon"
+                          onClick={() => setPreviewPhoto(photo.previewUrl)}
+                          className="h-8 w-8"
+                        >
+                          <Eye className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="destructive"
+                          size="icon"
+                          onClick={() => removePhoto(index)}
+                          className="h-8 w-8"
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
                       </div>
 
-                      <div className="p-2">
-                        <p className="text-xs text-gray-600 truncate">
+                      <div className="absolute bottom-0 left-0 right-0 bg-black/50 p-2">
+                        <p className="truncate text-xs text-white">
                           {photo.name}
                         </p>
                       </div>

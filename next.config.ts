@@ -1,7 +1,6 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
   images: {
     remotePatterns: [
       {
@@ -9,6 +8,12 @@ const nextConfig: NextConfig = {
         hostname: "utfs.io",
         port: "",
         pathname: "/f/**",
+      },
+      {
+        protocol: "https",
+        hostname: process.env.SUPABASE_URL!.split("://")[1].split(":")[0],
+        port: "",
+        pathname: "/storage/**",
       },
     ],
   },

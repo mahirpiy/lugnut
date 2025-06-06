@@ -97,7 +97,6 @@ export default function NewServiceIntervalPage() {
   }, [vehicleId, setValue]);
 
   const onSubmit = async (data: ServiceIntervalInput) => {
-    console.log({ data });
     setIsLoading(true);
     setError("");
 

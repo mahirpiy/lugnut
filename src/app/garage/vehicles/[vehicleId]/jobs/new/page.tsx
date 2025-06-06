@@ -12,7 +12,10 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { PhotoUploadModal } from "@/components/ui/photo-upload-modal";
+import {
+  PhotoUploadModal,
+  UploadedPhoto,
+} from "@/components/ui/photo-upload-modal";
 import { Separator } from "@/components/ui/separator";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
@@ -20,6 +23,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Tag } from "@/lib/interfaces/tag";
 import { Vehicle } from "@/lib/interfaces/vehicle";
 import { jobSchema, type JobInput } from "@/lib/validations/job";
+import { uploadPhoto } from "@/utils/photo-upload";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Wrench } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
@@ -33,7 +37,8 @@ export default function NewJobPage() {
   const [error, setError] = useState("");
   const [tags, setTags] = useState<Tag[]>([]);
   const [vehicle, setVehicle] = useState<Vehicle | null>(null);
-  const [jobPhotos, setJobPhotos] = useState<string[]>([]);
+  const [jobPhotos, setJobPhotos] = useState<UploadedPhoto[]>([]);
+  const [partPhotos, setPartPhotos] = useState<UploadedPhoto[]>([]);
   const router = useRouter();
 
   const {
@@ -103,12 +108,51 @@ export default function NewJobPage() {
         delete data.url;
       }
 
+      // Upload job photos
+      const uploadedJobPhotos = await Promise.all(
+        jobPhotos.map(async (photo) => {
+          return await uploadPhoto(photo);
+        })
+      );
+
+      const partPhotoMap = new Map<string, string[]>();
+
+      const partPhotosByKey = partPhotos.reduce((acc, photo) => {
+        acc[photo.filePath] = photo;
+        return acc;
+      }, {} as Record<string, UploadedPhoto>);
+
+      // Upload all part photos and store paths
+      for (const record of data.records) {
+        for (const part of record.parts) {
+          if (part.partPhotos && part.partPhotos.length > 0) {
+            const uploadedPaths = await Promise.all(
+              part.partPhotos.map(async (photoKey) => {
+                const photo = partPhotosByKey[photoKey];
+                return await uploadPhoto(photo);
+              })
+            );
+            partPhotoMap.set(part.name, uploadedPaths);
+          }
+        }
+      }
+
       const response = await fetch(`/api/vehicles/${vehicleId}/jobs`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify({
+          ...data,
+          jobPhotos: uploadedJobPhotos,
+          records: data.records.map((record) => ({
+            ...record,
+            parts: record.parts.map((part) => ({
+              ...part,
+              partPhotos: part.partPhotos,
+            })),
+          })),
+        }),
       });
 
       const result = await response.json();
@@ -128,28 +172,18 @@ export default function NewJobPage() {
   };
 
   const handleFormExit = async () => {
-    if (jobPhotos.length > 0) {
-      const fileKeys = jobPhotos.map((photo) => photo);
-
-      // Delete orphaned files
-      await fetch("/api/uploadthing/delete", {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ fileKeys }),
-      });
-    }
-
     router.push(`/garage/vehicles/${vehicleId}`);
   };
 
   const onPartPhotoUpload = async (
     recordIndex: number,
     partIndex: number,
-    files: { url: string; name: string }[]
+    files: UploadedPhoto[]
   ) => {
+    setPartPhotos(files);
     setValue(
       `records.${recordIndex}.parts.${partIndex}.partPhotos`,
-      files.map((f) => f.url)
+      files.map((file) => file.filePath)
     );
   };
 
@@ -380,19 +414,14 @@ export default function NewJobPage() {
                 Add photos to document your work (optional)
               </p>
               <PhotoUploadModal
-                endpoint="jobImage"
+                storageFolder="jobs"
                 onUploadComplete={(files) => {
-                  setJobPhotos(files.map((file) => file.url));
+                  setJobPhotos(files);
                   setValue(
                     "jobPhotos",
-                    files.map((file) => file.url)
+                    files.map((file) => file.filePath)
                   );
                 }}
-                onUploadError={(error) => {
-                  console.error("Photo upload error:", error);
-                  setError("Failed to upload photos. Please try again.");
-                }}
-                maxFiles={5}
               />
             </div>
           </CardContent>

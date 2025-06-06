@@ -26,7 +26,7 @@ interface Part {
   cost: string;
   quantity: number;
   url?: string;
-  partPhotos?: { url: string; uuid: string }[];
+  partPhotos?: { id: string; url: string }[];
 }
 
 interface Tag {
@@ -92,7 +92,6 @@ export default function JobDetailPage() {
         );
         if (jobResponse.ok) {
           const jobData = await jobResponse.json();
-          console.log({ jobData });
           setJob(jobData);
         }
       } catch (error) {
@@ -321,7 +320,7 @@ export default function JobDetailPage() {
                         <div className="flex gap-2">
                           {part.partPhotos.map((photo, index) => (
                             <div
-                              key={photo.uuid}
+                              key={photo.id}
                               className="w-[70px] h-[70px] relative rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow cursor-pointer"
                               onClick={() => window.open(photo.url, "_blank")}
                             >
@@ -329,6 +328,7 @@ export default function JobDetailPage() {
                                 src={photo.url}
                                 alt={`Part Photo ${index + 1}`}
                                 fill
+                                sizes="70px"
                                 className="object-cover hover:scale-105 transition-transform duration-200"
                               />
                             </div>
@@ -360,7 +360,7 @@ export default function JobDetailPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {job.photos.map((photo, index) => (
                   <div
-                    key={photo}
+                    key={`job-photo-${index}`}
                     className="aspect-square relative rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow cursor-pointer"
                     onClick={() => window.open(photo, "_blank")}
                   >
@@ -368,6 +368,7 @@ export default function JobDetailPage() {
                       src={photo}
                       alt={`Job Photo ${index + 1}`}
                       fill
+                      sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
                       className="object-cover hover:scale-105 transition-transform duration-200"
                     />
                   </div>

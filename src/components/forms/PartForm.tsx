@@ -13,7 +13,7 @@ import {
   UseFormRegister,
   UseFormWatch,
 } from "react-hook-form";
-import { PhotoUploadModal } from "../ui/photo-upload-modal";
+import { PhotoUploadModal, UploadedPhoto } from "../ui/photo-upload-modal";
 
 interface PartFormProps {
   control: Control<JobInput>;
@@ -23,7 +23,7 @@ interface PartFormProps {
   onPartPhotoUpload: (
     recordIndex: number,
     partIndex: number,
-    files: { url: string; name: string }[]
+    files: UploadedPhoto[]
   ) => Promise<void>;
   watch: UseFormWatch<JobInput>;
 }
@@ -197,14 +197,11 @@ export function PartForm({
                 Add photos to document your parts (optional)
               </p>
               <PhotoUploadModal
-                endpoint="partImage"
+                storageFolder="parts"
                 onUploadComplete={(files) => {
                   onPartPhotoUpload(recordIndex, partIndex, files);
                 }}
-                onUploadError={(error) => {
-                  console.error("Photo upload error:", error);
-                }}
-                maxFiles={2}
+                maxFiles={1}
               />
             </div>
           </CardContent>

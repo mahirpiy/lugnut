@@ -17,7 +17,10 @@ import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
 
 // GET all jobs for a vehicle
-export async function GET(request: NextRequest, props: { params: Promise<{ vehicleId: string }> }) {
+export async function GET(
+  request: NextRequest,
+  props: { params: Promise<{ vehicleId: string }> }
+) {
   const params = await props.params;
   try {
     const { vehicleId } = params;
@@ -114,7 +117,10 @@ export async function GET(request: NextRequest, props: { params: Promise<{ vehic
 }
 
 // POST create new job
-export async function POST(request: NextRequest, props: { params: Promise<{ vehicleId: string }> }) {
+export async function POST(
+  request: NextRequest,
+  props: { params: Promise<{ vehicleId: string }> }
+) {
   const params = await props.params;
   try {
     const { vehicleId } = params;
@@ -208,9 +214,9 @@ export async function POST(request: NextRequest, props: { params: Promise<{ vehi
 
         if (validatedData.jobPhotos && validatedData.jobPhotos.length > 0) {
           await tx.insert(jobPhotos).values(
-            validatedData.jobPhotos.map((url) => ({
+            validatedData.jobPhotos.map((filePath) => ({
               jobId: newJob.id,
-              url,
+              filePath,
             }))
           );
         }
@@ -243,9 +249,9 @@ export async function POST(request: NextRequest, props: { params: Promise<{ vehi
 
             if (partData.partPhotos && partData.partPhotos.length > 0) {
               await tx.insert(partPhotos).values(
-                partData.partPhotos.map((url) => ({
+                partData.partPhotos.map((filePath) => ({
                   partId: newPart.id,
-                  url,
+                  filePath,
                 }))
               );
             }

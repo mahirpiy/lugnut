@@ -18,8 +18,8 @@ import {
   UseFormWatch,
   useFieldArray,
 } from "react-hook-form";
+import { UploadedPhoto } from "../ui/photo-upload-modal";
 import { PartForm } from "./PartForm";
-
 interface RecordFormProps {
   control: Control<JobInput>;
   register: UseFormRegister<JobInput>;
@@ -30,7 +30,7 @@ interface RecordFormProps {
   onPartPhotoUpload: (
     recordIndex: number,
     partIndex: number,
-    files: { url: string; name: string }[]
+    files: UploadedPhoto[]
   ) => Promise<void>;
 }
 

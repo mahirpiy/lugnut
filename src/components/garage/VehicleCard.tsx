@@ -8,7 +8,6 @@ interface VehicleCardProps {
 }
 
 export function VehicleCard({ vehicle }: VehicleCardProps) {
-  console.log(vehicle);
   const displayName =
     vehicle.nickname || `${vehicle.year} ${vehicle.make} ${vehicle.model}`;
 
