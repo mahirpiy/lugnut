@@ -3,21 +3,8 @@ import bcrypt from "bcryptjs";
 import { eq } from "drizzle-orm";
 import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { UsageCredits } from "../../types/next-auth";
 import { db } from "./db";
-import {
-  accounts,
-  paygUsageCredits,
-  sessions,
-  subscriptions,
-  users,
-  verificationTokens,
-} from "./db/schema";
-import {
-  SubscriptionStatus,
-  SubscriptionType,
-  UsageCreditType,
-} from "./enums/upgrades";
+import { accounts, sessions, users, verificationTokens } from "./db/schema";
 
 export const authOptions: NextAuthOptions = {
   adapter: DrizzleAdapter(db, {
@@ -59,10 +46,13 @@ export const authOptions: NextAuthOptions = {
         if (!isPasswordValid) {
           return null;
         }
+
+        console.log("subscriptionExpiresAt", user[0].subscriptionExpiresAt);
         return {
           id: user[0].id,
           email: user[0].email,
           name: user[0].name,
+          subscriptionExpiresAt: user[0].subscriptionExpiresAt,
         };
       },
     }),
@@ -71,16 +61,21 @@ export const authOptions: NextAuthOptions = {
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
+        token.subscriptionExpiresAt = user.subscriptionExpiresAt
+          ? new Date(user.subscriptionExpiresAt).toISOString()
+          : null;
       }
       return token;
     },
     async session({ session, token }) {
       if (token && session.user) {
         session.user.id = token.id as string;
-        session.user.hasActiveSubscription = await userHasActiveSubscription(
-          session.user.id
-        );
-        session.user.usageCredits = await getUserUsageCredits(session.user.id);
+        const expiryDate = token.subscriptionExpiresAt
+          ? new Date(token.subscriptionExpiresAt)
+          : null;
+        session.user.hasActiveSubscription = expiryDate
+          ? expiryDate > new Date()
+          : false;
       }
       return session;
     },
@@ -90,64 +85,3 @@ export const authOptions: NextAuthOptions = {
     newUser: "/auth/signup",
   },
 };
-
-async function userHasActiveSubscription(userId: string): Promise<boolean> {
-  const subscription = await db
-    .select()
-    .from(subscriptions)
-    .where(eq(subscriptions.userId, userId));
-
-  const hasActiveSubscription =
-    subscription.some((sub) => sub.status === SubscriptionStatus.ACTIVE) ||
-    subscription.some((sub) => sub.status === SubscriptionType.PERMANENT);
-
-  return hasActiveSubscription;
-}
-
-async function getUserUsageCredits(userId: string): Promise<UsageCredits> {
-  const usageCredits = await db
-    .select()
-    .from(paygUsageCredits)
-    .where(eq(paygUsageCredits.userId, userId));
-
-  const vehicleCredits = usageCredits.filter(
-    (credit) => credit.creditType === UsageCreditType.VEHICLE
-  );
-  const jobCredits = usageCredits.filter(
-    (credit) => credit.creditType === UsageCreditType.JOB
-  );
-  const fuelCredits = usageCredits.filter(
-    (credit) => credit.creditType === UsageCreditType.FUEL
-  );
-  const odometerCredits = usageCredits.filter(
-    (credit) => credit.creditType === UsageCreditType.ODOMETER
-  );
-
-  return {
-    vehicle: {
-      total: vehicleCredits.reduce(
-        (acc, credit) => acc + credit.purchasedCount,
-        0
-      ),
-      used: vehicleCredits.reduce((acc, credit) => acc + credit.usedCount, 0),
-    },
-    job: {
-      total: jobCredits.reduce((acc, credit) => acc + credit.purchasedCount, 0),
-      used: jobCredits.reduce((acc, credit) => acc + credit.usedCount, 0),
-    },
-    fuel: {
-      total: fuelCredits.reduce(
-        (acc, credit) => acc + credit.purchasedCount,
-        0
-      ),
-      used: fuelCredits.reduce((acc, credit) => acc + credit.usedCount, 0),
-    },
-    odometer: {
-      total: odometerCredits.reduce(
-        (acc, credit) => acc + credit.purchasedCount,
-        0
-      ),
-      used: odometerCredits.reduce((acc, credit) => acc + credit.usedCount, 0),
-    },
-  };
-}

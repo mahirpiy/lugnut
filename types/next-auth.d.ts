@@ -6,36 +6,18 @@ declare module "next-auth" {
     user: {
       id: string;
       hasActiveSubscription: boolean;
-      usageCredits: UsageCredits | null;
     } & DefaultSession["user"];
   }
 
   interface User extends DefaultUser {
     id: string;
+    subscriptionExpiresAt?: Date | null;
   }
 }
 
 declare module "next-auth/jwt" {
   interface JWT extends DefaultJWT {
     id: string;
+    subscriptionExpiresAt: string | null;
   }
 }
-
-type UsageCredits = {
-  vehicle: {
-    total: number;
-    used: number;
-  };
-  job: {
-    total: number;
-    used: number;
-  };
-  fuel: {
-    total: number;
-    used: number;
-  };
-  odometer: {
-    total: number;
-    used: number;
-  };
-};

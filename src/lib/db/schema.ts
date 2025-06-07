@@ -21,6 +21,9 @@ export const users = pgTable("user", {
   zipCode: text("zip_code"),
   password: text("password"), // Added for credentials auth
   createdAt: timestamp("created_at").defaultNow(),
+  subscriptionExpiresAt: timestamp("subscription_expires_at", {
+    mode: "date",
+  }),
 });
 
 export const accounts = pgTable(
@@ -68,32 +71,6 @@ export const verificationTokens = pgTable(
 );
 
 // Lugnut tables
-export const subscriptions = pgTable("subscriptions", {
-  id: uuid("id").defaultRandom().notNull().primaryKey(),
-  userId: uuid("user_id")
-    .notNull()
-    .references(() => users.id, { onDelete: "cascade" }),
-  plan: text("plan").notNull(), // one of: "monthly" | "yearly" | "permanent"
-  status: text("status").notNull(), // one of: "active" | "expired" | "canceled"
-  startDate: timestamp("start_date", { mode: "date" }).notNull(),
-  expiryDate: timestamp("expiry_date", { mode: "date" }).notNull(),
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
-});
-
-export const paygUsageCredits = pgTable("payg_usage_credits", {
-  id: uuid("id").defaultRandom().notNull().primaryKey(),
-  userId: uuid("user_id")
-    .notNull()
-    .references(() => users.id, { onDelete: "cascade" }),
-  creditType: text("credit_type").notNull(), // one of: "vehicle" | "job" | "fuel" | "odometer"
-  purchasedCount: integer("purchased_count").notNull().default(0),
-  usedCount: integer("used_count").notNull().default(0),
-  purchasedAt: timestamp("purchased_at", { mode: "date" }).notNull(),
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
-});
-
 export const vehicles = pgTable("vehicles", {
   id: uuid("id").defaultRandom().notNull().primaryKey(),
   userId: uuid("user_id")

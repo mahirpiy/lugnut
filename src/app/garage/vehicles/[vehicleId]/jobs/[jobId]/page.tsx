@@ -66,7 +66,6 @@ interface Job {
 export default function JobDetailPage() {
   const { vehicleId, jobId } = useParams();
   const { vehicle, getVehicleDisplayName } = useVehicle();
-
   const [job, setJob] = useState<Job | null>(null);
   const [loading, setLoading] = useState(true);
 
