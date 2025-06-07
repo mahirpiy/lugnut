@@ -216,8 +216,7 @@ export const jobPhotos = pgTable("job_photos", {
   jobId: uuid("job_id")
     .notNull()
     .references(() => jobs.id, { onDelete: "cascade" }),
-  url: text("url"),
-  filePath: text("file_path"),
+  filePath: text("file_path").notNull(),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
@@ -226,8 +225,7 @@ export const partPhotos = pgTable("part_photos", {
   partId: uuid("part_id")
     .notNull()
     .references(() => parts.id, { onDelete: "cascade" }),
-  url: text("url"),
-  filePath: text("file_path"),
+  filePath: text("file_path").notNull(),
   createdAt: timestamp("created_at").defaultNow(),
 });
 

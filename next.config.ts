@@ -5,12 +5,6 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "utfs.io",
-        port: "",
-        pathname: "/f/**",
-      },
-      {
-        protocol: "https",
         hostname: process.env.SUPABASE_URL!.split("://")[1].split(":")[0],
         port: "",
         pathname: "/storage/**",

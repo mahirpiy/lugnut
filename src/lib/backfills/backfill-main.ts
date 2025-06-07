@@ -15,10 +15,6 @@ console.log("BUCKET_NAME:", process.env.BUCKET_NAME ? "✓" : "✗");
 
 async function main() {
   console.log("\nStarting backfill process...");
-
-  // Import and run the migration
-  const { migratePhotos } = await import("./migrate-supabase-storage");
-  await migratePhotos();
 }
 
 main()

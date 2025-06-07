@@ -8,6 +8,7 @@ Lugnut is a tool for managing your vehicle maintenance records. I built it becau
 2. Analyze cost and time of DIY vs shop maintenance
 3. Track fuel consumption and cost
 4. Granular tracking for jobs, allowing deeper trends around vehicle health
+5. Custom service intervals, allowing for servicing your car on your timeline
 
 ### Tech Stack
 
@@ -15,14 +16,13 @@ Lugnut is a tool for managing your vehicle maintenance records. I built it becau
 - Drizzle
 - NextAuth
 - Vercel
-- Uploadthing
+- Supabase DB + Storage
 
 ### Future Plans
 
 1. Data export -- I hate apps that don't let me export my data
 1. I wanna make money so I'll probs set up a subscription model
 1. In the name of making money, might as well add some ads for Rock Auto or local shops
-1. Maintenance scheduling or planning
 
 ### Long Shot Features
 
