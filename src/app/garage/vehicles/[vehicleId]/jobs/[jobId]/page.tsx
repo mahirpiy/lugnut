@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useVehicle } from "@/context/VehicleContext";
 import {
   ArrowLeft,
   ClipboardList,
@@ -62,30 +63,16 @@ interface Job {
   photos?: string[];
 }
 
-interface Vehicle {
-  uuid: string;
-  make: string;
-  model: string;
-  year: number;
-  nickname?: string;
-}
-
 export default function JobDetailPage() {
   const { vehicleId, jobId } = useParams();
+  const { vehicle, getVehicleDisplayName } = useVehicle();
+
   const [job, setJob] = useState<Job | null>(null);
-  const [vehicle, setVehicle] = useState<Vehicle | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Fetch vehicle
-        const vehicleResponse = await fetch(`/api/vehicles/${vehicleId}`);
-        if (vehicleResponse.ok) {
-          const vehicleData = await vehicleResponse.json();
-          setVehicle(vehicleData);
-        }
-
         // Fetch job details
         const jobResponse = await fetch(
           `/api/vehicles/${vehicleId}/jobs/${jobId}`
@@ -132,9 +119,6 @@ export default function JobDetailPage() {
     );
   }
 
-  const displayName =
-    vehicle.nickname || `${vehicle.year} ${vehicle.make} ${vehicle.model}`;
-
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
       {/* Header */}
@@ -144,7 +128,7 @@ export default function JobDetailPage() {
           className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground mb-4"
         >
           <ArrowLeft className="h-4 w-4 mr-1" />
-          Back to {displayName}
+          Back to {getVehicleDisplayName()}
         </Link>
         <div className="flex items-center space-x-3">
           <Wrench className="h-8 w-8 text-muted-foreground" />

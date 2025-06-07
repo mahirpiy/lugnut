@@ -7,8 +7,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Textarea } from "@/components/ui/textarea";
+import { useVehicle } from "@/context/VehicleContext";
 import { Tag } from "@/lib/interfaces/tag";
-import { Vehicle } from "@/lib/interfaces/vehicle";
 import { cn } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowLeft, Gauge, Trash2 } from "lucide-react";
@@ -47,8 +47,8 @@ type ServiceIntervalInput = z.infer<typeof serviceIntervalSchema>;
 
 export default function NewServiceIntervalPage() {
   const [isLoading, setIsLoading] = useState(false);
+  const { vehicle, refetchVehicle, getVehicleDisplayName } = useVehicle();
   const [error, setError] = useState("");
-  const [vehicle, setVehicle] = useState<Vehicle | null>(null);
   const [showMileage, setShowMileage] = useState(true);
   const [showTime, setShowTime] = useState(true);
   const [tags, setTags] = useState<Tag[]>([]);
@@ -76,12 +76,6 @@ export default function NewServiceIntervalPage() {
   useEffect(() => {
     const fetchVehicle = async () => {
       try {
-        const response = await fetch(`/api/vehicles/${vehicleId}`);
-        if (response.ok) {
-          const vehicleData = await response.json();
-          setVehicle(vehicleData);
-        }
-
         const tagsResponse = await fetch("/api/tags");
         if (tagsResponse.ok) {
           const tagsData = await tagsResponse.json();
@@ -134,6 +128,7 @@ export default function NewServiceIntervalPage() {
       setError("Something went wrong. Please try again.");
     } finally {
       setIsLoading(false);
+      refetchVehicle();
     }
   };
 
@@ -184,9 +179,6 @@ export default function NewServiceIntervalPage() {
     );
   }
 
-  const displayName =
-    vehicle.nickname || `${vehicle.year} ${vehicle.make} ${vehicle.model}`;
-
   return (
     <div className="max-w-2xl mx-auto px-4 py-8">
       <div className="mb-6">
@@ -195,7 +187,7 @@ export default function NewServiceIntervalPage() {
           className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground mb-4"
         >
           <ArrowLeft className="h-4 w-4 mr-1" />
-          Back to {displayName}
+          Back to {getVehicleDisplayName()}
         </Link>
         <div className="flex items-center space-x-3">
           <Gauge className="h-8 w-8 text-stone-600" />
@@ -204,7 +196,7 @@ export default function NewServiceIntervalPage() {
               Add Service Interval
             </h1>
             <p className="text-muted-foreground">
-              Create a new service interval for {displayName}
+              Create a new service interval for {getVehicleDisplayName()}
             </p>
           </div>
         </div>

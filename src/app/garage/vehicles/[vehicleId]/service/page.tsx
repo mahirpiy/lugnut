@@ -4,8 +4,8 @@ import { LinkRecordsModal } from "@/components/service/link-records-modal";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useVehicle } from "@/context/VehicleContext";
 import { ServiceInterval } from "@/lib/interfaces/service-interval";
-import { Vehicle } from "@/lib/interfaces/vehicle";
 import {
   AlertTriangle,
   ArrowLeft,
@@ -22,9 +22,8 @@ import { useCallback, useEffect, useState } from "react";
 
 export default function ServicePage() {
   const { vehicleId } = useParams();
-  const [vehicle, setVehicle] = useState<Vehicle | null>(null);
+  const { vehicle, getVehicleDisplayName } = useVehicle();
   const [intervals, setIntervals] = useState<ServiceInterval[] | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
   const [selectedInterval, setSelectedInterval] = useState<{
     id: string;
     name: string;
@@ -32,14 +31,6 @@ export default function ServicePage() {
 
   const fetchData = useCallback(async () => {
     try {
-      setIsLoading(true);
-      // Fetch vehicle
-      const vehicleResponse = await fetch(`/api/vehicles/${vehicleId}`);
-      if (vehicleResponse.ok) {
-        const vehicleData = await vehicleResponse.json();
-        setVehicle(vehicleData);
-      }
-
       // Fetch intervals
       const intervalsResponse = await fetch(
         `/api/vehicles/${vehicleId}/service-intervals`
@@ -53,8 +44,6 @@ export default function ServicePage() {
       }
     } catch (error) {
       console.error("Error fetching data:", error);
-    } finally {
-      setIsLoading(false);
     }
   }, [vehicleId]);
 
@@ -63,17 +52,6 @@ export default function ServicePage() {
   }, [fetchData]);
 
   if (!vehicle) {
-    if (isLoading) {
-      return (
-        <div className="max-w-4xl mx-auto px-4 py-8">
-          <div className="animate-pulse space-y-4">
-            <div className="h-8 bg-muted rounded w-1/4"></div>
-            <div className="h-48 bg-muted rounded"></div>
-          </div>
-        </div>
-      );
-    }
-
     return (
       <div className="max-w-4xl mx-auto px-4 py-8">
         <Card>
@@ -90,9 +68,6 @@ export default function ServicePage() {
     );
   }
 
-  const displayName =
-    vehicle.nickname || `${vehicle.year} ${vehicle.make} ${vehicle.model}`;
-
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
       {/* Header */}
@@ -102,14 +77,13 @@ export default function ServicePage() {
           className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground mb-4"
         >
           <ArrowLeft className="h-4 w-4 mr-1" />
-          Back to {displayName}
+          Back to {getVehicleDisplayName()}
         </Link>
         <div className="flex items-center space-x-3">
           <Car className="h-8 w-8 text-muted-foreground" />
           <div>
             <h1 className="text-2xl font-bold text-foreground">
-              {vehicle.nickname ||
-                `${vehicle.year} ${vehicle.make} ${vehicle.model}`}
+              {getVehicleDisplayName()}
             </h1>
           </div>
         </div>

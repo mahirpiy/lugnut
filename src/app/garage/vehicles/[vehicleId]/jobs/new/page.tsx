@@ -20,8 +20,8 @@ import { Separator } from "@/components/ui/separator";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
+import { useVehicle } from "@/context/VehicleContext";
 import { Tag } from "@/lib/interfaces/tag";
-import { Vehicle } from "@/lib/interfaces/vehicle";
 import { jobSchema, type JobInput } from "@/lib/validations/job";
 import { uploadPhoto } from "@/utils/photo-upload";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -33,10 +33,11 @@ import { useForm } from "react-hook-form";
 export default function NewJobPage() {
   const { vehicleId } = useParams();
 
+  const { vehicle, refetchVehicle, getVehicleDisplayName } = useVehicle();
+
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [tags, setTags] = useState<Tag[]>([]);
-  const [vehicle, setVehicle] = useState<Vehicle | null>(null);
   const [jobPhotos, setJobPhotos] = useState<UploadedPhoto[]>([]);
   const [partPhotos, setPartPhotos] = useState<UploadedPhoto[]>([]);
   const router = useRouter();
@@ -75,14 +76,6 @@ export default function NewJobPage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Fetch vehicle data
-        const vehicleResponse = await fetch(`/api/vehicles/${vehicleId}`);
-        if (vehicleResponse.ok) {
-          const vehicleData = await vehicleResponse.json();
-          setVehicle(vehicleData);
-          setValue("odometer", vehicleData.currentOdometer);
-        }
-
         // Fetch tags
         const tagsResponse = await fetch("/api/tags");
         if (tagsResponse.ok) {
@@ -168,6 +161,7 @@ export default function NewJobPage() {
       setError("Something went wrong. Please try again.");
     } finally {
       setIsLoading(false);
+      refetchVehicle();
     }
   };
 
@@ -198,15 +192,12 @@ export default function NewJobPage() {
     );
   }
 
-  const displayName =
-    vehicle.nickname || `${vehicle.year} ${vehicle.make} ${vehicle.model}`;
-
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
       <div className="mb-6">
         <BackToVehicle
           vehicleId={vehicleId as string}
-          displayName={displayName}
+          displayName={getVehicleDisplayName()}
         />
         <div className="flex items-center space-x-3">
           <Wrench className="h-8 w-8 text-stone-600" />

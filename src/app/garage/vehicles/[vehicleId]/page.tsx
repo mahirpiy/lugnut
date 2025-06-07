@@ -3,6 +3,7 @@
 import AddJob from "@/components/clickable/AddJob";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { useVehicle } from "@/context/VehicleContext";
 import { ServiceInterval } from "@/lib/interfaces/service-interval";
 import {
   calculateDiyLaborSavedString,
@@ -23,19 +24,6 @@ import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
-
-interface Vehicle {
-  id: string;
-  make: string;
-  model: string;
-  year: number;
-  nickname?: string;
-  currentOdometer: number;
-  vin?: string;
-  initialOdometer: number;
-  purchaseDate?: string;
-  createdAt: string;
-}
 
 interface Job {
   uuid: string;
@@ -66,7 +54,12 @@ export default function VehicleDetailPage() {
   const { vehicleId } = useParams();
   const { data: session } = useSession();
 
-  const [vehicle, setVehicle] = useState<Vehicle | null>(null);
+  const {
+    vehicle,
+    isLoading: isVehicleLoading,
+    getVehicleDisplayName,
+  } = useVehicle();
+
   const [jobs, setJobs] = useState<Job[]>([]);
   const [fuelEntries, setFuelEntries] = useState<FuelEntry[]>([]);
   const [serviceIntervals, setServiceIntervals] = useState<ServiceInterval[]>(
@@ -77,13 +70,6 @@ export default function VehicleDetailPage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Fetch vehicle
-        const vehicleResponse = await fetch(`/api/vehicles/${vehicleId}`);
-        if (vehicleResponse.ok) {
-          const vehicleData = await vehicleResponse.json();
-          setVehicle(vehicleData);
-        }
-
         // Fetch jobs
         const jobsResponse = await fetch(`/api/vehicles/${vehicleId}/jobs`);
         if (jobsResponse.ok) {
@@ -126,7 +112,7 @@ export default function VehicleDetailPage() {
     return sum;
   }, 0);
 
-  if (loading) {
+  if (loading || isVehicleLoading) {
     return (
       <div className="max-w-6xl mx-auto px-4 py-8">
         <div className="animate-pulse space-y-4">
@@ -152,8 +138,6 @@ export default function VehicleDetailPage() {
     );
   }
 
-  const displayName =
-    vehicle.nickname || `${vehicle.year} ${vehicle.make} ${vehicle.model}`;
   const totalSpent = jobs.reduce((sum, job) => {
     return sum + parseFloat(job.laborCost) + parseFloat(job.totalPartsCost);
   }, 0);
@@ -187,7 +171,7 @@ export default function VehicleDetailPage() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold text-foreground">
-              {displayName}
+              {getVehicleDisplayName()}
             </h1>
             {vehicle.nickname && (
               <p className="text-muted-foreground mt-1">

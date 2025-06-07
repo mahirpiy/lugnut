@@ -10,7 +10,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Vehicle } from "@/lib/interfaces/vehicle";
+import { useVehicle } from "@/context/VehicleContext";
 import { Calendar, Gauge, Plus, Wrench } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
@@ -34,18 +34,16 @@ export default function VehicleJobsPage() {
   const { vehicleId } = useParams();
   const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
-  const [vehicle, setVehicle] = useState<Vehicle | null>(null);
+
+  const {
+    vehicle,
+    isLoading: isVehicleLoading,
+    getVehicleDisplayName,
+  } = useVehicle();
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Fetch vehicle details
-        const vehicleResponse = await fetch(`/api/vehicles/${vehicleId}`);
-        if (vehicleResponse.ok) {
-          const vehicleData = await vehicleResponse.json();
-          setVehicle(vehicleData);
-        }
-
         // Fetch jobs
         const response = await fetch(`/api/vehicles/${vehicleId}/jobs`);
         if (response.ok) {
@@ -65,7 +63,7 @@ export default function VehicleJobsPage() {
     fetchData();
   }, [vehicleId]);
 
-  if (loading) {
+  if (loading || isVehicleLoading) {
     return (
       <div className="max-w-6xl mx-auto px-4 py-8">
         <div className="animate-pulse space-y-4">
@@ -91,20 +89,19 @@ export default function VehicleJobsPage() {
     );
   }
 
-  const displayName =
-    vehicle.nickname || `${vehicle.year} ${vehicle.make} ${vehicle.model}`;
-
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
       <BackToVehicle
         vehicleId={vehicleId as string}
-        displayName={displayName}
+        displayName={getVehicleDisplayName()}
       />
 
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
           <div>
-            <CardTitle>{displayName} - Maintenance History</CardTitle>
+            <CardTitle>
+              {getVehicleDisplayName()} - Maintenance History
+            </CardTitle>
             <CardDescription>
               All maintenance jobs for this vehicle
             </CardDescription>

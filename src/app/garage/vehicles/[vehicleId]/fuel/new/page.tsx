@@ -11,6 +11,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { useVehicle } from "@/context/VehicleContext";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowLeft, Fuel } from "lucide-react";
 import Link from "next/link";
@@ -43,20 +44,10 @@ const fuelEntrySchema = z.object({
 
 type FuelEntryInput = z.infer<typeof fuelEntrySchema>;
 
-interface Vehicle {
-  uuid: string;
-  make: string;
-  model: string;
-  year: number;
-  nickname?: string;
-  currentOdometer: number;
-  initialOdometer: number;
-}
-
 export default function NewFuelEntryPage() {
   const [isLoading, setIsLoading] = useState(false);
+  const { vehicle, getVehicleDisplayName } = useVehicle();
   const [error, setError] = useState("");
-  const [vehicle, setVehicle] = useState<Vehicle | null>(null);
   const router = useRouter();
 
   const { vehicleId } = useParams();
@@ -82,22 +73,8 @@ export default function NewFuelEntryPage() {
 
   // Fetch vehicle data
   useEffect(() => {
-    const fetchVehicle = async () => {
-      try {
-        const response = await fetch(`/api/vehicles/${vehicleId}`);
-        if (response.ok) {
-          const vehicleData = await response.json();
-          setVehicle(vehicleData);
-          setValue("odometer", vehicleData.currentOdometer);
-        }
-      } catch (error) {
-        console.error("Error fetching vehicle:", error);
-        setError("Failed to load vehicle data");
-      }
-    };
-
-    fetchVehicle();
-  }, [vehicleId, setValue]);
+    setValue("odometer", vehicle?.currentOdometer || 0);
+  }, [vehicle, setValue]);
 
   const onSubmit = async (data: FuelEntryInput) => {
     setIsLoading(true);
@@ -139,9 +116,6 @@ export default function NewFuelEntryPage() {
     );
   }
 
-  const displayName =
-    vehicle.nickname || `${vehicle.year} ${vehicle.make} ${vehicle.model}`;
-
   return (
     <div className="max-w-2xl mx-auto px-4 py-8">
       <div className="mb-6">
@@ -150,7 +124,7 @@ export default function NewFuelEntryPage() {
           className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground mb-4"
         >
           <ArrowLeft className="h-4 w-4 mr-1" />
-          Back to {displayName}
+          Back to {getVehicleDisplayName()}
         </Link>
         <div className="flex items-center space-x-3">
           <Fuel className="h-8 w-8 text-stone-600" />
@@ -159,7 +133,7 @@ export default function NewFuelEntryPage() {
               Add Fuel Entry
             </h1>
             <p className="text-muted-foreground">
-              Record a fuel stop for {displayName}
+              Record a fuel stop for {getVehicleDisplayName()}
             </p>
           </div>
         </div>

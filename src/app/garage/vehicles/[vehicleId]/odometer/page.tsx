@@ -3,8 +3,8 @@
 import OdometerTile from "@/components/odometer/odometer-tile";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useVehicle } from "@/context/VehicleContext";
 import { OdometerEntry } from "@/lib/interfaces/odometer-entry";
-import { Vehicle } from "@/lib/interfaces/vehicle";
 import { ArrowLeft, Car, Gauge, Plus } from "lucide-react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
@@ -14,20 +14,13 @@ import { useEffect, useState } from "react";
 export default function OdometerPage() {
   const { vehicleId } = useParams();
   const { data: session } = useSession();
-  const [vehicle, setVehicle] = useState<Vehicle | null>(null);
+  const { vehicle, getVehicleDisplayName } = useVehicle();
   const [entries, setEntries] = useState<OdometerEntry[] | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Fetch vehicle
-        const vehicleResponse = await fetch(`/api/vehicles/${vehicleId}`);
-        if (vehicleResponse.ok) {
-          const vehicleData = await vehicleResponse.json();
-          setVehicle(vehicleData);
-        }
-
         // Fetch job details
         const odometerResponse = await fetch(
           `/api/vehicles/${vehicleId}/odometer`
@@ -78,9 +71,6 @@ export default function OdometerPage() {
     );
   }
 
-  const displayName =
-    vehicle.nickname || `${vehicle.year} ${vehicle.make} ${vehicle.model}`;
-
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
       {/* Header */}
@@ -90,14 +80,13 @@ export default function OdometerPage() {
           className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground mb-4"
         >
           <ArrowLeft className="h-4 w-4 mr-1" />
-          Back to {displayName}
+          Back to {getVehicleDisplayName()}
         </Link>
         <div className="flex items-center space-x-3">
           <Car className="h-8 w-8 text-muted-foreground" />
           <div>
             <h1 className="text-2xl font-bold text-foreground">
-              {vehicle.nickname ||
-                `${vehicle.year} ${vehicle.make} ${vehicle.model}`}
+              {getVehicleDisplayName()}
             </h1>
           </div>
         </div>
