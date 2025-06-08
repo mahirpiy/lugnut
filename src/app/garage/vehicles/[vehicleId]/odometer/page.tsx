@@ -1,19 +1,17 @@
 "use client";
 
-import OdometerTile from "@/components/odometer/odometer-tile";
+import { OdometerChart } from "@/components/charts/odometer-chart";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { useVehicle } from "@/context/VehicleContext";
 import { OdometerEntry } from "@/lib/interfaces/odometer-entry";
-import { ArrowLeft, Car, Gauge, Plus } from "lucide-react";
-import { useSession } from "next-auth/react";
+import { ArrowLeft, Car } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function OdometerPage() {
   const { vehicleId } = useParams();
-  const { data: session } = useSession();
   const { vehicle, getVehicleDisplayName } = useVehicle();
   const [entries, setEntries] = useState<OdometerEntry[] | null>(null);
   const [loading, setLoading] = useState(true);
@@ -93,32 +91,7 @@ export default function OdometerPage() {
       </div>
 
       {/* Odometer Entries */}
-      <Card className="mb-8">
-        <CardHeader>
-          <CardTitle className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <Gauge className="h-5 w-5" />
-              <span>Odometer History</span>
-            </div>
-            {session?.user?.hasActiveSubscription && (
-              <Button asChild size="sm">
-                <Link href={`/garage/vehicles/${vehicleId}/odometer/new`}>
-                  <Plus className="h-4 w-4 mr-2" />
-                  Add Reading
-                </Link>
-              </Button>
-            )}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {entries &&
-              entries.map((entry) => (
-                <OdometerTile key={entry.id} entry={entry} />
-              ))}
-          </div>
-        </CardContent>
-      </Card>
+      {entries && <OdometerChart entries={entries} />}
     </div>
   );
 }

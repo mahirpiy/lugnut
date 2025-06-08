@@ -1,24 +1,29 @@
-import { OdometerEntry } from "@/lib/interfaces/odometer-entry";
 import { Fuel, Gauge, Gift, Wrench } from "lucide-react";
 
 interface OdometerEntryProps {
-  entry: OdometerEntry;
+  date: string;
+  odometer: number;
+  type: "reading" | "fueling" | "initial" | "job";
 }
 
-export default function OdometerTile({ entry }: OdometerEntryProps) {
+export default function OdometerTile({
+  date,
+  odometer,
+  type,
+}: OdometerEntryProps) {
   return (
     <div
-      key={`${entry.id}-${entry.odometer}`}
+      key={`${date}-${odometer}`}
       className="flex items-center justify-between p-4 bg-muted-foreground rounded-lg"
     >
       <div className="flex items-center space-x-3">
-        {getIcon(entry.type)}
+        {getIcon(type)}
         <div>
           <p className="font-medium text-background">
-            {entry.odometer.toLocaleString()} miles
+            {odometer.toLocaleString()} miles
           </p>
           <p className="text-sm text-background">
-            {new Date(entry.entryDate).toLocaleDateString("en-US", {
+            {new Date(date).toLocaleDateString("en-US", {
               month: "long",
               day: "numeric",
               year: "numeric",

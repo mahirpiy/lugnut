@@ -6,6 +6,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { formatDate } from "@/utils/date";
 import { useEffect, useState } from "react";
 
 interface Record {
@@ -73,14 +74,6 @@ export function LinkRecordsModal({
       newSelected.add(recordId);
     }
     setSelectedRecords(newSelected);
-  };
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
   };
 
   const handleLink = async () => {

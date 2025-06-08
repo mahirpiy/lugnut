@@ -173,7 +173,7 @@ export default function JobDetailPage() {
                   Work Type
                 </p>
                 <p className="font-semibold">
-                  {job.isDiy ? "DIY" : job.shopName || "Shop Work"}
+                  {job.isDiy ? "DIY" : "Shop Work"}
                 </p>
                 {!job.isDiy && job.shopName && (
                   <p className="text-xs text-muted-foreground">
