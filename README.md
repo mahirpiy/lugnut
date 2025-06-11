@@ -21,10 +21,9 @@ Lugnut is a tool for managing your vehicle maintenance records. I built it becau
 ### Future Plans
 
 1. Data export -- I hate apps that don't let me export my data
-1. I wanna make money so I'll probs set up a subscription model
-1. In the name of making money, might as well add some ads for Rock Auto or local shops
+1. Stripe subscription model
 
 ### Long Shot Features
 
 1. Integration with OBD2 scanners
-2. Something AI because its the future
+2. An AI mechanic feature
